@@ -1900,43 +1900,156 @@ export async function sendTestNotificationLog(channel, recipient, actor) {
   }, actor);
 }
 
+export function normalizeAccountingInvoice(inv) {
+  const subtotal = Number(inv.subtotal ?? inv.subtotalExclVat ?? 0);
+  const discountTotal = Number(inv.discountTotal ?? 0);
+  const netExclVat = Number(inv.netExclVat ?? inv.netMatrah ?? Math.max(subtotal - discountTotal, 0));
+  const vatRate = Number(inv.vatRate ?? 20);
+  const vatAmount = Number(inv.vatAmount ?? ((netExclVat * vatRate) / 100));
+  let withholdingRate = inv.withholdingRate || 'Yok';
+  let withholdingNumer = Number(inv.withholdingNumerator ?? 0);
+  if ((!inv.withholdingRate || inv.withholdingRate === 'Yok') && withholdingNumer > 0) {
+    withholdingRate = `${withholdingNumer}/10`;
+  } else if (typeof withholdingRate === 'string' && withholdingRate.includes('/')) {
+    const parsed = Number(withholdingRate.split('/')[0]);
+    if (Number.isFinite(parsed) && parsed > 0) withholdingNumer = parsed;
+  }
+  const withholdingAmount = Number(inv.withholdingAmount ?? (withholdingNumer > 0 ? (vatAmount * withholdingNumer) / 10 : 0));
+  const payableVat = Number(inv.payableVat ?? Math.max(vatAmount - withholdingAmount, 0));
+  const grandTotal = Number(inv.grandTotal ?? (netExclVat + payableVat));
+  const currency = String(inv.currency || 'TRY').toUpperCase();
+  const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(inv.exchangeRate || 1), 0.0001);
+  const grandTotalTry = Number(inv.grandTotalTry ?? (grandTotal * exchangeRate));
+  const paidAmountTry = Number(inv.paidAmountTry ?? (Number(inv.paidAmount || 0) * exchangeRate));
+  const remainingAmountTry = Number(inv.remainingAmountTry ?? Math.max(grandTotalTry - paidAmountTry, 0));
+
+  return {
+    ...inv,
+    companyName: inv.companyName || inv.partyName || 'İsimsiz Cari',
+    partyName: inv.partyName || inv.companyName || 'İsimsiz Cari',
+    docCategory: inv.docCategory || inv.eDocumentType || 'E-FATURA',
+    eDocumentType: inv.eDocumentType || inv.docCategory || 'E-FATURA',
+    orderId: inv.orderId || inv.linkedOrderId || '',
+    linkedOrderId: inv.linkedOrderId || inv.orderId || '',
+    orderNo: inv.orderNo || inv.linkedOrderNo || '',
+    contactEmail: inv.contactEmail || '',
+    subtotal,
+    subtotalExclVat: subtotal,
+    discountTotal,
+    netExclVat,
+    netMatrah: netExclVat,
+    vatRate,
+    vatAmount,
+    withholdingRate,
+    withholdingNumerator: withholdingNumer,
+    withholdingAmount,
+    payableVat,
+    grandTotal,
+    currency,
+    exchangeRate,
+    grandTotalTry,
+    paidAmountTry,
+    remainingAmountTry,
+    paymentStatus: inv.paymentStatus || (remainingAmountTry <= 0 && grandTotalTry > 0 ? 'Ödendi' : paidAmountTry > 0 ? 'Kısmi Ödeme' : 'Ödeme Bekliyor')
+  };
+}
+
+export function normalizeAccountingTransaction(trx) {
+  const direction = String(trx.direction || trx.trxType || 'TAHSILAT').toUpperCase();
+  const currency = String(trx.currency || 'TRY').toUpperCase();
+  const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(trx.exchangeRate || 1), 0.0001);
+  const amount = Number(trx.amount || 0);
+  const amountTry = Number(trx.amountTry ?? (amount * exchangeRate));
+  return {
+    ...trx,
+    direction,
+    trxType: direction,
+    companyName: trx.companyName || trx.partyName || 'Genel Cari',
+    partyName: trx.partyName || trx.companyName || 'Genel Cari',
+    invoiceId: trx.invoiceId || trx.linkedInvoiceId || '',
+    linkedInvoiceId: trx.linkedInvoiceId || trx.invoiceId || '',
+    invoiceNo: trx.invoiceNo || trx.linkedInvoiceNo || '',
+    linkedInvoiceNo: trx.linkedInvoiceNo || trx.invoiceNo || '',
+    notes: trx.notes || trx.description || '',
+    description: trx.description || trx.notes || '',
+    currency,
+    exchangeRate,
+    amount,
+    amountTry
+  };
+}
+
+export function normalizeChequeOrNote(chq) {
+  const currency = String(chq.currency || 'TRY').toUpperCase();
+  const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(chq.exchangeRate || 1), 0.0001);
+  const amount = Number(chq.amount || 0);
+  const amountTry = Number(chq.amountTry ?? (amount * exchangeRate));
+  const portfolioNo = chq.portfolioNo || chq.instrumentNo || `PRT-${(chq.id || '').slice(0, 6).toUpperCase()}`;
+  const maturityDate = chq.maturityDate || chq.dueDate || '';
+  return {
+    ...chq,
+    portfolioNo,
+    instrumentNo: portfolioNo,
+    serialNumber: chq.serialNumber || chq.instrumentNo || portfolioNo,
+    companyName: chq.companyName || chq.drawerName || 'İsimsiz Keşideci',
+    drawerName: chq.drawerName || chq.companyName || 'İsimsiz Keşideci',
+    maturityDate,
+    dueDate: maturityDate,
+    currency,
+    exchangeRate,
+    amount,
+    amountTry
+  };
+}
+
 export async function saveAccountingInvoice(invoiceData, actor) {
   if (!db) throw new Error('Veritabanı bağlantısı yok.');
   if (!hasPermission(actor?.role, 'manage_accounting')) {
     throw new Error('Fatura oluşturma ve düzenleme yetkiniz bulunmuyor.');
   }
 
-  const partyName = String(invoiceData.partyName || '').trim();
+  const partyName = String(invoiceData.partyName || invoiceData.companyName || '').trim();
   if (!partyName || partyName.length < 2) {
     throw new Error('Cari ünvanı (Müşteri veya Tedarikçi) zorunludur.');
   }
 
   const nowIso = new Date().toISOString();
   const invoiceType = String(invoiceData.invoiceType || 'SATIS').toUpperCase();
-  const eDocumentType = String(invoiceData.eDocumentType || 'E-FATURA').toUpperCase();
+  const eDocumentType = String(invoiceData.docCategory || invoiceData.eDocumentType || 'E-FATURA').toUpperCase();
   const currency = String(invoiceData.currency || 'TRY').toUpperCase();
   const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(invoiceData.exchangeRate || 1), 0.0001);
 
-  const subtotalExclVat = Math.max(Number(invoiceData.subtotalExclVat || 0), 0);
+  const subtotalExclVat = Math.max(Number(invoiceData.subtotal ?? invoiceData.subtotalExclVat ?? 0), 0);
   const discountTotal = Math.max(Number(invoiceData.discountTotal || 0), 0);
   const netMatrah = Math.max(subtotalExclVat - discountTotal, 0);
   const vatRate = Math.max(Number(invoiceData.vatRate ?? 20), 0);
   const rawVat = Number(((netMatrah * vatRate) / 100).toFixed(2));
 
-  // KDV Tevkifatı (Örn: 0, 2, 5, 7, 9 -> X/10)
-  const withholdingNumer = Math.min(Math.max(Number(invoiceData.withholdingNumerator || 0), 0), 10);
+  // KDV Tevkifatı (Örn: '2/10', '5/10', 'Yok' veya 0, 2, 5, 7, 9 -> X/10)
+  let withholdingNumer = Number(invoiceData.withholdingNumerator ?? 0);
+  const rawWithholdingStr = String(invoiceData.withholdingRate || '').trim();
+  if (!withholdingNumer && rawWithholdingStr.includes('/')) {
+    const parsed = Number(rawWithholdingStr.split('/')[0]);
+    if (Number.isFinite(parsed) && parsed > 0) withholdingNumer = parsed;
+  }
+  withholdingNumer = Math.min(Math.max(withholdingNumer, 0), 10);
+  const withholdingRate = withholdingNumer > 0 ? `${withholdingNumer}/10` : 'Yok';
   const withholdingAmount = withholdingNumer > 0 ? Number(((rawVat * withholdingNumer) / 10).toFixed(2)) : 0;
   const payableVat = Number((rawVat - withholdingAmount).toFixed(2));
   const grandTotal = Number((netMatrah + payableVat).toFixed(2));
   const grandTotalTry = Number((grandTotal * exchangeRate).toFixed(2));
-  const paidAmountTry = Math.max(Number(invoiceData.paidAmountTry || 0), 0);
+
+  const rawPaidTry = invoiceData.paidAmountTry !== undefined && invoiceData.paidAmountTry !== null
+    ? Number(invoiceData.paidAmountTry)
+    : Number(invoiceData.paidAmount || 0) * exchangeRate;
+  const paidAmountTry = Math.max(Number(rawPaidTry.toFixed(2)), 0);
   const remainingAmountTry = Math.max(Number((grandTotalTry - paidAmountTry).toFixed(2)), 0);
 
-  let paymentStatus = 'Bekliyor';
+  let paymentStatus = invoiceData.paymentStatus || 'Ödeme Bekliyor';
   if (paidAmountTry >= grandTotalTry && grandTotalTry > 0) {
     paymentStatus = 'Ödendi';
   } else if (paidAmountTry > 0) {
-    paymentStatus = 'Kısmi Ödendi';
+    paymentStatus = 'Kısmi Ödeme';
   } else if (invoiceData.dueDate && new Date(invoiceData.dueDate).getTime() < Date.now()) {
     paymentStatus = 'Vadesi Geçti';
   }
@@ -1946,32 +2059,44 @@ export async function saveAccountingInvoice(invoiceData, actor) {
     `ELF${new Date().getFullYear()}${String(Date.now()).slice(-6)}`
   ).trim();
 
+  const linkedOrderId = optStr(invoiceData.orderId || invoiceData.linkedOrderId, 120) || '';
+  const linkedOrderNo = optStr(invoiceData.orderNo || invoiceData.linkedOrderNo, 120) || '';
+
   const payload = {
     invoiceNo: invoiceNo.slice(0, 95),
     invoiceType,
     eDocumentType,
+    docCategory: eDocumentType,
     partyType: invoiceType === 'ALIS' ? 'SUPPLIER' : 'CUSTOMER',
     partyName: partyName.slice(0, 240),
+    companyName: partyName.slice(0, 240),
+    contactEmail: optStr(invoiceData.contactEmail, 160) || '',
     taxOffice: optStr(invoiceData.taxOffice, 140) || '',
     taxNumber: optStr(invoiceData.taxNumber, 45) || '',
     issueDate: String(invoiceData.issueDate || nowIso.slice(0, 10)),
     dueDate: String(invoiceData.dueDate || nowIso.slice(0, 10)),
     currency,
     exchangeRate,
+    subtotal: subtotalExclVat,
     subtotalExclVat,
     discountTotal,
+    netExclVat: netMatrah,
     netMatrah,
     vatRate,
     vatAmount: rawVat,
+    withholdingRate,
     withholdingNumerator: withholdingNumer,
     withholdingAmount,
     payableVat,
     grandTotal,
     grandTotalTry,
+    paidAmount: Number((paidAmountTry / exchangeRate).toFixed(2)),
     paidAmountTry,
     remainingAmountTry,
     paymentStatus,
-    linkedOrderId: optStr(invoiceData.linkedOrderId, 120) || '',
+    orderId: linkedOrderId,
+    linkedOrderId,
+    orderNo: linkedOrderNo,
     description: optStr(invoiceData.description, 1500) || '',
     notes: optStr(invoiceData.notes, 4000) || '',
     updatedByEmail: actor?.email || actor?.uid || '',
@@ -1992,9 +2117,9 @@ export async function saveAccountingInvoice(invoiceData, actor) {
   }
 
   // Eğer onaylı bir siparişten faturalandıysa siparişi "Faturalandı" olarak işaretle
-  if (payload.linkedOrderId) {
+  if (linkedOrderId) {
     try {
-      await updateDoc(doc(db, COLLECTIONS.ORDERS, payload.linkedOrderId), {
+      await updateDoc(doc(db, COLLECTIONS.ORDERS, linkedOrderId), {
         status: 'Faturalandı',
         fulfillmentStatus: 'Faturalandı',
         linkedInvoiceNo: payload.invoiceNo,
@@ -2006,7 +2131,7 @@ export async function saveAccountingInvoice(invoiceData, actor) {
     }
   }
 
-  return { id: docId, ...payload };
+  return normalizeAccountingInvoice({ id: docId, ...payload });
 }
 
 export async function saveAccountingTransaction(trxData, actor) {
@@ -2021,28 +2146,37 @@ export async function saveAccountingTransaction(trxData, actor) {
   }
 
   const nowIso = new Date().toISOString();
-  const trxType = String(trxData.trxType || 'TAHSILAT').toUpperCase();
+  const trxType = String(trxData.direction || trxData.trxType || 'TAHSILAT').toUpperCase();
   const currency = String(trxData.currency || 'TRY').toUpperCase();
   const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(trxData.exchangeRate || 1), 0.0001);
   const amountTry = Number((amount * exchangeRate).toFixed(2));
   const trxNo = String(trxData.trxNo || `FIN-${Date.now().toString().slice(-6)}`).trim();
+  const partyName = String(trxData.companyName || trxData.partyName || 'Genel Cari').trim().slice(0, 240);
+  const linkedInvoiceId = optStr(trxData.invoiceId || trxData.linkedInvoiceId, 120) || '';
+  const linkedInvoiceNo = optStr(trxData.invoiceNo || trxData.linkedInvoiceNo, 100) || '';
+  const notesText = optStr(trxData.notes || trxData.description, 2000) || '';
 
   const payload = {
     trxNo: trxNo.slice(0, 90),
     trxType,
+    direction: trxType,
     category: String(trxData.category || 'Müşteri Tahsilatı').slice(0, 140),
-    paymentMethod: String(trxData.paymentMethod || 'Banka Havale/EFT').slice(0, 95),
-    accountName: String(trxData.accountName || 'Merkez TL Banka Hesabı').slice(0, 140),
-    partyName: String(trxData.partyName || 'Genel Cari').slice(0, 240),
-    linkedInvoiceId: optStr(trxData.linkedInvoiceId, 120) || '',
-    linkedInvoiceNo: optStr(trxData.linkedInvoiceNo, 100) || '',
+    paymentMethod: String(trxData.paymentMethod || 'Banka Havale / EFT').slice(0, 95),
+    accountName: String(trxData.accountName || 'Merkez TL Kasa').slice(0, 140),
+    partyName,
+    companyName: partyName,
+    invoiceId: linkedInvoiceId,
+    linkedInvoiceId,
+    invoiceNo: linkedInvoiceNo,
+    linkedInvoiceNo,
     currency,
     exchangeRate,
     amount,
     amountTry,
     transactionDate: String(trxData.transactionDate || nowIso.slice(0, 10)),
     referenceNo: optStr(trxData.referenceNo, 100) || '',
-    description: optStr(trxData.description, 2000) || '',
+    description: notesText,
+    notes: notesText,
     createdByEmail: actor?.email || actor?.uid || '',
     createdAt: serverTimestamp(),
     createdAtIso: nowIso,
@@ -2054,16 +2188,16 @@ export async function saveAccountingTransaction(trxData, actor) {
   await writeAuditLog('CREATE_ACCOUNTING_TRX', COLLECTIONS.ACCOUNTING_TRANSACTIONS, ref.id, { trxNo, trxType, amountTry }, actor);
 
   // Eğer bir faturaya bağlı tahsilat/tediye ise ilgili faturanın ödenen tutarını güncelle
-  if (payload.linkedInvoiceId) {
+  if (linkedInvoiceId) {
     try {
-      const invRef = doc(db, COLLECTIONS.ACCOUNTING_INVOICES, payload.linkedInvoiceId);
+      const invRef = doc(db, COLLECTIONS.ACCOUNTING_INVOICES, linkedInvoiceId);
       const invSnap = await getDoc(invRef);
       if (invSnap.exists()) {
         const inv = invSnap.data();
         const newPaid = Number((Number(inv.paidAmountTry || 0) + amountTry).toFixed(2));
         const totalTry = Number(inv.grandTotalTry || inv.grandTotal || 0);
         const newRem = Math.max(Number((totalTry - newPaid).toFixed(2)), 0);
-        const newStatus = newPaid >= totalTry && totalTry > 0 ? 'Ödendi' : 'Kısmi Ödendi';
+        const newStatus = newPaid >= totalTry && totalTry > 0 ? 'Ödendi' : 'Kısmi Ödeme';
         await updateDoc(invRef, {
           paidAmountTry: newPaid,
           remainingAmountTry: newRem,
@@ -2077,7 +2211,7 @@ export async function saveAccountingTransaction(trxData, actor) {
     }
   }
 
-  return { id: ref.id, ...payload };
+  return normalizeAccountingTransaction({ id: ref.id, ...payload });
 }
 
 export async function saveChequeOrNote(instrumentData, actor) {
@@ -2086,7 +2220,7 @@ export async function saveChequeOrNote(instrumentData, actor) {
     throw new Error('Çek ve senet kaydetme yetkiniz bulunmuyor.');
   }
 
-  const drawerName = String(instrumentData.drawerName || '').trim();
+  const drawerName = String(instrumentData.companyName || instrumentData.drawerName || '').trim();
   const amount = Number(instrumentData.amount || 0);
   if (!drawerName || drawerName.length < 2) {
     throw new Error('Keşideci / Cari ünvanı zorunludur.');
@@ -2099,15 +2233,21 @@ export async function saveChequeOrNote(instrumentData, actor) {
   const currency = String(instrumentData.currency || 'TRY').toUpperCase();
   const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(instrumentData.exchangeRate || 1), 0.0001);
   const amountTry = Number((amount * exchangeRate).toFixed(2));
-  const instrumentNo = String(instrumentData.instrumentNo || `CEK-${Date.now().toString().slice(-6)}`).trim();
+  const portfolioNo = String(instrumentData.portfolioNo || instrumentData.instrumentNo || `PRT-${new Date().getFullYear()}-${Date.now().toString().slice(-4)}`).trim();
+  const serialNumber = String(instrumentData.serialNumber || portfolioNo).trim();
+  const maturityDate = String(instrumentData.maturityDate || instrumentData.dueDate || nowIso.slice(0, 10));
 
   const payload = {
-    instrumentNo: instrumentNo.slice(0, 90),
+    portfolioNo: portfolioNo.slice(0, 90),
+    instrumentNo: portfolioNo.slice(0, 90),
+    serialNumber: serialNumber.slice(0, 90),
     instrumentType: String(instrumentData.instrumentType || 'MUSTERI_CEKI').slice(0, 55),
+    companyName: drawerName.slice(0, 240),
     drawerName: drawerName.slice(0, 240),
     bankName: String(instrumentData.bankName || '').slice(0, 140),
     branchName: String(instrumentData.branchName || '').slice(0, 120),
-    dueDate: String(instrumentData.dueDate || nowIso.slice(0, 10)),
+    maturityDate,
+    dueDate: maturityDate,
     currency,
     exchangeRate,
     amount,
@@ -2123,8 +2263,8 @@ export async function saveChequeOrNote(instrumentData, actor) {
   };
 
   const ref = await addDoc(collection(db, COLLECTIONS.CHEQUES_AND_NOTES), payload);
-  await writeAuditLog('CREATE_CHEQUE_NOTE', COLLECTIONS.CHEQUES_AND_NOTES, ref.id, { instrumentNo, amountTry }, actor);
-  return { id: ref.id, ...payload };
+  await writeAuditLog('CREATE_CHEQUE_NOTE', COLLECTIONS.CHEQUES_AND_NOTES, ref.id, { instrumentNo: portfolioNo, amountTry }, actor);
+  return normalizeChequeOrNote({ id: ref.id, ...payload });
 }
 
 export async function updateChequeOrNoteStatus(instrumentId, newStatus, endorsedTo, actor) {
@@ -2295,9 +2435,9 @@ export async function loadAdminAllData() {
     inventoryMovements,
     suppliers,
     rawServices,
-    accountingInvoices,
-    accountingTransactions,
-    chequesAndNotes,
+    rawAccountingInvoices,
+    rawAccountingTransactions,
+    rawChequesAndNotes,
     users,
     auditLogs,
     settings
@@ -2401,6 +2541,10 @@ export async function loadAdminAllData() {
     nextServiceDate: s.nextServiceDate || s.nextPlannedDate || '',
     technicianNotes: s.technicianNotes || s.actionsTaken || s.faultDescription || ''
   }));
+
+  const accountingInvoices = rawAccountingInvoices.map(normalizeAccountingInvoice);
+  const accountingTransactions = rawAccountingTransactions.map(normalizeAccountingTransaction);
+  const chequesAndNotes = rawChequesAndNotes.map(normalizeChequeOrNote);
 
   return {
     crmRequests,

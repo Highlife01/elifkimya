@@ -107,6 +107,10 @@ export function renderAdminPage(container, navigate) {
   let store = null;
   let dashboardDateDays = 0; // 0 = Tümü
   let dashboardInboxTab = 'all'; // 'all' | 'orders_quotes' | 'contacts' | 'unread'
+  let dashboardInboxSearch = '';
+  let lastSyncedTimeStr = '';
+  let isSyncingStore = false;
+  let lastInboxSignature = '';
   let dashPreset = null;
   let dashScrollOnce = false;
   let crmFocusId = '';
@@ -123,6 +127,66 @@ export function renderAdminPage(container, navigate) {
   let pendingProposalSeed = null;
   let accountingTab = 'overview'; // 'overview' | 'invoices' | 'cashbank' | 'cheques' | 'ledger'
   let accountingInvoiceFilter = 'all'; // 'all' | 'SATIS' | 'ALIS' | 'OVERDUE'
+
+  function computeCrmSignature(list) {
+    if (!Array.isArray(list)) return '';
+    return list
+      .map((r) => `${r.id}:${r.stage || ''}:${r.resolutionStatus || 'active'}:${r.updatedAtIso || r.createdAtIso || ''}`)
+      .join('|');
+  }
+
+  function getModuleBadgeCounts() {
+    return {
+      crm: store ? store.crmRequests.filter((r) => (r.resolutionStatus || 'active') === 'active').length : 0,
+      products: store ? store.products.length : 0,
+      documents: store ? store.documents.length : 0,
+      projects: store ? store.projects.length : 0,
+      proposals: store ? store.proposals.length : 0,
+      orders: store ? store.orders.length : 0,
+      accounting: store ? (store.accountingInvoices?.length || 0) + (store.chequesAndNotes?.length || 0) : 0,
+      service: store ? store.serviceRecords.length : 0
+    };
+  }
+
+  function syncShellChrome() {
+    const counts = getModuleBadgeCounts();
+    container.querySelectorAll('.admin-nav-btn').forEach((btn) => {
+      const modId = btn.getAttribute('data-module');
+      btn.classList.toggle('active', modId === activeModule);
+      const badgeEl = btn.querySelector('.admin-nav-badge[data-badge-key]');
+      if (badgeEl) {
+        const key = badgeEl.getAttribute('data-badge-key');
+        badgeEl.textContent = String(counts[key] || 0);
+      }
+    });
+    const refreshBtn = container.querySelector('#admin-refresh-btn');
+    if (refreshBtn) {
+      refreshBtn.disabled = isSyncingStore;
+      refreshBtn.textContent = isSyncingStore ? 'Senkronize Ediliyor...' : '↻ Verileri Yenile';
+    }
+    const syncMetaEl = container.querySelector('#admin-sync-status');
+    if (syncMetaEl) {
+      syncMetaEl.textContent = isSyncingStore
+        ? 'Canlı veritabanı senkronize ediliyor...'
+        : (lastSyncedTimeStr ? `Son senkron: ${lastSyncedTimeStr} (Canlı)` : 'Canlı bağlantı aktif');
+    }
+  }
+
+  function upsertCrmRequestInStore(updatedRecord) {
+    if (!store || !updatedRecord || !updatedRecord.id) return;
+    const list = Array.isArray(store.crmRequests) ? [...store.crmRequests] : [];
+    const idx = list.findIndex((r) => r.id === updatedRecord.id);
+    if (idx >= 0) {
+      list[idx] = { ...list[idx], ...updatedRecord };
+    } else {
+      list.unshift(updatedRecord);
+    }
+    list.sort((a, b) => new Date(b.createdAtIso || 0).getTime() - new Date(a.createdAtIso || 0).getTime());
+    store.crmRequests = list;
+    lastInboxSignature = computeCrmSignature(store.crmRequests);
+    lastSyncedTimeStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    syncShellChrome();
+  }
 
   function getInboundChannelMeta(req) {
     const ch = String(req?.formChannel || '').toLowerCase();
@@ -217,14 +281,22 @@ export function renderAdminPage(container, navigate) {
   }
 
   async function refreshStoreAndRender() {
+    if (isSyncingStore) return;
+    isSyncingStore = true;
+    syncShellChrome();
     const mainArea = container.querySelector('#admin-module-content');
     if (mainArea && !store) {
       renderSafeHtml(mainArea, `<div class="loading-banner">İzole <strong>${escapeHtml(DATABASE_ID)}</strong> veritabanından gerçek kayıtlar yükleniyor...</div>`);
     }
     try {
       store = await loadAdminAllData();
+      lastInboxSignature = computeCrmSignature(store?.crmRequests);
+      lastSyncedTimeStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      isSyncingStore = false;
       renderShell();
     } catch (err) {
+      isSyncingStore = false;
+      syncShellChrome();
       showNotification(err.message || 'Veriler yüklenirken hata oluştu.', 'error');
     }
   }
@@ -260,76 +332,75 @@ export function renderAdminPage(container, navigate) {
       return;
     }
 
-    const counts = {
-      crm: store ? store.crmRequests.filter((r) => (r.resolutionStatus || 'active') === 'active').length : 0,
-      products: store ? store.products.length : 0,
-      documents: store ? store.documents.length : 0,
-      projects: store ? store.projects.length : 0,
-      proposals: store ? store.proposals.length : 0,
-      orders: store ? store.orders.length : 0,
-      accounting: store ? (store.accountingInvoices?.length || 0) + (store.chequesAndNotes?.length || 0) : 0,
-      service: store ? store.serviceRecords.length : 0
-    };
-
-    const shellHtml = `
-      <div class="admin-layout">
-        <!-- Sol Menü -->
-        <aside class="admin-sidebar">
-          <div class="admin-sidebar-brand">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <strong>ELİF KİMYA ERP</strong>
-              <span class="badge badge-teal">DB: ${escapeHtml(DATABASE_ID)}</span>
+    const shellKey = `${currentUser.uid || currentUser.email}:${currentProfile.role}`;
+    const existingShell = container.querySelector('.admin-layout');
+    if (!existingShell || existingShell.getAttribute('data-shell-key') !== shellKey) {
+      const counts = getModuleBadgeCounts();
+      const shellHtml = `
+        <div class="admin-layout" data-shell-key="${escapeAttr(shellKey)}">
+          <!-- Sol Menü -->
+          <aside class="admin-sidebar">
+            <div class="admin-sidebar-brand">
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <strong>ELİF KİMYA ERP</strong>
+                <span class="badge badge-teal">DB: ${escapeHtml(DATABASE_ID)}</span>
+              </div>
+              <div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.35rem;">
+                ${escapeHtml(currentProfile.displayName || currentUser.email)} — <strong>${escapeHtml(ROLE_LABELS[currentProfile.role] || currentProfile.role)}</strong>
+              </div>
+              <div id="admin-sync-status" class="admin-sync-meta">
+                ${escapeHtml(lastSyncedTimeStr ? `Son senkron: ${lastSyncedTimeStr} (Canlı)` : 'Canlı bağlantı aktif')}
+              </div>
             </div>
-            <div style="font-size:0.78rem;color:var(--text-secondary);margin-top:0.35rem;">
-              ${escapeHtml(currentProfile.displayName || currentUser.email)} — <strong>${escapeHtml(ROLE_LABELS[currentProfile.role] || currentProfile.role)}</strong>
-            </div>
-          </div>
 
-          <nav class="admin-nav-list">
-            ${ADMIN_MODULES.map((m) => `
-              <button type="button" class="admin-nav-btn ${activeModule === m.id ? 'active' : ''}" data-module="${escapeAttr(m.id)}">
-                <span>${escapeHtml(m.label)}</span>
-                ${m.badgeKey ? `<span class="admin-nav-badge">${counts[m.badgeKey] || 0}</span>` : ''}
+            <nav class="admin-nav-list">
+              ${ADMIN_MODULES.map((m) => `
+                <button type="button" class="admin-nav-btn ${activeModule === m.id ? 'active' : ''}" data-module="${escapeAttr(m.id)}">
+                  <span>${escapeHtml(m.label)}</span>
+                  ${m.badgeKey ? `<span class="admin-nav-badge" data-badge-key="${escapeAttr(m.badgeKey)}">${counts[m.badgeKey] || 0}</span>` : ''}
+                </button>
+              `).join('')}
+            </nav>
+
+            <div class="admin-sidebar-footer">
+              <button type="button" class="btn btn-secondary btn-sm" id="admin-refresh-btn" style="width:100%;margin-bottom:0.5rem;">
+                ↻ Verileri Yenile
               </button>
-            `).join('')}
-          </nav>
-
-          <div class="admin-sidebar-footer">
-            <button type="button" class="btn btn-secondary btn-sm" id="admin-refresh-btn" style="width:100%;margin-bottom:0.5rem;">
-              Verileri Yenile
-            </button>
-            <div style="display:flex;gap:0.5rem;">
-              <a href="/" class="btn btn-secondary btn-sm" id="admin-home-btn" style="flex:1;text-align:center;">Siteyi Aç</a>
-              <button type="button" class="btn btn-secondary btn-sm" id="admin-logout-btn" style="flex:1;">Çıkış</button>
+              <div style="display:flex;gap:0.5rem;">
+                <a href="/" class="btn btn-secondary btn-sm" id="admin-home-btn" style="flex:1;text-align:center;">Siteyi Aç</a>
+                <button type="button" class="btn btn-secondary btn-sm" id="admin-logout-btn" style="flex:1;">Çıkış</button>
+              </div>
             </div>
+          </aside>
+
+          <!-- Sağ İçerik Alanı -->
+          <div class="admin-main">
+            <div id="admin-module-content"></div>
           </div>
-        </aside>
-
-        <!-- Sağ İçerik Alanı -->
-        <div class="admin-main">
-          <div id="admin-module-content"></div>
         </div>
-      </div>
-    `;
+      `;
 
-    renderSafeHtml(container, shellHtml);
+      renderSafeHtml(container, shellHtml);
 
-    container.querySelectorAll('.admin-nav-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        clearDashPreset();
-        activeModule = btn.getAttribute('data-module') || 'dashboard';
-        renderShell();
+      container.querySelectorAll('.admin-nav-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          clearDashPreset();
+          activeModule = btn.getAttribute('data-module') || 'dashboard';
+          renderShell();
+        });
       });
-    });
 
-    container.querySelector('#admin-refresh-btn')?.addEventListener('click', refreshStoreAndRender);
-    container.querySelector('#admin-home-btn')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      navigate('/');
-    });
-    container.querySelector('#admin-logout-btn')?.addEventListener('click', async () => {
-      await logoutCurrentUser();
-    });
+      container.querySelector('#admin-refresh-btn')?.addEventListener('click', refreshStoreAndRender);
+      container.querySelector('#admin-home-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('/');
+      });
+      container.querySelector('#admin-logout-btn')?.addEventListener('click', async () => {
+        await logoutCurrentUser();
+      });
+    } else {
+      syncShellChrome();
+    }
 
     const contentBox = container.querySelector('#admin-module-content');
     if (!store) {
@@ -487,12 +558,19 @@ export function renderAdminPage(container, navigate) {
     const contactAndCallbackInbox = crmList.filter((r) => !getInboundChannelMeta(r).isOrderOrQuote);
     const unreadInbox = crmList.filter((r) => (r.resolutionStatus || 'active') === 'active' && r.stage === 'Yeni Talep');
 
-    const visibleInboxItems = crmList.filter((r) => {
-      if (dashboardInboxTab === 'orders_quotes') return getInboundChannelMeta(r).isOrderOrQuote;
-      if (dashboardInboxTab === 'contacts') return !getInboundChannelMeta(r).isOrderOrQuote;
-      if (dashboardInboxTab === 'unread') return (r.resolutionStatus || 'active') === 'active' && r.stage === 'Yeni Talep';
-      return true;
-    });
+    function getFilteredDashboardInboxItems() {
+      const q = String(dashboardInboxSearch || '').trim().toLowerCase();
+      return crmList.filter((r) => {
+        if (dashboardInboxTab === 'orders_quotes' && !getInboundChannelMeta(r).isOrderOrQuote) return false;
+        if (dashboardInboxTab === 'contacts' && getInboundChannelMeta(r).isOrderOrQuote) return false;
+        if (dashboardInboxTab === 'unread' && !((r.resolutionStatus || 'active') === 'active' && r.stage === 'Yeni Talep')) return false;
+        if (q) {
+          const hay = `${r.companyName || ''} ${r.contactName || ''} ${r.phone || ''} ${r.email || ''} ${r.cityCountry || ''} ${r.relatedProductOrSystem || ''} ${r.subject || ''} ${r.description || ''} ${r.message || ''} ${r.requestedAmount || ''}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
 
     // Aşama dağılımı (Grafik verisi)
     const stageCounts = CRM_STAGES.map((st) => ({
@@ -542,12 +620,12 @@ export function renderAdminPage(container, navigate) {
         </div>
       </div>
 
-      <!-- 7 Operasyonel KPI Kartı -->
+      <!-- 8 Operasyonel KPI Kartı -->
       <div class="admin-kpi-grid">
-        <button type="button" class="admin-kpi-card" data-inbox-jump="orders_quotes">
+        <button type="button" class="admin-kpi-card ${unreadInbox.length > 0 ? 'kpi-alert' : ''}" data-inbox-jump="orders_quotes">
           <span class="kpi-title">Gelen Sipariş & Teklif Formları</span>
           <strong class="kpi-num">${orderAndQuoteInbox.length}</strong>
-          <span class="kpi-sub">${unreadInbox.length} yeni yanıt bekliyor${periodNote(crmSplit.undated)}</span>
+          <span class="kpi-sub">${unreadInbox.length > 0 ? `🔴 ${unreadInbox.length} yeni yanıt bekliyor` : `${newPendingRequests.length} açık ön görüşmede`}${periodNote(crmSplit.undated)}</span>
         </button>
         <button type="button" class="admin-kpi-card" data-inbox-jump="contacts">
           <span class="kpi-title">Gelen İletişim & Geri Arama Mesajları</span>
@@ -579,7 +657,7 @@ export function renderAdminPage(container, navigate) {
           <strong class="kpi-num">${activeProductsCount}</strong>
           <span class="kpi-sub">Toplam ${store.products.length} ürün kartı · tarih filtresinden bağımsız</span>
         </button>
-        <button type="button" class="admin-kpi-card" data-jump="${jump({ module: 'orders', label: 'Sayımı girilmiş ve eşiğin altındaki stok', ordersListFocus: 'critical', anchor: '#inventory-table-anchor' })}">
+        <button type="button" class="admin-kpi-card ${criticalStockItems.length > 0 ? 'kpi-warn' : ''}" data-jump="${jump({ module: 'orders', label: 'Sayımı girilmiş ve eşiğin altındaki stok', ordersListFocus: 'critical', anchor: '#inventory-table-anchor' })}">
           <span class="kpi-title">Kritik Stok Uyarıları</span>
           <strong class="kpi-num">${initializedInventory.length === 0 ? '—' : criticalStockItems.length}</strong>
           <span class="kpi-sub">${initializedInventory.length === 0 ? 'Stok sayımı henüz girilmedi' : `${initializedInventory.length} stok kalemi izleniyor`} · tarih filtresinden bağımsız</span>
@@ -588,11 +666,12 @@ export function renderAdminPage(container, navigate) {
 
       <!-- CANLI GELEN KUTUSU: SİPARİŞ FORMLARI & İLETİŞİM MESAJLARI -->
       <div class="card" id="dash-inbox" style="margin-top:1.5rem;padding:1.5rem;border:2px solid var(--accent-teal);">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.15rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
           <div>
-            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.25rem;">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.25rem;flex-wrap:wrap;">
               <span class="badge badge-teal">CANLI AKIŞ (GERÇEK ZAMANLI)</span>
               <span style="font-size:0.8rem;color:var(--text-muted);">DB: <code>${escapeHtml(DATABASE_ID)}/crmRequests</code></span>
+              ${lastSyncedTimeStr ? `<span style="font-size:0.78rem;color:var(--text-muted);">• Son senkron: ${escapeHtml(lastSyncedTimeStr)}</span>` : ''}
             </div>
             <h3 style="margin:0;">📥 Web Sitesi Gelen Kutusu: Sipariş Formları & İletişim Mesajları</h3>
             <p style="font-size:0.86rem;color:var(--text-secondary);margin-top:0.2rem;">
@@ -615,97 +694,21 @@ export function renderAdminPage(container, navigate) {
           </div>
         </div>
 
-        ${visibleInboxItems.length === 0 ? `
-          <div class="empty-state-box">
-            <h4>Bu Sekmede Kayıtlı Form Mesajı veya Sipariş Talebi Yok</h4>
-            <p>Ziyaretçiler <code>/iletisim</code> veya <code>/teklif-al</code> sayfalarından form gönderdiğinde sayfa yenilenmesine gerek kalmadan anında burada listelenir.</p>
-          </div>
-        ` : `
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1rem;max-height:620px;overflow-y:auto;padding-right:0.25rem;">
-            ${visibleInboxItems.slice(0, 24).map((req) => {
-              const chMeta = getInboundChannelMeta(req);
-              const dateStr = (req.createdAtIso || '').replace('T', ' ').slice(0, 16) || 'Tarih belirtilmedi';
-              const cleanPhoneDigits = String(req.phone || '').replace(/\D/g, '');
-              const waPhone = cleanPhoneDigits.length >= 10
-                ? (cleanPhoneDigits.startsWith('90') ? cleanPhoneDigits : (cleanPhoneDigits.startsWith('0') ? `9${cleanPhoneDigits}` : `90${cleanPhoneDigits}`))
-                : '';
-              const fullMessage = req.description || req.message || 'Mesaj metni girilmedi.';
-              const qtyLabel = req.requestedAmount || req.packaging || '';
-              return `
-                <div class="card" style="padding:1.1rem;background:var(--bg-surface-alt);border:1px solid var(--border-subtle);display:flex;flex-direction:column;justify-content:space-between;gap:0.75rem;">
-                  <div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.55rem;">
-                      <span class="badge ${escapeAttr(chMeta.badgeClass)}">${escapeHtml(chMeta.label)}</span>
-                      <span style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">🕒 ${escapeHtml(dateStr)}</span>
-                    </div>
+        <div class="dash-inbox-toolbar" style="margin-bottom:1rem;display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+          <input
+            type="search"
+            id="dash-inbox-search-input"
+            class="form-input"
+            style="max-width:380px;flex:1;"
+            value="${escapeAttr(dashboardInboxSearch)}"
+            placeholder="Gelen kutusunda firma, yetkili, telefon, ürün veya mesaj ara..."
+          />
+          <button type="button" class="btn btn-secondary btn-sm" id="dash-inbox-clear-search" style="${dashboardInboxSearch ? '' : 'display:none;'}">
+            Aramayı Temizle
+          </button>
+        </div>
 
-                    <div style="margin-bottom:0.45rem;">
-                      <strong style="font-size:1.02rem;color:var(--text-primary);">${escapeHtml(req.companyName || 'İsimsiz Firma / Ziyaretçi')}</strong>
-                      <div style="font-size:0.84rem;color:var(--text-secondary);margin-top:0.15rem;">
-                        👤 Yetkili: <strong>${escapeHtml(req.contactName || '-')}</strong>
-                        ${req.cityCountry ? ` • 📍 ${escapeHtml(req.cityCountry)}` : ''}
-                      </div>
-                      <div style="font-size:0.84rem;color:var(--text-secondary);margin-top:0.15rem;">
-                        📞 <strong>${escapeHtml(req.phone || '-')}</strong>
-                        ${req.email ? ` • ✉️ <a href="mailto:${escapeAttr(req.email)}" style="color:var(--accent-teal);text-decoration:underline;">${escapeHtml(req.email)}</a>` : ''}
-                      </div>
-                    </div>
-
-                    <div style="padding:0.55rem 0.75rem;background:var(--bg-surface);border-radius:8px;border-left:3px solid var(--accent-teal);margin-bottom:0.55rem;">
-                      <div style="font-size:0.82rem;font-weight:700;color:var(--accent-teal);margin-bottom:0.2rem;">
-                        📌 Konu / Ürün / Sistem: ${escapeHtml(req.relatedProductOrSystem || req.subject || req.requestType || 'Genel')}
-                      </div>
-                      ${qtyLabel ? `
-                        <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary);margin-bottom:0.25rem;">
-                          📦 Talep Edilen Miktar / Ambalaj: <span class="badge badge-neutral">${escapeHtml(qtyLabel)}</span>
-                        </div>
-                      ` : ''}
-                      <div style="font-size:0.85rem;color:var(--text-primary);white-space:pre-wrap;line-height:1.45;">${escapeHtml(fullMessage)}</div>
-                    </div>
-                  </div>
-
-                  <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;padding-top:0.45rem;border-top:1px solid var(--border-subtle);">
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <label style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">Aşama:</label>
-                      <select class="form-select form-select-xs dash-inbox-stage" data-req-id="${escapeAttr(req.id)}" data-prev-stage="${escapeAttr(req.stage)}" style="width:auto;min-width:140px;">
-                        ${CRM_STAGES.map((s) => `<option value="${escapeAttr(s)}" ${req.stage === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
-                      </select>
-                    </div>
-                    <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
-                      ${waPhone ? `
-                        <a href="https://wa.me/${escapeAttr(waPhone)}?text=${encodeURIComponent(`Merhaba ${req.contactName || req.companyName || ''}, Elif Çevre Kimya web sitemiz üzerinden ilettiğiniz "${req.relatedProductOrSystem || 'talebiniz'}" hakkında dönüş yapıyoruz.`)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs">
-                          💬 WhatsApp
-                        </a>
-                      ` : ''}
-                      <button type="button" class="btn btn-secondary btn-xs dash-prepare-proposal-btn" data-req-id="${escapeAttr(req.id)}">
-                        📄 Teklif Hazırla
-                      </button>
-                      ${req.stage !== 'Onaylandı' ? `
-                        <button type="button" class="btn btn-primary btn-xs dash-convert-order-btn" data-req-id="${escapeAttr(req.id)}">
-                          🛒 Siparişe Aktar
-                        </button>
-                      ` : `
-                        <span class="badge badge-teal">✅ Siparişe Aktarıldı</span>
-                      `}
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-          ${visibleInboxItems.length > 24 ? `
-            <button type="button" class="btn btn-secondary btn-sm" style="margin-top:0.85rem;" data-jump="${jump({
-              module: 'crm',
-              label: 'Gelen kutusunda listelenmeyen kayıtlar dahil',
-              crmFilterStage: dashboardInboxTab === 'unread' ? 'Yeni Talep' : 'all',
-              crmFilterRes: 'active',
-              crmViewMode: 'table',
-              crmSearchQuery: '',
-              crmChannelFilter: dashboardInboxTab === 'orders_quotes' ? 'order' : dashboardInboxTab === 'contacts' ? 'contact' : dashboardInboxTab === 'unread' ? 'unread' : 'all',
-              anchor: '#crm-view-container'
-            })}">Kalan ${visibleInboxItems.length - 24} kaydı CRM’de aç</button>
-          ` : ''}
-        `}
+        <div id="dash-inbox-list-region"></div>
       </div>
 
       <!-- Finansal Ayrım Barı (Teklif Hacmi vs Onaylanan Sipariş vs Muhasebe & Kasa) -->
@@ -871,7 +874,228 @@ export function renderAdminPage(container, navigate) {
       </div>
     `;
 
+    function renderInboxRegion() {
+      const regionEl = box.querySelector('#dash-inbox-list-region');
+      if (!regionEl) return;
+      const visibleInboxItems = getFilteredDashboardInboxItems();
+      const clearBtn = box.querySelector('#dash-inbox-clear-search');
+      if (clearBtn) clearBtn.style.display = dashboardInboxSearch ? '' : 'none';
+
+      if (visibleInboxItems.length === 0) {
+        renderSafeHtml(regionEl, `
+          <div class="empty-state-box">
+            <h4>${dashboardInboxSearch ? 'Arama Kriterine Uygun Mesaj veya Talep Bulunamadı' : 'Bu Sekmede Kayıtlı Form Mesajı veya Sipariş Talebi Yok'}</h4>
+            <p>Ziyaretçiler <code>/iletisim</code> veya <code>/teklif-al</code> sayfalarından form gönderdiğinde sayfa yenilenmesine gerek kalmadan anında burada listelenir.</p>
+          </div>
+        `);
+        return;
+      }
+
+      const listHtml = `
+        <div class="dash-inbox-grid">
+          ${visibleInboxItems.slice(0, 24).map((req) => {
+            const chMeta = getInboundChannelMeta(req);
+            const dateStr = (req.createdAtIso || '').replace('T', ' ').slice(0, 16) || 'Tarih belirtilmedi';
+            const cleanPhoneDigits = String(req.phone || '').replace(/\D/g, '');
+            const waPhone = cleanPhoneDigits.length >= 10
+              ? (cleanPhoneDigits.startsWith('90') ? cleanPhoneDigits : (cleanPhoneDigits.startsWith('0') ? `9${cleanPhoneDigits}` : `90${cleanPhoneDigits}`))
+              : '';
+            const fullMessage = req.description || req.message || 'Mesaj metni girilmedi.';
+            const qtyLabel = req.requestedAmount || req.packaging || '';
+            return `
+              <div class="card dash-inbox-card">
+                <div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.55rem;">
+                    <span class="badge ${escapeAttr(chMeta.badgeClass)}">${escapeHtml(chMeta.label)}</span>
+                    <span style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">🕒 ${escapeHtml(dateStr)}</span>
+                  </div>
+
+                  <div style="margin-bottom:0.45rem;">
+                    <strong style="font-size:1.02rem;color:var(--text-primary);">${escapeHtml(req.companyName || 'İsimsiz Firma / Ziyaretçi')}</strong>
+                    <div style="font-size:0.84rem;color:var(--text-secondary);margin-top:0.15rem;">
+                      👤 Yetkili: <strong>${escapeHtml(req.contactName || '-')}</strong>
+                      ${req.cityCountry ? ` • 📍 ${escapeHtml(req.cityCountry)}` : ''}
+                    </div>
+                    <div style="font-size:0.84rem;color:var(--text-secondary);margin-top:0.15rem;">
+                      📞 <strong>${escapeHtml(req.phone || '-')}</strong>
+                      ${req.email ? ` • ✉️ <a href="mailto:${escapeAttr(req.email)}" style="color:var(--accent-teal);text-decoration:underline;">${escapeHtml(req.email)}</a>` : ''}
+                    </div>
+                  </div>
+
+                  <div style="padding:0.55rem 0.75rem;background:var(--bg-surface);border-radius:8px;border-left:3px solid var(--accent-teal);margin-bottom:0.55rem;">
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--accent-teal);margin-bottom:0.2rem;">
+                      📌 Konu / Ürün / Sistem: ${escapeHtml(req.relatedProductOrSystem || req.subject || req.requestType || 'Genel')}
+                    </div>
+                    ${qtyLabel ? `
+                      <div style="font-size:0.8rem;font-weight:600;color:var(--text-primary);margin-bottom:0.25rem;">
+                        📦 Talep Edilen Miktar / Ambalaj: <span class="badge badge-neutral">${escapeHtml(qtyLabel)}</span>
+                      </div>
+                    ` : ''}
+                    <div style="font-size:0.85rem;color:var(--text-primary);white-space:pre-wrap;line-height:1.45;">${escapeHtml(fullMessage)}</div>
+                  </div>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;padding-top:0.45rem;border-top:1px solid var(--border-subtle);">
+                  <div style="display:flex;align-items:center;gap:0.4rem;">
+                    <label style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">Aşama:</label>
+                    <select class="form-select form-select-xs dash-inbox-stage" data-req-id="${escapeAttr(req.id)}" data-prev-stage="${escapeAttr(req.stage)}" style="width:auto;min-width:136px;">
+                      ${CRM_STAGES.map((s) => `<option value="${escapeAttr(s)}" ${req.stage === s ? 'selected' : ''}>${escapeHtml(s)}</option>`).join('')}
+                    </select>
+                  </div>
+                  <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                    ${waPhone ? `
+                      <a href="https://wa.me/${escapeAttr(waPhone)}?text=${encodeURIComponent(`Merhaba ${req.contactName || req.companyName || ''}, Elif Çevre Kimya web sitemiz üzerinden ilettiğiniz "${req.relatedProductOrSystem || 'talebiniz'}" hakkında dönüş yapıyoruz.`)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs">
+                        💬 WhatsApp
+                      </a>
+                    ` : ''}
+                    <button type="button" class="btn btn-secondary btn-xs dash-open-crm-btn" data-req-id="${escapeAttr(req.id)}">
+                      🔍 CRM'de Aç
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-xs dash-prepare-proposal-btn" data-req-id="${escapeAttr(req.id)}">
+                      📄 Teklif Hazırla
+                    </button>
+                    ${req.stage !== 'Onaylandı' ? `
+                      <button type="button" class="btn btn-primary btn-xs dash-convert-order-btn" data-req-id="${escapeAttr(req.id)}">
+                        🛒 Siparişe Aktar
+                      </button>
+                    ` : `
+                      <span class="badge badge-teal">✅ Siparişe Aktarıldı</span>
+                    `}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        ${visibleInboxItems.length > 24 ? `
+          <button type="button" class="btn btn-secondary btn-sm" id="dash-inbox-more-btn" style="margin-top:0.85rem;">
+            Kalan ${visibleInboxItems.length - 24} kaydı CRM’de aç
+          </button>
+        ` : ''}
+      `;
+
+      renderSafeHtml(regionEl, listHtml);
+
+      regionEl.querySelector('#dash-inbox-more-btn')?.addEventListener('click', () => {
+        applyDashPreset({
+          module: 'crm',
+          label: 'Gelen kutusunda listelenmeyen kayıtlar dahil',
+          crmFilterStage: dashboardInboxTab === 'unread' ? 'Yeni Talep' : 'all',
+          crmFilterRes: 'active',
+          crmViewMode: 'table',
+          crmSearchQuery: dashboardInboxSearch || '',
+          crmChannelFilter: dashboardInboxTab === 'orders_quotes' ? 'order' : dashboardInboxTab === 'contacts' ? 'contact' : dashboardInboxTab === 'unread' ? 'unread' : 'all',
+          anchor: '#crm-view-container'
+        });
+      });
+
+      // Canlı Gelen Kutusu Aşama Güncelleyici (In-Place Store Güncelleme — 19 koleksiyonu tekrar çekmez)
+      regionEl.querySelectorAll('.dash-inbox-stage').forEach((sel) => {
+        sel.addEventListener('change', async () => {
+          const reqId = sel.getAttribute('data-req-id');
+          const prevStage = sel.getAttribute('data-prev-stage');
+          const nextStage = sel.value;
+          sel.disabled = true;
+          try {
+            const updated = await createOrUpdateCrmRequest({ id: reqId, stage: nextStage }, currentProfile);
+            upsertCrmRequestInStore(updated);
+            showNotification(`Mesaj / talep aşaması "${nextStage}" olarak sunucuda güncellendi.`, 'success');
+            renderDashboardModule(box);
+          } catch (err) {
+            sel.disabled = false;
+            sel.value = prevStage;
+            showNotification(err.message || 'Aşama güncellenemedi.', 'error');
+          }
+        });
+      });
+
+      // CRM'de Detay Aç Butonu
+      regionEl.querySelectorAll('.dash-open-crm-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const reqId = btn.getAttribute('data-req-id');
+          const req = store.crmRequests.find((r) => r.id === reqId);
+          applyDashPreset({
+            module: 'crm',
+            label: `Seçilen talep: ${req?.companyName || reqId}`,
+            crmFocusId: reqId,
+            crmFilterRes: 'all',
+            crmFilterStage: 'all',
+            crmViewMode: 'table',
+            crmSearchQuery: '',
+            anchor: '#crm-view-container'
+          });
+        });
+      });
+
+      // Teklif Hazırla Butonu
+      regionEl.querySelectorAll('.dash-prepare-proposal-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const req = store.crmRequests.find((r) => r.id === btn.getAttribute('data-req-id'));
+          if (!req) {
+            showNotification('Talep kaydı bulunamadı.', 'error');
+            return;
+          }
+          clearDashPreset();
+          pendingProposalSeed = {
+            crmRequestId: req.id,
+            companyName: req.companyName || '',
+            contactName: req.contactName || '',
+            email: req.email && req.email !== '-' ? req.email : '',
+            phone: req.phone && req.phone !== '-' ? req.phone : '',
+            address: req.cityCountry || '',
+            productName: req.relatedProductOrSystem || req.subject || req.requestType || '',
+            description: req.description || req.message || '',
+            quantityLabel: req.requestedAmount || req.packaging || ''
+          };
+          dashPreset = {
+            module: 'proposals',
+            label: `${req.companyName || 'Talep'} için teklif taslağı`,
+            anchor: '#proposal-builder'
+          };
+          dashScrollOnce = true;
+          activeModule = 'proposals';
+          renderShell();
+        });
+      });
+
+      // Tek Tıkla Onaylı Siparişe Aktar Butonu
+      regionEl.querySelectorAll('.dash-convert-order-btn').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const reqId = btn.getAttribute('data-req-id');
+          const reqObj = store.crmRequests.find((r) => r.id === reqId);
+          if (!reqObj) return;
+          const amountRaw = await showConfirmModal({
+            title: 'Talebi Onaylı Siparişe Aktar',
+            message: `"${reqObj.companyName || 'Talep'}" sipariş kaydına aktarılacak ve CRM aşaması Onaylandı yapılacak. Tutar form metninden üretilmez.`,
+            confirmText: 'Evet, Siparişe Aktar',
+            cancelText: 'Vazgeç',
+            inputLabel: 'KDV dahil sipariş tutarı (₺)',
+            inputType: 'number',
+            inputPlaceholder: 'Örn: 125000',
+            inputRequired: true
+          });
+          if (amountRaw == null) return;
+          const amount = Number(String(amountRaw).replace(',', '.'));
+          if (!Number.isFinite(amount) || amount <= 0) {
+            showNotification('Sipariş tutarı girilmeden aktarım yapılmaz.', 'error');
+            return;
+          }
+          btn.disabled = true;
+          try {
+            await convertCrmRequestToOrder(reqObj, amount, currentProfile);
+            showNotification(`"${reqObj.companyName}" siparişi oluşturuldu ve Sipariş & Sevkiyat modülüne aktarıldı.`, 'success');
+            await refreshStoreAndRender();
+          } catch (err) {
+            btn.disabled = false;
+            showNotification(err.message || 'Siparişe aktarım sırasında hata oluştu.', 'error');
+          }
+        });
+      });
+    }
+
     renderSafeHtml(box, html);
+    renderInboxRegion();
+
     box.querySelectorAll('[data-jump]').forEach((el) => {
       el.addEventListener('click', () => {
         const preset = jumps[Number(el.getAttribute('data-jump'))];
@@ -913,90 +1137,28 @@ export function renderAdminPage(container, navigate) {
     box.querySelectorAll('.dash-inbox-tab').forEach((btn) => {
       btn.addEventListener('click', () => {
         dashboardInboxTab = btn.getAttribute('data-tab') || 'all';
-        renderDashboardModule(box);
-      });
-    });
-
-    // Canlı Gelen Kutusu Aşama Güncelleyici
-    box.querySelectorAll('.dash-inbox-stage').forEach((sel) => {
-      sel.addEventListener('change', async () => {
-        const reqId = sel.getAttribute('data-req-id');
-        const prevStage = sel.getAttribute('data-prev-stage');
-        const nextStage = sel.value;
-        try {
-          await createOrUpdateCrmRequest({ id: reqId, stage: nextStage }, currentProfile);
-          showNotification(`Mesaj / talep aşaması "${nextStage}" olarak sunucuda güncellendi.`, 'success');
-          await refreshStoreAndRender();
-        } catch (err) {
-          sel.value = prevStage;
-          showNotification(err.message || 'Aşama güncellenemedi.', 'error');
-        }
-      });
-    });
-
-    // Teklif Hazırla Butonu
-    box.querySelectorAll('.dash-prepare-proposal-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const req = store.crmRequests.find((r) => r.id === btn.getAttribute('data-req-id'));
-        if (!req) {
-          showNotification('Talep kaydı bulunamadı.', 'error');
-          return;
-        }
-        clearDashPreset();
-        pendingProposalSeed = {
-          crmRequestId: req.id,
-          companyName: req.companyName || '',
-          contactName: req.contactName || '',
-          email: req.email && req.email !== '-' ? req.email : '',
-          phone: req.phone && req.phone !== '-' ? req.phone : '',
-          address: req.cityCountry || '',
-          productName: req.relatedProductOrSystem || req.subject || req.requestType || '',
-          description: req.description || req.message || '',
-          quantityLabel: req.requestedAmount || req.packaging || ''
-        };
-        dashPreset = {
-          module: 'proposals',
-          label: `${req.companyName || 'Talep'} için teklif taslağı`,
-          anchor: '#proposal-builder'
-        };
-        dashScrollOnce = true;
-        activeModule = 'proposals';
-        renderShell();
-      });
-    });
-
-    // Tek Tıkla Onaylı Siparişe Aktar Butonu
-    box.querySelectorAll('.dash-convert-order-btn').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const reqId = btn.getAttribute('data-req-id');
-        const reqObj = store.crmRequests.find((r) => r.id === reqId);
-        if (!reqObj) return;
-        const amountRaw = await showConfirmModal({
-          title: 'Talebi Onaylı Siparişe Aktar',
-          message: `"${reqObj.companyName || 'Talep'}" sipariş kaydına aktarılacak ve CRM aşaması Onaylandı yapılacak. Tutar form metninden üretilmez.`,
-          confirmText: 'Evet, Siparişe Aktar',
-          cancelText: 'Vazgeç',
-          inputLabel: 'KDV dahil sipariş tutarı (₺)',
-          inputType: 'number',
-          inputPlaceholder: 'Örn: 125000',
-          inputRequired: true
+        box.querySelectorAll('.dash-inbox-tab').forEach((b) => {
+          const isAct = (b.getAttribute('data-tab') || 'all') === dashboardInboxTab;
+          b.classList.toggle('btn-primary', isAct);
+          b.classList.toggle('btn-secondary', !isAct);
         });
-        if (amountRaw == null) return;
-        const amount = Number(String(amountRaw).replace(',', '.'));
-        if (!Number.isFinite(amount) || amount <= 0) {
-          showNotification('Sipariş tutarı girilmeden aktarım yapılmaz.', 'error');
-          return;
-        }
-        btn.disabled = true;
-        try {
-          await convertCrmRequestToOrder(reqObj, amount, currentProfile);
-          showNotification(`"${reqObj.companyName}" siparişi oluşturuldu ve Sipariş & Sevkiyat modülüne aktarıldı.`, 'success');
-          await refreshStoreAndRender();
-        } catch (err) {
-          btn.disabled = false;
-          showNotification(err.message || 'Siparişe aktarım sırasında hata oluştu.', 'error');
-        }
+        renderInboxRegion();
       });
+    });
+
+    // Canlı Gelen Kutusu Anlık Arama (Focus kaybetmeden yalnızca kart listesini yeniler)
+    box.querySelector('#dash-inbox-search-input')?.addEventListener('input', (e) => {
+      dashboardInboxSearch = e.target.value;
+      renderInboxRegion();
+    });
+    box.querySelector('#dash-inbox-clear-search')?.addEventListener('click', () => {
+      dashboardInboxSearch = '';
+      const searchInput = box.querySelector('#dash-inbox-search-input');
+      if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+      }
+      renderInboxRegion();
     });
   }
 
@@ -1004,22 +1166,25 @@ export function renderAdminPage(container, navigate) {
      MODÜL 2: MÜŞTERİ VE TALEP YÖNETİMİ (CRM)
      ======================================================================== */
   function renderCrmModule(box) {
-    const filteredRequests = store.crmRequests.filter((r) => {
-      if (crmFocusId) return r.id === crmFocusId;
-      const res = r.resolutionStatus || 'active';
-      if (crmFilterRes !== 'all' && res !== crmFilterRes) return false;
-      if (crmFilterStage === '__inbox') return CRM_INBOX_STAGES.includes(r.stage);
-      if (crmFilterStage === '__stale') return isStaleOpenCrm(r, Date.now());
-      if (crmFilterStage !== 'all' && r.stage !== crmFilterStage) return false;
-      if (crmChannelFilter === 'order' && !getInboundChannelMeta(r).isOrderOrQuote) return false;
-      if (crmChannelFilter === 'contact' && getInboundChannelMeta(r).isOrderOrQuote) return false;
-      if (crmChannelFilter === 'unread' && !((r.resolutionStatus || 'active') === 'active' && r.stage === 'Yeni Talep')) return false;
-      if (crmSearchQuery) {
-        const hay = `${r.companyName || ''} ${r.contactName || ''} ${r.email || ''} ${r.phone || ''} ${r.cityCountry || ''} ${r.relatedProductOrSystem || ''}`.toLowerCase();
-        if (!hay.includes(crmSearchQuery.toLowerCase())) return false;
-      }
-      return true;
-    });
+    function getFilteredCrmRequests() {
+      const q = String(crmSearchQuery || '').trim().toLowerCase();
+      return store.crmRequests.filter((r) => {
+        if (crmFocusId) return r.id === crmFocusId;
+        const res = r.resolutionStatus || 'active';
+        if (crmFilterRes !== 'all' && res !== crmFilterRes) return false;
+        if (crmFilterStage === '__inbox') return CRM_INBOX_STAGES.includes(r.stage);
+        if (crmFilterStage === '__stale') return isStaleOpenCrm(r, Date.now());
+        if (crmFilterStage !== 'all' && r.stage !== crmFilterStage) return false;
+        if (crmChannelFilter === 'order' && !getInboundChannelMeta(r).isOrderOrQuote) return false;
+        if (crmChannelFilter === 'contact' && getInboundChannelMeta(r).isOrderOrQuote) return false;
+        if (crmChannelFilter === 'unread' && !((r.resolutionStatus || 'active') === 'active' && r.stage === 'Yeni Talep')) return false;
+        if (q) {
+          const hay = `${r.companyName || ''} ${r.contactName || ''} ${r.email || ''} ${r.phone || ''} ${r.cityCountry || ''} ${r.relatedProductOrSystem || ''} ${r.description || ''} ${r.message || ''}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
 
     const html = `
       <div class="admin-module-header">
@@ -1121,7 +1286,7 @@ export function renderAdminPage(container, navigate) {
 
     box.querySelector('#crm-search-input')?.addEventListener('input', (e) => {
       crmSearchQuery = e.target.value;
-      renderCrmSubView(box.querySelector('#crm-view-container'), filteredRequests);
+      renderCrmSubView(box.querySelector('#crm-view-container'), getFilteredCrmRequests());
     });
     box.querySelector('#crm-stage-select')?.addEventListener('change', (e) => {
       crmFilterStage = e.target.value;
@@ -1137,7 +1302,7 @@ export function renderAdminPage(container, navigate) {
       e.preventDefault();
       const fd = new FormData(newForm);
       try {
-        await createOrUpdateCrmRequest({
+        const created = await createOrUpdateCrmRequest({
           companyName: fd.get('companyName'),
           contactName: fd.get('contactName'),
           phone: fd.get('phone'),
@@ -1151,14 +1316,15 @@ export function renderAdminPage(container, navigate) {
           stage: 'Yeni Talep',
           resolutionStatus: 'active'
         }, currentProfile);
+        upsertCrmRequestInStore(created);
         showNotification('CRM talebi sunucuya kaydedildi.', 'success');
-        await refreshStoreAndRender();
+        renderCrmModule(box);
       } catch (err) {
         showNotification(err.message || 'Talep kaydedilemedi.', 'error');
       }
     });
 
-    renderCrmSubView(box.querySelector('#crm-view-container'), filteredRequests);
+    renderCrmSubView(box.querySelector('#crm-view-container'), getFilteredCrmRequests());
   }
 
   function renderCrmSubView(subBox, requests) {
@@ -1379,11 +1545,15 @@ export function renderAdminPage(container, navigate) {
         const reqId = sel.getAttribute('data-req-id');
         const prevStage = sel.getAttribute('data-prev-stage');
         const nextStage = sel.value;
+        sel.disabled = true;
         try {
-          await createOrUpdateCrmRequest({ id: reqId, stage: nextStage }, currentProfile);
+          const updated = await createOrUpdateCrmRequest({ id: reqId, stage: nextStage }, currentProfile);
+          upsertCrmRequestInStore(updated);
           showNotification(`Talep aşaması "${nextStage}" olarak sunucuda güncellendi.`, 'success');
-          await refreshStoreAndRender();
+          const contentBox = container.querySelector('#admin-module-content');
+          if (contentBox && activeModule === 'crm') renderCrmModule(contentBox);
         } catch (err) {
+          sel.disabled = false;
           sel.value = prevStage; // Hata durumunda arayüzü geri al!
           showNotification(err.message || 'Aşama güncellenemedi, değişiklik geri alındı.', 'error');
         }
@@ -1395,11 +1565,15 @@ export function renderAdminPage(container, navigate) {
         const reqId = sel.getAttribute('data-req-id');
         const prevRes = sel.getAttribute('data-prev-res');
         const nextRes = sel.value;
+        sel.disabled = true;
         try {
-          await createOrUpdateCrmRequest({ id: reqId, resolutionStatus: nextRes }, currentProfile);
+          const updated = await createOrUpdateCrmRequest({ id: reqId, resolutionStatus: nextRes }, currentProfile);
+          upsertCrmRequestInStore(updated);
           showNotification('Talep durumu sunucuda güncellendi.', 'success');
-          await refreshStoreAndRender();
+          const contentBox = container.querySelector('#admin-module-content');
+          if (contentBox && activeModule === 'crm') renderCrmModule(contentBox);
         } catch (err) {
+          sel.disabled = false;
           sel.value = prevRes; // Hata durumunda arayüzü geri al!
           showNotification(err.message || 'Durum güncellenemedi, değişiklik geri alındı.', 'error');
         }
@@ -4479,9 +4653,17 @@ export function renderAdminPage(container, navigate) {
         (store.crmRequests || []).forEach((oldItem) => {
           if (!liveMap.has(oldItem.id)) liveMap.set(oldItem.id, oldItem);
         });
-        store.crmRequests = Array.from(liveMap.values()).sort(
+        const merged = Array.from(liveMap.values()).sort(
           (a, b) => new Date(b.createdAtIso || 0).getTime() - new Date(a.createdAtIso || 0).getTime()
         );
+        const nextSig = computeCrmSignature(merged);
+        if (nextSig === lastInboxSignature) return;
+
+        store.crmRequests = merged;
+        lastInboxSignature = nextSig;
+        lastSyncedTimeStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        syncShellChrome();
+
         if (newlyArrived.length > 0 && knownCount > 0) {
           const latest = newlyArrived[0];
           const chMeta = getInboundChannelMeta(latest);
@@ -4492,7 +4674,11 @@ export function renderAdminPage(container, navigate) {
         }
         knownCount = store.crmRequests.length;
         if (activeModule === 'dashboard' || activeModule === 'crm') {
-          renderShell();
+          const activeEl = document.activeElement;
+          const isEditingFormField = activeEl && container.contains(activeEl) && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName);
+          if (!isEditingFormField) {
+            renderShell();
+          }
         }
       });
     } else {

@@ -2013,6 +2013,17 @@ code {
   margin-bottom: 1rem;
 }
 
+.admin-sync-meta {
+  font-size: 0.72rem;
+  color: var(--accent-teal-hover);
+  background: var(--bg-teal-tint);
+  border: 1px solid rgba(13, 148, 136, 0.22);
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  margin-top: 0.45rem;
+  font-weight: 600;
+}
+
 .admin-nav-list {
   display: flex;
   flex-direction: column;
@@ -2089,6 +2100,42 @@ code {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-kpi-card.kpi-alert {
+  border-top-color: #ef4444;
+  background: linear-gradient(180deg, #fff5f5 0%, #ffffff 45%);
+}
+
+.admin-kpi-card.kpi-warn {
+  border-top-color: #f59e0b;
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 45%);
+}
+
+.dash-inbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1rem;
+  max-height: 640px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.dash-inbox-card {
+  padding: 1.1rem;
+  background: var(--bg-surface-alt, #f8fafc);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dash-inbox-card:hover {
+  border-color: rgba(13, 148, 136, 0.45);
+  box-shadow: var(--shadow-sm);
 }
 
 button.admin-kpi-card,
@@ -2109,6 +2156,7 @@ button.recent-activity-item:hover,
 button.dash-money-row:hover,
 button.dash-work-item:hover {
   border-color: var(--accent-teal);
+  transform: translateY(-1px);
 }
 
 .dash-money-row {
