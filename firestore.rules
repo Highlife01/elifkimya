@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.admin == true || 
+         request.auth.token.email.matches('.*@elifkimya[.]com'));
+    }
+
+    // Teklif Talepleri (Quote Requests)
+    // Dışarıdan anonim / müşteri teklif oluşturabilir; okuma ve durum yönetimi sadece yöneticiye açıktır.
+    match /quoteRequests/{quoteId} {
+      allow create: if request.resource.data.companyName is string &&
+                       request.resource.data.email is string &&
+                       request.resource.data.phone is string &&
+                       request.resource.data.email.size() > 5;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // İletişim Mesajları (Contact Messages)
+    match /contactMessages/{messageId} {
+      allow create: if request.resource.data.name is string &&
+                       request.resource.data.email is string &&
+                       request.resource.data.message is string;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Şirket & Cari Kayıtları (Companies)
+    match /companies/{companyId} {
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == companyId);
+      allow write: if isAdmin();
+    }
+
+    // Ürün Kataloğu (Products)
+    // Herkes ürünleri ve TDS/MSDS teknik bilgilerini listeleyebilir, sadece yönetici düzenleyebilir.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Uygulama Alanları & Endüstriyel Çözümler (Application Areas)
+    match /applicationAreas/{areaId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Site İçeriği & Kurumsal Konfigürasyon (Site Content)
+    match /siteContent/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Muhasebe & B2B Sipariş Kayıtları (Accounting Entries)
+    match /accountingEntries/{entryId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Denetim Günlükleri - Değiştirilemez Loglar (Audit Logs)
+    match /auditLogs/{logId} {
+      allow create: if isAuthenticated();
+      allow read: if isAdmin();
+      allow update, delete: if false; // Değiştirilemez denetim izi
+    }
+  }
+}

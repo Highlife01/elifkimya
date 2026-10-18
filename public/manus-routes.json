@@ -1,0 +1,13 @@
+{
+  "routes": [
+    { "path": "/", "title": "Elif Kimya | Ana Sayfa" },
+    { "path": "/urunler", "title": "Ürün Kataloğu (06 Kategori)" },
+    { "path": "/sistemler", "title": "Endüstriyel Su Arıtma & EDI" },
+    { "path": "/sektorler", "title": "Sektörel Uygulama Alanları" },
+    { "path": "/hizmet-bolgeleri", "title": "Hizmet Bölgeleri & Lojistik" },
+    { "path": "/teknik-bilgi", "title": "Teknik Bilgi Bankası & GEO" },
+    { "path": "/teklif-al", "title": "B2B Teklif Talebi (RFQ)" },
+    { "path": "/iletisim", "title": "İletişim & WhatsApp" },
+    { "path": "/admin", "title": "Yönetim Merkezi (Portal)" }
+  ]
+}
