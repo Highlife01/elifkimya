@@ -30,6 +30,9 @@ Belediye paket evsel arıtma, biyogaz tesisi ve akredite laboratuvar hizmeti ver
 - Ham su analizi (pH, İletkenlik µS/cm, Sertlik °Fr, Alkalinite, Silis) doğrulanmadan su arıtma kapasite veya dozaj garantisi verilmez.
 - Her parti sevkiyatta güncel SDS (GBF), TDS ve Parti Analiz Sertifikası (COA) ibraz edilir.
 
+## Kanonik sayfalar
+Ürün, sistem, sektör ve bölge sayfaları mevcut katalog kaydından üretilir. Fiyat, stok ve ayrı şube adresi bu dosyada yoktur. Örnek: `/urunler/sogutma-kulesi-kimyasallari`, `/sistemler/endustriyel-ro`, `/sektorler/tekstil-gida-enerji`, `/hizmet-bolgeleri/mersin`. Sodyum hipoklorit, kostik ve asitler için doğrulanmış ayrı saflık sayfası yayınlanmamıştır; teklif `/teklif-al` üzerindendir.
+
 ## Ana Sayfalar
 - [Ana Sayfa](https://elifkimya.web.app/)
 - [Endüstriyel Kimyasal Ürünler](https://elifkimya.web.app/urunler)

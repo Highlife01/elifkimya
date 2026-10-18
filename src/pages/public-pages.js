@@ -26,6 +26,8 @@ import {
 } from '../firebase.js';
 import { showNotification } from '../components/notification.js';
 import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
+import { fold, t, withLanguageSearch } from '../utils/i18n.js';
+import { REGION_SLUGS } from './seo-landings.js';
 import { bindMedipureCatalog, renderMedipureCatalog } from '../components/medipure-catalog.js';
 
 function attachSpaLinks(container, navigate) {
@@ -45,13 +47,13 @@ function attachSpaLinks(container, navigate) {
    ========================================================================== */
 export async function renderProductsPage(container, navigate) {
   const categoryImages = [
-    '/assets/hero-cooling-towers.jpg',
-    '/assets/hero-chemical.jpg',
-    '/assets/hero-water-ro.jpg',
-    '/assets/hero-ultra-pure.jpg',
-    '/assets/hero-chemical-lab.jpg',
-    '/assets/hero-wastewater.jpg',
-    '/assets/hero-chemical.jpg'
+    '/assets/cat-cooling.jpg',
+    '/assets/cat-boiler.jpg',
+    '/assets/cat-ro-membrane.jpg',
+    '/assets/cat-water-systems.jpg',
+    '/assets/cat-acids.jpg',
+    '/assets/cat-coagulants.jpg',
+    '/assets/cat-caustic.jpg'
   ];
   const categoryEmojis = ['💧', '🌋', '⚙️', '🔬', '🔥', '♻️', '🏭'];
 
@@ -82,7 +84,7 @@ export async function renderProductsPage(container, navigate) {
       <div class="container-x">
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           ${productCategories.map((cat, idx) => `
-            <a href="#${escapeAttr(cat.slug)}" class="group relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+            <a href="/urunler/${escapeAttr(cat.id)}" data-nav class="group relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
               <div>
                 <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100">
                   <img src="${escapeAttr(categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="1200" height="896" loading="lazy" class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
@@ -110,10 +112,10 @@ export async function renderProductsPage(container, navigate) {
         <!-- Arama ve Kategori Filtre Barı -->
         <div class="catalog-toolbar">
           <div class="search-input-wrap">
-            <input type="search" id="product-search-input" class="form-input" placeholder="Ticari ad, kimyasal ad, CAS no veya kullanım alanı ara..." />
+            <input type="search" id="product-search-input" class="form-input" placeholder="${escapeAttr(t('search_products'))}" aria-label="${escapeAttr(t('search_products'))}" />
           </div>
           <div class="filter-pills" id="product-category-pills">
-            <button type="button" class="filter-pill active" data-cat="all">Tüm Ürün Grupları</button>
+            <button type="button" class="filter-pill active" data-cat="all">${escapeHtml(t('all_product_groups'))}</button>
             ${productCategories.map((c) => `
               <button type="button" class="filter-pill" data-cat="${escapeAttr(c.id)}">${escapeHtml(c.shortTitle)}</button>
             `).join('')}
@@ -174,13 +176,16 @@ export async function renderProductsPage(container, navigate) {
         </div>
 
         <div class="categories-detailed-list" id="static-categories-list">
-          ${productCategories.map((cat) => `
+          ${productCategories.map((cat, idx) => `
             <div class="category-detail-card" data-category-id="${escapeAttr(cat.id)}" id="${escapeAttr(cat.slug)}">
-              <div class="category-detail-head">
-                <div>
-                  <span class="sector-region-pill">${escapeHtml(cat.shortTitle)}</span>
-                  <h2>${escapeHtml(cat.title)}</h2>
-                  <p>${escapeHtml(cat.description)}</p>
+              <div class="category-detail-head" style="display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:1.25rem;flex:1;min-width:280px;">
+                  <img src="${escapeAttr(categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="140" height="96" loading="lazy" style="width:140px;height:96px;object-fit:cover;border-radius:14px;border:2px solid #cbd5e1;flex-shrink:0;" />
+                  <div>
+                    <span class="sector-region-pill">${escapeHtml(cat.shortTitle)}</span>
+                    <h2>${escapeHtml(cat.title)}</h2>
+                    <p>${escapeHtml(cat.description)}</p>
+                  </div>
                 </div>
                 <a href="/teklif-al?product=${encodeURIComponent(cat.title)}" class="btn btn-primary" data-nav>
                   Teklif İste
@@ -199,7 +204,7 @@ export async function renderProductsPage(container, navigate) {
                   </thead>
                   <tbody>
                     ${cat.subProducts.map((sub) => `
-                      <tr class="searchable-product-row" data-search="${escapeAttr((sub.name + ' ' + sub.detail + ' ' + cat.title).toLowerCase())}">
+                      <tr class="searchable-product-row" data-search="${escapeAttr(withLanguageSearch(`${sub.name} ${sub.detail} ${cat.title}`))}">
                         <td><strong>${escapeHtml(sub.name)}</strong></td>
                         <td>${escapeHtml(sub.detail)}</td>
                         <td><span class="badge badge-neutral">${escapeHtml(cat.packaging)}</span></td>
@@ -267,7 +272,7 @@ export async function renderProductsPage(container, navigate) {
                 ? `${Number(p.unitPrice).toLocaleString('tr-TR')} ${escapeHtml(p.currency || 'TRY')} / ${escapeHtml(p.salesUnit || 'kg')}`
                 : 'Teklif isteyin';
               return `
-                <div class="category-card searchable-live-card" data-cat="${escapeAttr(p.category || 'all')}" data-search="${escapeAttr(((p.tradeName || '') + ' ' + (p.chemicalName || '') + ' ' + (p.productCode || '') + ' ' + (p.casNumber || '') + ' ' + (p.applicationArea || '')).toLowerCase())}">
+                <div class="category-card searchable-live-card" data-cat="${escapeAttr(p.category || 'all')}" data-search="${escapeAttr(withLanguageSearch(`${p.tradeName || ''} ${p.chemicalName || ''} ${p.productCode || ''} ${p.casNumber || ''} ${p.applicationArea || ''}`))}">
                   <div class="category-card-top">
                     <span class="badge badge-teal">${escapeHtml(p.productCode || 'ÜRÜN')}</span>
                     ${p.casNumber ? `<span class="badge badge-neutral">CAS: ${escapeHtml(p.casNumber)}</span>` : ''}
@@ -303,7 +308,7 @@ export async function renderProductsPage(container, navigate) {
   let activeCat = 'all';
 
   function applyFilters() {
-    const q = (searchInput?.value || '').trim().toLowerCase();
+    const q = fold(searchInput?.value || '');
     container.querySelectorAll('.category-detail-card').forEach((card) => {
       const catMatch = activeCat === 'all' || card.dataset.categoryId === activeCat;
       let anyRowVisible = false;
@@ -423,6 +428,7 @@ export function renderSystemsPage(container, navigate) {
                 <strong>Hedef Uygulamalar:</strong> ${escapeHtml(sys.useCases)}
               </div>
               <div style="margin-top:1.25rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <a href="/sistemler/${escapeAttr(sys.id)}" class="btn btn-secondary btn-sm" data-nav>Sistem sayfası</a>
                 <a href="/teklif-al?type=water_project&product=${encodeURIComponent(sys.title)}" class="btn btn-primary btn-sm" data-nav>
                   Proje Teklifi Al
                 </a>
@@ -886,15 +892,15 @@ export function renderRegionsPage(container, navigate) {
         <div class="breadcrumb">
           <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Hizmet Bölgeleri & Lojistik Ağımız</span>
         </div>
-        <h1>Adana Merkezli Çukurova, İç Anadolu ve Uluslararası Lojistik Ağı</h1>
-        <p>Adana Hacı Sabancı OSB, Mersin MTOSB ve Liman, İskenderun-Payas-Osmaniye Demir-Çelik Koridoru, Kayseri ve Niğde OSB'lerine 2–6 saat içinde ADR'li sevkiyat ve yerinde mühendislik.</p>
+        <h1>Seyhan/Adana merkezli sanayi sevkiyat ağı</h1>
+        <p>Kayıtlı adres Seyhan/Adana’dır. Mersin, İskenderun-Payas-Osmaniye, Kayseri, Niğde, Gaziantep ve Kahramanmaraş sanayi hatlarına sevkiyat bu sayfadaki bölge kayıtlarına göredir. Ayrı şube adresi yayınlanmaz.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
         <div class="regions-grid">
-          ${serviceRegions.map((reg) => `
+          ${serviceRegions.map((reg, regionIndex) => `
             <div class="region-card">
               <div class="region-badge">${escapeHtml(reg.badge)}</div>
               <h3>${escapeHtml(reg.region)}</h3>
@@ -903,6 +909,9 @@ export function renderRegionsPage(container, navigate) {
                 ${reg.highlights.map((h) => `<span class="highlight-chip">${escapeHtml(h)}</span>`).join('')}
               </div>
               <div style="margin-top:1.25rem;">
+                <a href="/hizmet-bolgeleri/${escapeAttr(REGION_SLUGS[regionIndex] || '')}" class="btn btn-sm btn-secondary" data-nav>
+                  Bölge sayfası
+                </a>
                 <a href="/teklif-al?city=${encodeURIComponent(reg.region)}" class="btn btn-sm btn-secondary" data-nav>
                   Bu Bölge İçin Teklif Al →
                 </a>

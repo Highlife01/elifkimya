@@ -5,9 +5,9 @@
 
 import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
 import { companyInfo } from '../data/products.js';
+import { getLanguage, t } from '../utils/i18n.js';
 
-export function renderFooter(currentLang = 'tr', generalSettings = {}) {
-  const isTr = currentLang === 'tr';
+export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
   const rawPhone = generalSettings.phone || companyInfo.phoneDisplay;
   const whatsappClean = (generalSettings.whatsapp || companyInfo.whatsappNumber || '905425903626').replace(/[^0-9]/g, '');
   const whatsappUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent('Merhaba ELİF KİMYA, web siteniz üzerinden ulaşıyorum. Endüstriyel kimyasal ürünleriniz ve su arıtma sistemleriniz hakkında detaylı bilgi ve fiyat teklifi almak istiyorum.')}`;
@@ -57,9 +57,7 @@ export function renderFooter(currentLang = 'tr', generalSettings = {}) {
             />
           </a>
           <p class="mt-4 max-w-xs text-sm leading-relaxed text-slate-300 font-medium">
-            ${isTr
-              ? 'Endüstriyel Proses Kimyasalları, 360° Su Arıtma Mühendisliği ve PLC/SCADA Otomasyon Sistemleri'
-              : 'Industrial Process Chemicals, 360° Water Treatment Engineering & Automation Systems'}
+            ${escapeHtml(t('footer_tagline'))}
           </p>
           <div class="mt-4 space-y-1.5 text-xs text-slate-300">
             <p class="font-bold text-emerald-400">${escapeHtml(email)}</p>
@@ -77,7 +75,7 @@ export function renderFooter(currentLang = 'tr', generalSettings = {}) {
 
         <div>
           <h3 class="text-xs font-black uppercase tracking-wider text-emerald-400">
-            ${isTr ? 'Ürün & Sistem Grupları' : 'Products & Systems'}
+            ${escapeHtml(t('footer_groups'))}
           </h3>
           <ul class="mt-4 space-y-2.5 text-sm">
             <li>
@@ -120,7 +118,7 @@ export function renderFooter(currentLang = 'tr', generalSettings = {}) {
 
         <div>
           <h3 class="text-xs font-black uppercase tracking-wider text-emerald-400">
-            ${isTr ? 'Kurumsal & Teknik Merkez' : 'Corporate & Technical Hub'}
+            ${escapeHtml(t('footer_corporate'))}
           </h3>
           <ul class="mt-4 space-y-2.5 text-sm font-semibold">
             <li>
@@ -159,7 +157,7 @@ export function renderFooter(currentLang = 'tr', generalSettings = {}) {
 
         <div>
           <h3 class="text-xs font-black uppercase tracking-wider text-emerald-400">
-            ${isTr ? 'Bölge, Portal & Belgeler' : 'Regions & Portals'}
+            ${escapeHtml(t('footer_regions'))}
           </h3>
           <ul class="mt-4 flex flex-wrap gap-2 text-xs">
             <li>
@@ -226,7 +224,7 @@ export function renderFooter(currentLang = 'tr', generalSettings = {}) {
 
 export function createFooter(navigate) {
   const wrapper = document.createElement('div');
-  renderSafeHtml(wrapper, renderFooter('tr'));
+  renderSafeHtml(wrapper, renderFooter(getLanguage()));
 
   wrapper.querySelectorAll('a[data-nav]').forEach((link) => {
     link.addEventListener('click', (e) => {

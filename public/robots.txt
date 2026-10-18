@@ -23,35 +23,57 @@ Disallow: /portal
 # GEO (Generative Engine Optimization) & Yapay Zeka Arama Botları
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: GPTBot
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: Amazonbot
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: meta-externalagent
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: Bytespider
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 User-agent: CCBot
 Allow: /
+Disallow: /admin
+Disallow: /portal
 
 Sitemap: https://elifkimya.web.app/sitemap.xml

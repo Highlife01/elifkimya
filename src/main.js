@@ -14,6 +14,9 @@ import {
 import { renderPortalPage } from './pages/portal.js';
 import { renderAdminPage } from './pages/admin.js';
 import { applyDynamicPageSeoAndGeo } from './utils/seo-geo.js';
+import { findPublicRoute, renderNotFoundPage, renderPublicLanding } from './pages/seo-landings.js';
+import { renderSafeHtml } from './utils/security.js';
+import { applyDocumentLanguage, subscribeLanguage } from './utils/i18n.js';
 
 const appRoot = document.getElementById('app');
 let navbarEl = null;
@@ -71,6 +74,7 @@ function normalizePathname() {
 
 function routeCurrentUrl() {
   if (!appRoot) return;
+  applyDocumentLanguage();
   const pathname = normalizePathname();
   updateSeoAndRobotsMeta(pathname);
 
@@ -87,6 +91,23 @@ function routeCurrentUrl() {
   }
 
   ensurePublicLayout(pathname);
+
+  const landing = findPublicRoute(pathname);
+  const isDetail = landing && !['/', '/urunler', '/sistemler', '/sektorler', '/hizmet-bolgeleri', '/teknik-bilgi', '/teklif-al', '/iletisim'].includes(pathname);
+  if (isDetail) {
+    renderSafeHtml(mainEl, renderPublicLanding(landing));
+    mainEl.querySelectorAll('a[data-nav]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('/')) {
+          event.preventDefault();
+          navigate(href);
+        }
+      });
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
 
   switch (pathname) {
     case '/':
@@ -117,7 +138,16 @@ function routeCurrentUrl() {
       renderPortalPage(mainEl, navigate);
       break;
     default:
-      renderHomePage(mainEl, navigate);
+      renderSafeHtml(mainEl, renderNotFoundPage());
+      mainEl.querySelectorAll('a[data-nav]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const href = link.getAttribute('href');
+          if (href && href.startsWith('/')) {
+            event.preventDefault();
+            navigate(href);
+          }
+        });
+      });
       break;
   }
 
@@ -130,6 +160,11 @@ function routeCurrentUrl() {
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+subscribeLanguage(() => {
+  mainEl = null;
+  routeCurrentUrl();
+});
 
 window.addEventListener('popstate', routeCurrentUrl);
 window.addEventListener('hashchange', routeCurrentUrl);

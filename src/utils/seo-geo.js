@@ -4,7 +4,8 @@
  * hibrit mimari veri modellerini barındırır.
  */
 
-import { pageSEO, faqItems, productCategories } from '../data/products.js';
+import { faqItems, productCategories } from '../data/products.js';
+import { findPublicRoute } from '../pages/seo-landings.js';
 import { MEDIPURE_CATEGORIES, MEDIPURE_PRODUCT_COUNT } from '../data/medipure-catalog.js';
 
 export const SEO_KEYWORD_CLUSTERS = [
@@ -168,7 +169,15 @@ const PAGE_CLUSTER_IDS = {
 };
 
 export function keywordsForPath(pathname) {
-  const ids = PAGE_CLUSTER_IDS[pathname] || PAGE_CLUSTER_IDS['/'];
+  let key = pathname;
+  if (!PAGE_CLUSTER_IDS[key]) {
+    if (pathname.startsWith('/urunler')) key = '/urunler';
+    else if (pathname.startsWith('/sistemler')) key = '/sistemler';
+    else if (pathname.startsWith('/sektorler')) key = '/sektorler';
+    else if (pathname.startsWith('/hizmet-bolgeleri')) key = '/hizmet-bolgeleri';
+    else key = '/';
+  }
+  const ids = PAGE_CLUSTER_IDS[key] || [];
   const byId = new Map(SEO_KEYWORD_CLUSTERS.map((cluster) => [cluster.id, cluster]));
   const picked = [];
   ids.forEach((id) => {
@@ -346,7 +355,21 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
     return;
   }
 
-  const baseSeo = pageSEO[pathname] || pageSEO['/'];
+  const record = findPublicRoute(pathname);
+  if (!record) {
+    document.title = 'Sayfa bulunamadı | Elif Kimya';
+    upsertMetaTag('name', 'description', 'Bu adres Elif Kimya sitesinde yok.');
+    upsertMetaTag('name', 'robots', 'noindex, nofollow');
+    const staleCanonical = document.querySelector('link[rel="canonical"]');
+    staleCanonical?.remove();
+    return;
+  }
+
+  const baseSeo = {
+    title: record.title,
+    description: record.description,
+    canonical: record.canonical
+  };
 
   const title = (pathname === '/' && customSeoSettings?.siteTitle)
     ? customSeoSettings.siteTitle
@@ -410,13 +433,27 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
       name: breadcrumbNames[pathname],
       item: canonical
     });
+  } else if (pathname !== '/' && record.kind !== 'hub') {
+    const parentPath = `/${pathname.split('/').filter(Boolean)[0]}`;
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: 2,
+      name: breadcrumbNames[parentPath] || 'Elif Kimya',
+      item: `https://elifkimya.web.app${parentPath}`
+    });
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: 3,
+      name: record.h1,
+      item: canonical
+    });
   }
 
   const graphSchema = {
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': ['ChemicalManufacturer', 'Organization', 'LocalBusiness'],
+        '@type': ['Organization', 'LocalBusiness'],
         '@id': 'https://elifkimya.web.app/#organization',
         name: 'Elif Kimya',
         legalName: 'Elif Kimya Sanayi ve Ticaret',
@@ -426,7 +463,6 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
         description,
         telephone: '+905425903626',
         email: 'info@elifkimya.com.tr',
-        priceRange: '$$$',
         hasMap: 'https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111',
         address: {
           '@type': 'PostalAddress',
@@ -501,6 +537,16 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
         isPartOf: { '@id': 'https://elifkimya.web.app/#website' },
         about: { '@id': 'https://elifkimya.web.app/#organization' }
       },
+      ...(record.kind === 'hub' ? [] : [{
+        '@type': 'Service',
+        '@id': `${canonical}#service`,
+        name: record.h1,
+        description: record.description,
+        serviceType: record.kind,
+        url: canonical,
+        provider: { '@id': 'https://elifkimya.web.app/#organization' },
+        areaServed: { '@type': 'Country', name: 'Türkiye' }
+      }]),
       {
         '@type': 'ItemList',
         '@id': 'https://elifkimya.web.app/sistemler#medipure-katalog',

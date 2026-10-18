@@ -117,7 +117,19 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/admin",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/portal",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/portal/**",
         "destination": "/index.html"
       }
     ]

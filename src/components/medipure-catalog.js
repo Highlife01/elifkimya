@@ -1,4 +1,5 @@
 import { escapeAttr, escapeHtml } from '../utils/security.js';
+import { fold, t, withLanguageSearch } from '../utils/i18n.js';
 import {
   MEDIPURE_CATEGORIES,
   MEDIPURE_GROUPS,
@@ -34,7 +35,7 @@ function capacityRank(capacity) {
 }
 
 function productCard(product, categoryTitle) {
-  const search = `${product.code} ${product.name} ${product.capacity} ${categoryTitle}`.toLocaleLowerCase('tr');
+  const search = withLanguageSearch(`${product.code} ${product.name} ${product.capacity} ${categoryTitle}`);
   const href = quoteHref(product);
   return `
     <article
@@ -151,7 +152,7 @@ export function renderMedipureCatalog() {
           type="search"
           data-medipure-search
           class="form-input"
-          placeholder="Model kodu, cihaz adı veya kapasite ara. Örn: DT-5012, 100 lt"
+          placeholder="${escapeAttr(t('search_medipure'))}"
           aria-label="Medipure modellerinde ara"
         />
         <select data-medipure-sort class="form-select lg:max-w-xs" aria-label="Sıralama">
@@ -164,7 +165,7 @@ export function renderMedipureCatalog() {
       </div>
 
       <div class="mb-3 flex flex-wrap gap-2" data-medipure-groups>
-        <button type="button" class="filter-pill active" data-medipure-filter="all">Tüm gruplar</button>
+        <button type="button" class="filter-pill active" data-medipure-filter="all">${escapeHtml(t('all_groups'))}</button>
         ${MEDIPURE_GROUPS.map((group) => `
           <button type="button" class="filter-pill" data-medipure-filter="${escapeAttr(group.id)}">${escapeHtml(group.title)}</button>
         `).join('')}
@@ -237,7 +238,7 @@ export function bindMedipureCatalog(root) {
   }
 
   function apply() {
-    const query = (search?.value || '').trim().toLocaleLowerCase('tr');
+    const query = fold(search?.value || '');
     let visible = 0;
     cards.forEach((card) => {
       const groupOk = activeGroup === 'all' || card.dataset.group === activeGroup;

@@ -3,49 +3,137 @@
   <url>
     <loc>https://elifkimya.web.app/</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://elifkimya.web.app/urunler</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.95</priority>
   </url>
   <url>
     <loc>https://elifkimya.web.app/sistemler</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.95</priority>
   </url>
   <url>
     <loc>https://elifkimya.web.app/sektorler</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
   </url>
   <url>
     <loc>https://elifkimya.web.app/hizmet-bolgeleri</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://elifkimya.web.app/teknik-bilgi</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
   </url>
   <url>
     <loc>https://elifkimya.web.app/teklif-al</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.90</priority>
   </url>
   <url>
     <loc>https://elifkimya.web.app/iletisim</loc>
     <lastmod>2026-10-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/urunler/sogutma-kulesi-kimyasallari</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/urunler/jeotermal-su-sartlandirma</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/urunler/endustriyel-su-aritma-sistemleri</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/urunler/saf-su-ve-ultra-saf-su-sistemleri</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/urunler/kazan-suyu-kimyasallari</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/urunler/atik-su-aritma-kimyasallari</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/urunler/fabrika-ve-proses-kimyasallari</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sistemler/endustriyel-ro</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sistemler/edi-ultra-saf-su</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sistemler/ultrafiltrasyon-uf</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sistemler/yumusatma-demineralizasyon</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sistemler/kum-karbon-demir-mangan</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sistemler/dozaj-ve-otomasyon</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sektorler/demir-celik</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sektorler/deterjan-kimya</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sektorler/kagit-ambalaj</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sektorler/cam-seramik</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sektorler/maden-kalsit</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sektorler/tekstil-gida-enerji</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/sektorler/jeotermal</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/hizmet-bolgeleri/adana</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/hizmet-bolgeleri/mersin</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/hizmet-bolgeleri/iskenderun-osmaniye</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/hizmet-bolgeleri/nigde-kayseri</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/hizmet-bolgeleri/gaziantep-kahramanmaras</loc>
+    <lastmod>2026-10-18</lastmod>
+  </url>
+  <url>
+    <loc>https://elifkimya.web.app/hizmet-bolgeleri/turkiye-geneli</loc>
+    <lastmod>2026-10-18</lastmod>
   </url>
 </urlset>

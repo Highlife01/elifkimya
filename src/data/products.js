@@ -574,6 +574,8 @@ export const solutionLines = [
   {
     id: 'su-sartlandirma',
     title: 'Endüstriyel Su Şartlandırma',
+    badge: 'Kule • Kazan • Kapalı Devre',
+    image: '/assets/cat-cooling.jpg',
     summary: 'Açık kule, kapalı devre, buhar kazanı ve hat temizliği aynı program mantığıyla kurulur.',
     points: ['Kışır ve korozyon inhibitörü', 'Kapalı devre molibdat / azol', 'Oksijen tutucu ve kondens amini', 'Eşanjör ve hat temizliği'],
     href: '/urunler#sogutma-kulesi-kimyasallari'
@@ -581,6 +583,8 @@ export const solutionLines = [
   {
     id: 'jeotermal',
     title: 'Jeotermal Şartlandırma',
+    badge: 'Kuyu • Eşanjör • Silika',
+    image: '/assets/cat-boiler.jpg',
     summary: 'Kuyu, sera ve bölgesel ısıtma hatlarında kireç, silika ve korozyon. Dozaj brine analizine bağlıdır.',
     points: ['Kireç ve silika inhibitörü', 'Korozyon programı', 'Hat ve eşanjör temizliği', 'H₂S koku yardımcısı'],
     href: '/urunler#jeotermal-su-sartlandirma'
@@ -588,6 +592,8 @@ export const solutionLines = [
   {
     id: 'metal-yuzey',
     title: 'Metal Yüzey ve Boya Kabini',
+    badge: 'Yağ Alma • Fosfat • Pasivasyon',
+    image: '/assets/cat-acids.jpg',
     summary: 'Yağ alma, fosfatlama, pasivasyon ve sulu boya kabininde boya çürütme.',
     points: ['Alkali yağ sökücü', 'Demir ve çinko fosfat', 'Pasivasyon', 'Boya detackifier'],
     href: '/urunler#fabrika-ve-proses-kimyasallari'
@@ -595,6 +601,8 @@ export const solutionLines = [
   {
     id: 'maden',
     title: 'Maden ve Tikiner',
+    badge: 'Kalsit • Dispersant • Flokülant',
+    image: '/assets/cat-caustic.jpg',
     summary: 'Kalsit yaş öğütme dispersantı ve maden tikiner / filtre pres flokülantı.',
     points: ['Sodyum poliakrilat dispersant', 'Tikiner A-PAM', 'Filtre pres kek verimi', 'Çöktürme jar-testi'],
     href: '/urunler#fabrika-ve-proses-kimyasallari'
@@ -602,6 +610,8 @@ export const solutionLines = [
   {
     id: 'atiksu',
     title: 'Atıksu ve Çamur',
+    badge: 'PAC • FeCl₃ • Dekantör C-PAM',
+    image: '/assets/cat-coagulants.jpg',
     summary: 'Koagülant, polimer, renk giderimi, emülsiyon kırma ve çamur susuzlaştırma.',
     points: ['PAC ve demir-III klorür', 'Toz ve emülsiyon polimer', 'Emülsiyon kırıcı', 'Dekantör C-PAM'],
     href: '/urunler#atik-su-aritma-kimyasallari'
@@ -609,6 +619,8 @@ export const solutionLines = [
   {
     id: 'ham-su',
     title: 'Ham Su, RO ve Saf Su',
+    badge: 'RO • EDI • Medipure Cihazlar',
+    image: '/assets/cat-water-systems.jpg',
     summary: 'Ön arıtma, ters ozmoz, EDI ve Medipure laboratuvar / endüstri cihazları.',
     points: ['Kum, karbon, yumuşatma', 'RO ve antiskalant', 'EDI ve deiyonize', 'Medipure model kataloğu'],
     href: '/sistemler#medipure-katalog'
@@ -616,6 +628,8 @@ export const solutionLines = [
   {
     id: 'koku-kopuk',
     title: 'Koku, Köpük ve Emülsiyon',
+    badge: 'Antifoam • Emülsiyon Kırıcı',
+    image: '/assets/hero-wastewater.jpg',
     summary: 'H₂S koku, havalandırma köpüğü ve yağ emülsiyonu için ayrı ürün seçimi.',
     points: ['H₂S koku giderici', 'Atıksu köpük kesici', 'Emülsiyon kırıcı', 'Kağıt silikonsuz antifoam'],
     href: '/urunler#atik-su-aritma-kimyasallari'
@@ -623,6 +637,8 @@ export const solutionLines = [
   {
     id: 'saha',
     title: 'Saha Analiz ve İşletme Takibi',
+    badge: 'Jar-Test • LSI • Kupon Analizi',
+    image: '/assets/hero-chemical-lab.jpg',
     summary: 'Jar-test, LSI ve periyodik saha kontrolü. Akredite laboratuvar iddiası yok; analiz sahada veya anlaşmalı laboratuvarda yapılır.',
     points: ['Yerinde jar-test', 'LSI ve korozyon kuponu', 'Dozaj programı revizyonu', 'Seviye ve tüketim takibi'],
     href: '/teklif-al?type=water_audit'
@@ -939,7 +955,7 @@ export const geoKnowledgeArticles = [
 export const pageSEO = {
   '/': {
     title: 'Elif Kimya | Adana Endüstriyel Kimya, Su Şartlandırma ve Saf Su Cihazları',
-    description: 'Adana AOSB merkezli Elif Kimya: sodyum hipoklorit, kostik, soğutma kulesi ve kazan kimyasalları, PAC, jeotermal inhibitör, RO/EDI ve 163 model Medipure saf su cihazı.',
+    description: 'Seyhan/Adana merkezli Elif Kimya: endüstriyel kimyasal tedariki, soğutma kulesi ve kazan kimyasalları, PAC, jeotermal inhibitör, RO/EDI ve 163 model Medipure saf su cihazı. Sevkiyat OSB hatlarına yapılır.',
     canonical: 'https://elifkimya.web.app/'
   },
   '/urunler': {
@@ -959,7 +975,7 @@ export const pageSEO = {
   },
   '/hizmet-bolgeleri': {
     title: 'Adana, Mersin, İskenderun, Gaziantep OSB Kimyasal Sevkiyat | Elif Kimya',
-    description: 'Adana Hacı Sabancı OSB deposundan Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde hatlarına ADR kimyasal sevkiyatı.',
+    description: 'Seyhan/Adana merkezinden Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde sanayi hatlarına kimyasal sevkiyat. Ayrı şube adresi yayınlanmaz.',
     canonical: 'https://elifkimya.web.app/hizmet-bolgeleri'
   },
   '/teknik-bilgi': {
