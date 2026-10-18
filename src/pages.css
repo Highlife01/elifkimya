@@ -2331,9 +2331,84 @@
   .admin-metric-grid {
     grid-template-columns: 1fr 1fr;
   }
-  .toast-container {
-    left: 15px;
-    right: 15px;
-    bottom: 15px;
-  }
 }
+
+/* ==========================================================================
+   16. HERO ÇOKLU GÖRSEL SEÇİCİ (5 PREMİUM GÖRSEL)
+   ========================================================================== */
+.hero-visual-selector-bar {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(231, 252, 247, 0.15);
+}
+
+.selector-title {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--turq-soft);
+  letter-spacing: 0.14em;
+  margin-bottom: 12px;
+}
+
+.visual-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.visual-select-btn {
+  background: rgba(7, 20, 31, 0.65);
+  border: 1px solid rgba(231, 252, 247, 0.2);
+  color: rgba(239, 251, 248, 0.75);
+  padding: 8px 14px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s;
+  backdrop-filter: blur(8px);
+}
+
+.visual-select-btn:hover {
+  background: rgba(45, 212, 191, 0.15);
+  border-color: var(--turq);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+.visual-select-btn.active {
+  background: rgba(45, 212, 191, 0.25);
+  border-color: var(--turq);
+  color: var(--white);
+  box-shadow: 0 0 15px rgba(45, 212, 191, 0.3);
+}
+
+.visual-select-btn .btn-idx {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--turq);
+  font-weight: 700;
+}
+
+.visual-select-btn .btn-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.visual-select-btn .btn-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 5px;
+  border-radius: 2px;
+  color: rgba(239, 251, 248, 0.6);
+}
+
+.visual-select-btn.active .btn-tag {
+  background: var(--turq);
+  color: var(--navy);
+  font-weight: 700;
+}
+

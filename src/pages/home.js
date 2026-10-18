@@ -1,20 +1,59 @@
 /**
  * Elif Kimya - Ana Sayfa (Home View)
+ * 5 Farklı Premium Hero Görseli & İnteraktif Görsel Seçici
  */
 
 import { productCategories } from '../data/products.js';
 import { industrialSectors } from '../data/sectors.js';
 import { regionsList } from '../data/regions.js';
 
+export const heroVisuals = [
+  {
+    id: 'ro',
+    title: 'Ters Ozmoz & Membran',
+    src: '/assets/hero-water-ro.jpg',
+    tag: 'Endüstriyel Su Arıtma',
+    caption: 'Reverse Osmosis ve Membran Filtrasyon Tesisi'
+  },
+  {
+    id: 'chem-lab',
+    title: 'Kimyasal Formülasyon',
+    src: '/assets/hero-chemical-lab.jpg',
+    tag: 'Reaktör Laboratuvarı',
+    caption: 'Yüksek Teknolojili Kimyasal Sentez ve Analiz Laboratuvarı'
+  },
+  {
+    id: 'cooling',
+    title: 'Soğutma Kuleleri',
+    src: '/assets/hero-cooling-towers.jpg',
+    tag: 'Isı Değişim Tesisi',
+    caption: 'Evaporatif Soğutma Kuleleri ve Şartlandırma Kompleksi'
+  },
+  {
+    id: 'ultra-pure',
+    title: 'Ultra Saf Su (EDI)',
+    src: '/assets/hero-ultra-pure.jpg',
+    tag: '18.2 MΩ·cm Saflık',
+    caption: 'Elektro-deiyonizasyon (EDI) ve Analitik Saf Su Tesisi'
+  },
+  {
+    id: 'process',
+    title: 'Proses Reaktörleri',
+    src: '/assets/hero-chemical.jpg',
+    tag: 'Endüstriyel Üretim',
+    caption: 'Endüstriyel Kimya Üretim ve Reaktör Hatları'
+  }
+];
+
 export function renderHomePage(currentLang = 'tr') {
   const isTr = currentLang === 'tr';
-  const heroImage = '/assets/hero-chemical.jpg';
+  const defaultHeroImage = heroVisuals[0].src;
   const whatsappUrl = 'https://wa.me/905464992342';
 
   return `
     <main class="page-home">
-      <!-- 1. BÜYÜK HERO ALANI -->
-      <section class="hero" id="top" style="--hero-image: url('${heroImage}')">
+      <!-- 1. BÜYÜK HERO ALANI & GÖRSEL SEÇİCİ -->
+      <section class="hero" id="top" style="--hero-image: url('${defaultHeroImage}')">
         <div class="hero-grid"></div>
         <div class="container hero-content">
           <div class="eyebrow">
@@ -52,6 +91,24 @@ export function renderHomePage(currentLang = 'tr') {
               <span class="wa-dot-small"></span>
               <span>${isTr ? 'WhatsApp Hızlı İletişim' : 'Instant WhatsApp'}</span>
             </a>
+          </div>
+
+          <!-- Hero Çoklu Görsel Seçici (5 Farklı Premium Görsel) -->
+          <div class="hero-visual-selector-bar">
+            <span class="selector-title">TESİS GÖRSELİ SEÇİN:</span>
+            <div class="visual-buttons-row">
+              ${heroVisuals.map((vis, idx) => `
+                <button type="button" 
+                        class="visual-select-btn ${idx === 0 ? 'active' : ''}" 
+                        data-hero-src="${vis.src}"
+                        data-hero-idx="${idx}"
+                        title="${vis.caption}">
+                  <span class="btn-idx">0${idx + 1}</span>
+                  <span class="btn-title">${vis.title}</span>
+                  <span class="btn-tag">${vis.tag}</span>
+                </button>
+              `).join('')}
+            </div>
           </div>
 
           <div class="hero-foot">

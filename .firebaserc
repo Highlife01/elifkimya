@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "advera-c8dd0"
+  },
+  "targets": {
+    "advera-c8dd0": {
+      "hosting": {
+        "elifkimya": [
+          "elifkimya"
+        ]
+      }
+    }
+  }
+}

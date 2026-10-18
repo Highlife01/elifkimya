@@ -184,7 +184,31 @@ function bindEvents() {
 
   // 9. Admin Dashboard Sekmeleri
   setupAdminTabs();
+
+  // 10. Hero Çoklu Görsel Seçici (5 Farklı Premium Görsel)
+  setupHeroVisualSwitcher();
 }
+
+/**
+ * Hero Çoklu Görsel Seçici Mantığı
+ */
+function setupHeroVisualSwitcher() {
+  const heroEl = document.getElementById('top');
+  const buttons = document.querySelectorAll('.visual-select-btn');
+  if (!heroEl || buttons.length === 0) return;
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.getAttribute('data-hero-src');
+      buttons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (src) {
+        heroEl.style.setProperty('--hero-image', `url('${src}')`);
+      }
+    });
+  });
+}
+
 
 /**
  * RFQ Sihirbazı Mantığı
