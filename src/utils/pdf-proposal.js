@@ -46,7 +46,7 @@ export function extractCustomerSafePdfModel(proposal, companySettings = {}) {
       name: companySettings.companyName || 'ELİF KİMYA SANAYİ VE TİCARET',
       subtitle: 'Endüstriyel Su Arıtma Sistemleri & Proses Kimyasalları Mühendisliği',
       address: companySettings.address || 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
-      phone: companySettings.phone || '+90 (542) 590 36 26',
+      phone: '0546 499 23 42',
       email: companySettings.email || 'info@elifcevrekimya.com.tr',
       website: 'https://www.elifcevrekimya.com.tr',
       taxInfo: companySettings.taxInfo || 'Adana Vergi Dairesi'

@@ -1,5 +1,5 @@
 /**
- * Katalog, sistem, sektör ve hizmet bölgesi sayfaları.
+ * Katalog, sistem, sektör, hizmet bölgesi ve teknik mühendislik rehberi (blog) sayfaları.
  * Metinler mevcut ürün verisinden gelir; fiyat, stok ve sertifika eklenmez.
  */
 import { escapeAttr, escapeHtml } from '../utils/security.js';
@@ -11,6 +11,7 @@ import {
   serviceRegions,
   waterTreatmentSystems
 } from '../data/products.js';
+import { TECHNICAL_BLOG_POSTS } from '../data/technical-blog.js';
 
 const SITE = 'https://www.elifcevrekimya.com.tr';
 
@@ -141,13 +142,54 @@ export function buildPublicRoutes() {
     ));
   });
 
+  TECHNICAL_BLOG_POSTS.forEach((post) => {
+    const related = TECHNICAL_BLOG_POSTS
+      .filter((other) => other.slug !== post.slug && other.category === post.category)
+      .slice(0, 4)
+      .map((other) => ({ href: `/teknik-bilgi/${other.slug}`, label: `${other.number}. ${other.title}` }));
+
+    routes.push(route(
+      `/teknik-bilgi/${post.slug}`,
+      post.seoTitle,
+      post.metaDescription,
+      post.title,
+      'blog',
+      {
+        blogPost: post,
+        paragraphs: [
+          post.summary,
+          ...post.sections.flatMap((sec) => sec.paragraphs || [])
+        ],
+        items: [
+          ...post.sections.map((sec) => ({
+            title: sec.heading,
+            text: (sec.paragraphs || []).join(' '),
+            facts: []
+          })),
+          {
+            title: 'Saha Kontrol ve İzleme Listesi',
+            text: 'Kimyasal dozaj ve sistem kapasitesi kararları analiz ve tesis koşullarıyla belirlenmelidir; sabit dozaj veya performans garantisi verilmez.',
+            facts: post.fieldChecklist || []
+          }
+        ],
+        links: [
+          { href: post.ctaLink, label: post.ctaLabel },
+          { href: post.secondaryLink, label: post.secondaryLabel },
+          ...related
+        ],
+        quote: post.quoteProduct || post.title
+      }
+    ));
+  });
+
   const home = routes.find((item) => item.path === '/');
   if (home) {
     home.body.links = [
       ...productCategories.map((cat) => ({ href: `/urunler/${cat.id}`, label: cat.title })),
       ...waterTreatmentSystems.map((sys) => ({ href: `/sistemler/${sys.id}`, label: sys.title })),
       ...sectorsData.map((sector) => ({ href: `/sektorler/${sector.id}`, label: sector.title })),
-      ...serviceRegions.map((region, index) => ({ href: `/hizmet-bolgeleri/${REGION_SLUGS[index]}`, label: region.region }))
+      ...serviceRegions.map((region, index) => ({ href: `/hizmet-bolgeleri/${REGION_SLUGS[index]}`, label: region.region })),
+      ...TECHNICAL_BLOG_POSTS.slice(0, 6).map((post) => ({ href: `/teknik-bilgi/${post.slug}`, label: post.title }))
     ];
   }
   const products = routes.find((item) => item.path === '/urunler');
@@ -169,6 +211,13 @@ export function buildPublicRoutes() {
       label: region.region
     }));
   }
+  const techHub = routes.find((item) => item.path === '/teknik-bilgi');
+  if (techHub) {
+    techHub.body.links = TECHNICAL_BLOG_POSTS.map((post) => ({
+      href: `/teknik-bilgi/${post.slug}`,
+      label: `${post.number}. ${post.title}`
+    }));
+  }
 
   return routes;
 }
@@ -177,7 +226,16 @@ const ROUTE_LIST = buildPublicRoutes();
 const ROUTE_MAP = new Map(ROUTE_LIST.map((item) => [item.path, item]));
 
 export function findPublicRoute(pathname) {
-  return ROUTE_MAP.get(pathname) || null;
+  let clean = String(pathname || '');
+  try {
+    clean = decodeURIComponent(clean);
+  } catch (_err) {
+    // ignore decode error
+  }
+  if (clean === '/teknik-bilgi/esanjör-hat-temizligi-birikinti-metal-uyumu') {
+    clean = '/teknik-bilgi/esanjor-hat-temizligi-birikinti-metal-uyumu';
+  }
+  return ROUTE_MAP.get(clean) || ROUTE_MAP.get(pathname) || null;
 }
 
 export function listIndexableRoutes() {
@@ -189,12 +247,122 @@ function crumb(kind) {
   if (kind === 'system') return { href: '/sistemler', label: 'Su arıtma sistemleri' };
   if (kind === 'sector') return { href: '/sektorler', label: 'Sektörler' };
   if (kind === 'region') return { href: '/hizmet-bolgeleri', label: 'Hizmet bölgeleri' };
+  if (kind === 'blog') return { href: '/teknik-bilgi', label: 'Teknik Belge Merkezi & Mühendislik Rehberi' };
   return { href: '/', label: 'Ana sayfa' };
 }
 
 export function renderPublicLanding(record) {
   const parent = crumb(record.kind);
   const wa = `https://wa.me/${companyInfo.whatsappNumber}?text=${encodeURIComponent(`Merhaba, ${record.h1} için teklif istiyorum.`)}`;
+
+  if (record.kind === 'blog' && record.body?.blogPost) {
+    const post = record.body.blogPost;
+    const relatedPosts = TECHNICAL_BLOG_POSTS.filter((p) => p.slug !== post.slug && p.category === post.category).slice(0, 4);
+    return `
+      <section class="page-hero">
+        <div class="container">
+          <div class="breadcrumb">
+            <a href="/" data-nav>Ana Sayfa</a>
+            <span>/</span>
+            <a href="/teknik-bilgi" data-nav>Teknik Belge Merkezi & Mühendislik Rehberi</a>
+            <span>/</span>
+            <span>Rehber #${escapeHtml(String(post.number))}</span>
+          </div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+            <span class="badge badge-teal">${escapeHtml(post.categoryLabel)}</span>
+            <span class="badge badge-neutral">Anahtar Kelime: ${escapeHtml(post.keyword)}</span>
+            <span class="badge badge-neutral">⏱️ ${escapeHtml(post.readingTime)}</span>
+          </div>
+          <h1>${escapeHtml(post.title)}</h1>
+          <p>${escapeHtml(post.summary)}</p>
+        </div>
+      </section>
+
+      <article class="section">
+        <div class="container" style="max-width:940px;">
+          <div class="engineering-guard-banner" style="margin-bottom:2rem;">
+            <div>
+              <strong>Mühendislik Doğrulama Notu:</strong>
+              <span>Kimyasal dozaj, derişim ve sistem kapasitesi kararları su/brine/atıksu analizi ve tesis koşullarıyla belirlenmelidir; sabit dozaj veya performans garantisi verilmez.</span>
+            </div>
+            <a href="${escapeAttr(post.secondaryLink)}" class="btn btn-primary btn-sm" data-nav>${escapeHtml(post.secondaryLabel)}</a>
+          </div>
+
+          <div class="card" style="padding:2.25rem;margin-bottom:2rem;">
+            ${post.sections.map((sec, idx) => `
+              <section style="${idx > 0 ? 'margin-top:2rem;padding-top:1.75rem;border-top:1px solid var(--border-subtle);' : ''}">
+                <h2 style="font-size:1.35rem;margin-bottom:0.85rem;color:var(--text-primary);">${escapeHtml(sec.heading)}</h2>
+                ${(sec.paragraphs || []).map((p) => `<p style="color:var(--text-secondary);line-height:1.75;margin-bottom:0.95rem;font-size:0.98rem;">${escapeHtml(p)}</p>`).join('')}
+              </section>
+            `).join('')}
+
+            ${(post.fieldChecklist && post.fieldChecklist.length) ? `
+              <section style="margin-top:2rem;padding:1.5rem;background:var(--bg-teal-tint);border:1px solid rgba(13,148,136,0.28);border-radius:var(--radius-sm);">
+                <h2 style="font-size:1.2rem;margin-bottom:0.75rem;color:var(--accent-teal-hover);">✅ Saha Kontrol ve İzleme Parametreleri</h2>
+                <ul style="padding-left:1.25rem;display:flex;flex-direction:column;gap:0.45rem;color:var(--text-primary);font-size:0.93rem;">
+                  ${post.fieldChecklist.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                </ul>
+              </section>
+            ` : ''}
+
+            <div style="margin-top:1.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+              ${(post.keywords || []).map((kw) => `<span class="metric-tag">#${escapeHtml(kw)}</span>`).join('')}
+            </div>
+          </div>
+
+          <!-- Görsel Alt Metni & 16:9 Fotoğraf Üretim Promptu -->
+          <div class="card" style="padding:1.75rem;margin-bottom:2rem;background:var(--bg-secondary);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+              <span class="section-tag">Görsel & Medya Künyesi (16:9 Endüstriyel Standart)</span>
+              <span class="badge badge-neutral">Slug: /teknik-bilgi/${escapeHtml(post.slug)}</span>
+            </div>
+            <div style="font-size:0.9rem;margin-bottom:0.65rem;">
+              <strong>Görsel Alt Metni (Alt Text):</strong> ${escapeHtml(post.imageAlt)}
+            </div>
+            <div style="font-size:0.86rem;color:var(--text-secondary);background:#ffffff;padding:0.9rem 1rem;border-radius:8px;border:1px solid var(--border-subtle);">
+              <strong>16:9 Fotoğraf Üretim Promptu (TR):</strong><br/>
+              <span>${escapeHtml(post.imagePromptTr)}</span>
+            </div>
+          </div>
+
+          <!-- Nazik CTA ve İç Yönlendirme -->
+          <div class="cta-banner-box" style="margin-bottom:2.5rem;">
+            <div class="cta-banner-content">
+              <span class="section-tag">Teknik Değerlendirme & Teklif</span>
+              <h2 style="font-size:1.45rem;margin:0.4rem 0 0.6rem;">Tesisinizin Su Analizi ve İşletme Verileriyle Doğrulayalım</h2>
+              <p style="font-size:0.92rem;color:var(--text-secondary);">Sisteminiz için uygun şartlandırma veya ekipman yaklaşımını değerlendirmek üzere ilgili ürün/sistem sayfamızı inceleyebilir veya su analiz bilgilerinizi paylaşarak teklif talep edebilirsiniz.</p>
+            </div>
+            <div class="cta-banner-actions">
+              <a href="${escapeAttr(post.ctaLink)}" class="btn btn-secondary" data-nav>${escapeHtml(post.ctaLabel)}</a>
+              <a href="${escapeAttr(post.secondaryLink)}" class="btn btn-primary" data-nav>${escapeHtml(post.secondaryLabel)}</a>
+              <a href="${escapeAttr(companyInfo.whatsappUrl || wa)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">💬 WhatsApp Teknik Destek</a>
+            </div>
+          </div>
+
+          ${relatedPosts.length ? `
+            <div>
+              <h3 style="margin-bottom:1rem;">Aynı Kategorideki Diğer Teknik Rehberler</h3>
+              <div class="knowledge-grid">
+                ${relatedPosts.map((rel) => `
+                  <article class="knowledge-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+                    <div>
+                      <span class="badge badge-neutral" style="margin-bottom:0.5rem;">Rehber #${escapeHtml(String(rel.number))}</span>
+                      <h4 style="margin-bottom:0.45rem;">${escapeHtml(rel.title)}</h4>
+                      <p style="font-size:0.88rem;color:var(--text-secondary);">${escapeHtml(rel.summary)}</p>
+                    </div>
+                    <div style="margin-top:1rem;">
+                      <a href="/teknik-bilgi/${escapeAttr(rel.slug)}" class="btn btn-secondary btn-sm" data-nav>Rehberi Oku →</a>
+                    </div>
+                  </article>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </article>
+    `;
+  }
+
   const items = record.body.items || [];
   const links = record.body.links || [];
   return `
@@ -258,7 +426,7 @@ export function renderNotFoundPage() {
 export function renderCrawlableDocument(record) {
   const parent = crumb(record.kind);
   return `
-    <main>
+    <main class="sr-only" data-prerender-seo="true">
       <p><a href="/">Ana sayfa</a> / <a href="${escapeAttr(parent.href)}">${escapeHtml(parent.label)}</a></p>
       <h1>${escapeHtml(record.h1)}</h1>
       ${(record.body.paragraphs || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
@@ -266,7 +434,7 @@ export function renderCrawlableDocument(record) {
         <section>
           <h2>${escapeHtml(item.title)}</h2>
           <p>${escapeHtml(item.text)}</p>
-          <ul>${item.facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join('')}</ul>
+          ${(item.facts || []).length ? `<ul>${item.facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join('')}</ul>` : ''}
         </section>
       `).join('')}
       ${(record.body.links || []).length ? `<ul>${record.body.links.map((link) => `<li><a href="${escapeAttr(link.href)}">${escapeHtml(link.label)}</a></li>`).join('')}</ul>` : ''}

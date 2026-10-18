@@ -102,7 +102,7 @@ routes.forEach((route) => {
   writeRouteFile(route.path, html);
 });
 
-const notFoundBody = `<main><h1>Sayfa bulunamadı</h1><p>Bu adres Elif Kimya sitesinde yok.</p><p><a href="/">Ana sayfa</a></p></main>`;
+const notFoundBody = `<main class="sr-only"><h1>Sayfa bulunamadı</h1><p>Bu adres Elif Kimya sitesinde yok.</p><p><a href="/">Ana sayfa</a></p></main>`;
 let notFound = applyHead(shell, {
   title: 'Sayfa bulunamadı | Elif Kimya',
   description: 'Bu adres Elif Kimya sitesinde yok.',

@@ -31,8 +31,35 @@
   <meta name="twitter:description" content="Seyhan/Adana merkezli Elif Çevre Kimya (www.elifcevrekimya.com.tr): endüstriyel kimyasal tedariki, çevre ve atık su arıtma kimyasalları, soğutma kulesi ve kazan kimyasalları, PAC, jeotermal inhibitör, RO/EDI ve 163 model Medipure saf su cihazı." />
   <meta name="twitter:image" content="https://www.elifcevrekimya.com.tr/assets/hero-chemical.jpg" />
 
-  <!-- Favicon -->
+  <!-- Favicon & PWA -->
   <link rel="icon" type="image/svg+xml" href="/brand-mark.svg" />
+  <link rel="apple-touch-icon" href="/pwa-icon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Elif Kimya" />
+
+  <!-- Critical Inline CSS: Sayfa açılışında düz/stilsiz metin parlamasını (FOUC) engeller -->
+  <style>
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+    body {
+      margin: 0;
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+  </style>
 
   <!-- Google Fonts: Inter, Manrope & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,7 +82,7 @@
     "logo": "https://www.elifcevrekimya.com.tr/logo.svg",
     "image": "https://www.elifcevrekimya.com.tr/assets/hero-chemical.jpg",
     "description": "Endüstriyel kimyasal tedariki, çevre ve atık su arıtma koagülant/polielektrolitleri, soğutma kulesi ve kazan suyu şartlandırma kimyasalları ile 360° endüstriyel su arıtma ve otomasyon sistemleri mühendisliği.",
-    "telephone": "+905425903626",
+    "telephone": "+905464992342",
     "email": "info@elifkimya.com.tr",
     "hasMap": "https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111",
     "address": {

@@ -200,6 +200,7 @@ export function keywordsForPath(pathname) {
     else if (pathname.startsWith('/sistemler')) key = '/sistemler';
     else if (pathname.startsWith('/sektorler')) key = '/sektorler';
     else if (pathname.startsWith('/hizmet-bolgeleri')) key = '/hizmet-bolgeleri';
+    else if (pathname.startsWith('/teknik-bilgi')) key = '/teknik-bilgi';
     else key = '/';
   }
   const ids = PAGE_CLUSTER_IDS[key] || [];
@@ -492,12 +493,12 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
         logo: 'https://www.elifcevrekimya.com.tr/logo.svg',
         image: 'https://www.elifcevrekimya.com.tr/assets/hero-chemical.jpg',
         description,
-        telephone: '+905425903626',
+        telephone: '+905464992342',
         email: 'info@elifkimya.com.tr',
         contactPoint: [
           {
             '@type': 'ContactPoint',
-            telephone: '+905425903626',
+            telephone: '+905464992342',
             email: 'satis@elifkimya.com.tr',
             contactType: 'sales',
             areaServed: 'TR',
@@ -505,7 +506,7 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
           },
           {
             '@type': 'ContactPoint',
-            telephone: '+905425903626',
+            telephone: '+905464992342',
             email: 'info@elifkimya.com.tr',
             contactType: 'customer support',
             areaServed: 'TR',

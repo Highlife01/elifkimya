@@ -8,8 +8,8 @@ import { companyInfo } from '../data/products.js';
 import { getLanguage, t } from '../utils/i18n.js';
 
 export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
-  const rawPhone = generalSettings.phone || companyInfo.phoneDisplay;
-  const whatsappClean = (generalSettings.whatsapp || companyInfo.whatsappNumber || '905425903626').replace(/[^0-9]/g, '');
+  const rawPhone = companyInfo.phoneDisplay;
+  const whatsappClean = '905464992342';
   const whatsappUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent('Merhaba ELİF KİMYA, web siteniz üzerinden ulaşıyorum. Endüstriyel kimyasal ürünleriniz ve su arıtma sistemleriniz hakkında detaylı bilgi ve fiyat teklifi almak istiyorum.')}`;
   const email = generalSettings.salesEmail || companyInfo.salesEmail || companyInfo.email;
 

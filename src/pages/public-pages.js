@@ -29,6 +29,7 @@ import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
 import { fold, t, withLanguageSearch } from '../utils/i18n.js';
 import { REGION_SLUGS } from './seo-landings.js';
 import { bindMedipureCatalog, renderMedipureCatalog } from '../components/medipure-catalog.js';
+import { TECHNICAL_BLOG_CATEGORIES, TECHNICAL_BLOG_POSTS } from '../data/technical-blog.js';
 
 function attachSpaLinks(container, navigate) {
   container.querySelectorAll('[data-nav]').forEach((link) => {
@@ -961,14 +962,147 @@ export function renderRegionsPage(container, navigate) {
    5. TEKNİK BELGE MERKEZİ VE BİLGİ KÜTÜPHANESİ (/teknik-bilgi)
    ========================================================================== */
 export async function renderTechnicalCenterPage(container, navigate) {
+  let activeBlogCategory = 'all';
+  let blogSearchQuery = '';
+
+  function getFilteredBlogPosts() {
+    const q = fold(blogSearchQuery.trim());
+    return TECHNICAL_BLOG_POSTS.filter((post) => {
+      if (activeBlogCategory !== 'all' && post.category !== activeBlogCategory) return false;
+      if (q) {
+        const hay = fold([
+          post.title,
+          post.seoTitle,
+          post.metaDescription,
+          post.keyword,
+          ...(post.keywords || []),
+          post.summary,
+          ...post.sections.flatMap((s) => [s.heading, ...(s.paragraphs || [])]),
+          ...(post.fieldChecklist || [])
+        ].join(' '));
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderBlogListRegion() {
+    const listBox = container.querySelector('#tech-blog-list-region');
+    if (!listBox) return;
+    const filtered = getFilteredBlogPosts();
+
+    if (filtered.length === 0) {
+      renderSafeHtml(listBox, `
+        <div class="empty-state-box">
+          <h4>Arama Kriterinize Uygun Teknik Rehber Bulunamadı</h4>
+          <p>Farklı bir anahtar kelime deneyebilir veya kategori filtresini sıfırlayabilirsiniz.</p>
+        </div>
+      `);
+      return;
+    }
+
+    const cardsHtml = filtered.map((post) => `
+      <article class="card" id="rehber-${escapeAttr(post.slug)}" style="padding:1.65rem;display:flex;flex-direction:column;justify-content:space-between;gap:1rem;">
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.65rem;">
+            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
+              <span class="badge badge-teal">Rehber #${escapeHtml(String(post.number))}</span>
+              <span class="badge badge-neutral">${escapeHtml(post.categoryLabel)}</span>
+            </div>
+            <span style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">⏱️ ${escapeHtml(post.readingTime)}</span>
+          </div>
+
+          <h3 style="font-size:1.22rem;line-height:1.38;margin-bottom:0.5rem;">
+            <a href="/teknik-bilgi/${escapeAttr(post.slug)}" data-nav style="color:var(--text-primary);">${escapeHtml(post.title)}</a>
+          </h3>
+
+          <p style="font-size:0.92rem;color:var(--text-secondary);line-height:1.6;margin-bottom:0.75rem;">
+            ${escapeHtml(post.summary)}
+          </p>
+
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.85rem;">
+            <span class="metric-tag">🎯 Anahtar Kelime: ${escapeHtml(post.keyword)}</span>
+            <span class="metric-tag">🔗 /teknik-bilgi/${escapeHtml(post.slug)}</span>
+          </div>
+
+          <details style="background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:0.85rem 1rem;margin-bottom:0.5rem;">
+            <summary style="cursor:pointer;font-weight:700;font-size:0.88rem;color:var(--accent-teal-hover);">
+              📖 Tam Metni, Saha Kontrol Listesini & 16:9 Görsel Promptunu Aç
+            </summary>
+            <div style="margin-top:1rem;padding-top:0.85rem;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:1rem;">
+              <div style="font-size:0.8rem;color:var(--text-muted);background:#ffffff;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid var(--border-subtle);">
+                <div><strong>SEO Başlığı:</strong> ${escapeHtml(post.seoTitle)}</div>
+                <div style="margin-top:0.2rem;"><strong>Meta Açıklaması:</strong> ${escapeHtml(post.metaDescription)}</div>
+              </div>
+
+              ${post.sections.map((sec) => `
+                <div>
+                  <h4 style="font-size:1rem;color:var(--text-primary);margin-bottom:0.35rem;">${escapeHtml(sec.heading)}</h4>
+                  ${(sec.paragraphs || []).map((p) => `<p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.65;margin-bottom:0.55rem;">${escapeHtml(p)}</p>`).join('')}
+                </div>
+              `).join('')}
+
+              ${(post.fieldChecklist && post.fieldChecklist.length) ? `
+                <div style="background:var(--bg-teal-tint);border:1px solid rgba(13,148,136,0.25);border-radius:6px;padding:0.8rem 1rem;">
+                  <strong style="font-size:0.86rem;color:var(--accent-teal-hover);display:block;margin-bottom:0.4rem;">✅ Saha Kontrol ve İzleme Listesi:</strong>
+                  <ul style="padding-left:1.15rem;font-size:0.84rem;color:var(--text-primary);display:flex;flex-direction:column;gap:0.25rem;">
+                    ${post.fieldChecklist.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+
+              <div style="background:#ffffff;border:1px solid var(--border-subtle);border-radius:6px;padding:0.8rem 1rem;font-size:0.82rem;">
+                <div style="margin-bottom:0.35rem;"><strong>🖼️ Görsel Alt Metni:</strong> ${escapeHtml(post.imageAlt)}</div>
+                <div style="color:var(--text-secondary);margin-bottom:0.5rem;"><strong>🎨 16:9 Fotoğraf Üretim Promptu:</strong> ${escapeHtml(post.imagePromptTr)}</div>
+                <button type="button" class="btn btn-secondary btn-xs copy-prompt-btn" data-prompt="${escapeAttr(post.imagePromptTr)}">
+                  📋 Fotoğraf Promptunu Kopyala
+                </button>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;padding-top:0.75rem;border-top:1px solid var(--border-subtle);">
+          <a href="/teknik-bilgi/${escapeAttr(post.slug)}" class="btn btn-secondary btn-sm" data-nav>
+            🔗 Tam Sayfa Aç
+          </a>
+          <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+            <a href="${escapeAttr(post.ctaLink)}" class="btn btn-secondary btn-sm" data-nav>
+              ${escapeHtml(post.ctaLabel)}
+            </a>
+            <a href="${escapeAttr(post.secondaryLink)}" class="btn btn-primary btn-sm" data-nav>
+              Teklif / Analiz İste →
+            </a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    renderSafeHtml(listBox, `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.25rem;">${cardsHtml}</div>`);
+    attachSpaLinks(listBox, navigate);
+
+    listBox.querySelectorAll('.copy-prompt-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const promptText = btn.getAttribute('data-prompt') || '';
+        if (!promptText) return;
+        try {
+          await navigator.clipboard.writeText(promptText);
+          showNotification('16:9 fotoğraf üretim promptu panoya kopyalandı.', 'success');
+        } catch (_err) {
+          showNotification('Prompt kopyalanamadı.', 'error');
+        }
+      });
+    });
+  }
+
   const html = `
     <section class="page-hero">
       <div class="container">
         <div class="breadcrumb">
           <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Teknik Belge Merkezi & Mühendislik Rehberi</span>
         </div>
-        <h1>Teknik Belge Merkezi (SDS / GBF, TDS, COA) ve Mühendislik Rehberi</h1>
-        <p>Ürünlerimize ait güncel yayımlanmış Güvenlik Bilgi Formları (SDS/GBF), Teknik Bilgi Formları (TDS), Parti Analiz Sertifikaları (COA) ve proses mühendisliği makaleleri.</p>
+        <h1>Teknik Belge Merkezi (SDS / GBF, TDS, COA) ve 20 Proses Mühendisliği Rehberi</h1>
+        <p>Ürünlerimize ait güncel yayımlanmış Güvenlik Bilgi Formları (SDS/GBF), Teknik Bilgi Formları (TDS), Parti Analiz Sertifikaları (COA) ve soğutma kulesi, kazan, RO/EDI, atıksu, jeotermal ve ağır sanayi prosesleri için hazırlanan 20 kapsamlı teknik rehber.</p>
       </div>
     </section>
 
@@ -985,10 +1119,41 @@ export async function renderTechnicalCenterPage(container, navigate) {
           <div class="loading-banner">Yayımlanmış teknik belgeler kontrol ediliyor...</div>
         </div>
 
-        <!-- Mühendislik Makaleleri -->
+        <!-- 20 Teknik Blog & Uygulama Rehberi Kütüphanesi -->
+        <div class="section-header" id="teknik-blog-kutuphanesi">
+          <span class="section-tag">Proses Mühendisliği & Uygulama Blogu (20 Rehber)</span>
+          <h2 class="section-title">Endüstriyel Su Şartlandırma, Arıtma ve Sektörel Kimya Rehberleri</h2>
+          <p class="section-desc">Kimyasal dozaj ve sistem kapasitesi kararları su/brine/atıksu analizi ve tesis koşullarıyla belirlenmelidir; içeriklerde sabit dozaj veya performans garantisi verilmez.</p>
+        </div>
+
+        <div class="card" style="padding:1.25rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+            ${TECHNICAL_BLOG_CATEGORIES.map((cat) => `
+              <button
+                type="button"
+                class="btn btn-sm ${activeBlogCategory === cat.id ? 'btn-primary' : 'btn-secondary'} tech-blog-cat-btn"
+                data-cat="${escapeAttr(cat.id)}"
+              >
+                ${escapeHtml(cat.label)}
+              </button>
+            `).join('')}
+          </div>
+          <div style="flex:1;min-width:250px;max-width:360px;">
+            <input
+              type="search"
+              id="tech-blog-search"
+              class="form-input"
+              placeholder="20 rehber içinde konu, ürün veya proses ara..."
+            />
+          </div>
+        </div>
+
+        <div id="tech-blog-list-region" style="margin-bottom:3.5rem;"></div>
+
+        <!-- Hızlı Mühendislik Özetleri -->
         <div class="section-header">
-          <span class="section-tag">Proses Mühendisliği Kütüphanesi</span>
-          <h2 class="section-title">Endüstriyel Su Şartlandırma ve Kimyasal Uygulama Rehberleri</h2>
+          <span class="section-tag">Saha Referans Notları</span>
+          <h2 class="section-title">Kritik Proses Parametreleri ve Mühendislik Özetleri</h2>
         </div>
 
         <div class="knowledge-grid">
@@ -1027,6 +1192,24 @@ export async function renderTechnicalCenterPage(container, navigate) {
 
   renderSafeHtml(container, html);
   attachSpaLinks(container, navigate);
+  renderBlogListRegion();
+
+  container.querySelectorAll('.tech-blog-cat-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activeBlogCategory = btn.getAttribute('data-cat') || 'all';
+      container.querySelectorAll('.tech-blog-cat-btn').forEach((b) => {
+        const isAct = (b.getAttribute('data-cat') || 'all') === activeBlogCategory;
+        b.classList.toggle('btn-primary', isAct);
+        b.classList.toggle('btn-secondary', !isAct);
+      });
+      renderBlogListRegion();
+    });
+  });
+
+  container.querySelector('#tech-blog-search')?.addEventListener('input', (e) => {
+    blogSearchQuery = e.target.value || '';
+    renderBlogListRegion();
+  });
 
   container.querySelectorAll('.faq-question').forEach((btn) => {
     btn.addEventListener('click', () => {

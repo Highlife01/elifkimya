@@ -279,7 +279,7 @@ export async function renderHomePage(container, navigate) {
   let activeCycleIdx = 0;
   let activeEngTab = 'total_water';
 
-  const whatsappClean = (companyInfo.whatsappNumber || '905425903626').replace(/[^0-9]/g, '');
+  const whatsappClean = (companyInfo.whatsappNumber || '905464992342').replace(/[^0-9]/g, '');
   const initialSlide = HERO_SLIDES[0];
   const initialWaText = `Merhaba ELİF KİMYA, web sitenizden ulaşıyorum. "${initialSlide.title}" hakkında toptan teklif almak istiyorum.`;
   const initialWaUrl = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(initialWaText)}`;

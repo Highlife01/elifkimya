@@ -2563,7 +2563,7 @@ export function renderAdminPage(container, navigate) {
         }, {
           companyName: 'Elif Çevre Kimya',
           address: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
-          phone: '+90 (542) 590 36 26',
+          phone: '0546 499 23 42',
           email: 'info@elifkimya.com.tr'
         });
       } catch (err) {
@@ -2578,7 +2578,7 @@ export function renderAdminPage(container, navigate) {
           openProposalA4Modal(p, {
             companyName: 'Elif Çevre Kimya',
             address: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
-            phone: '+90 (542) 590 36 26',
+            phone: '0546 499 23 42',
             email: 'info@elifkimya.com.tr'
           });
         }
@@ -2918,7 +2918,7 @@ export function renderAdminPage(container, navigate) {
             <div>
               <h2 style="margin:0;color:#0f172a;font-size:1.35rem;font-weight:900;">${escapeHtml(general.companyName || 'ELİF KİMYA SANAYİ VE TİCARET')}</h2>
               <p style="margin:0.25rem 0 0;color:#475569;font-size:0.82rem;">Endüstriyel Kimyasal Hammadde • Medipure Saf Su & Su Arıtma Mühendisliği</p>
-              <p style="margin:0.15rem 0 0;color:#475569;font-size:0.8rem;">${escapeHtml(general.address || 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana')} | Tel: ${escapeHtml(general.phone || '+90 (542) 590 36 26')}</p>
+              <p style="margin:0.15rem 0 0;color:#475569;font-size:0.8rem;">${escapeHtml(general.address || 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana')} | Tel: ${escapeHtml(general.phone || '0546 499 23 42')}</p>
             </div>
             <div style="text-align:right;">
               <div style="display:inline-block;padding:0.35rem 0.75rem;background:#0f172a;color:#34d399;font-weight:800;border-radius:6px;font-size:0.82rem;">
@@ -4399,7 +4399,7 @@ export function renderAdminPage(container, navigate) {
             </div>
             <div class="form-group">
               <label class="form-label">Kurumsal Telefon</label>
-              <input type="text" name="phone" class="form-input" value="${escapeAttr(general.phone || '+90 (542) 590 36 26')}" />
+              <input type="text" name="phone" class="form-input" value="${escapeAttr(general.phone || '0546 499 23 42')}" />
             </div>
             <div class="form-group">
               <label class="form-label">Kurumsal E-posta</label>
