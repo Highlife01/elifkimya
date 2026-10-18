@@ -4,11 +4,17 @@
  */
 
 export function showToast(message, type = 'info', duration = 4500) {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'notification-container';
+    container.setAttribute('aria-live', 'polite');
+    document.body.appendChild(container);
+  }
 
   const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
+  toast.className = `toast-notification toast-${type}`;
 
   const iconSpan = document.createElement('span');
   iconSpan.className = 'toast-icon';
@@ -41,6 +47,8 @@ export function showToast(message, type = 'info', duration = 4500) {
     }
   }, duration);
 }
+
+export const showNotification = showToast;
 
 /**
  * Native confirm() yerine kullanılan, ana iş parçacığını bloklamayan kurumsal onay modalı.

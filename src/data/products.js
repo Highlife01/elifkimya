@@ -449,3 +449,307 @@ export const productCategories = [
     ]
   }
 ];
+
+// Kategori kartlarını hem eski hem yeni şemayla tam uyumlu hale getir
+productCategories.forEach((cat) => {
+  cat.slug = cat.slug || cat.id;
+  cat.shortTitle = cat.shortTitle || cat.tag || cat.title;
+  cat.description = cat.description || cat.shortDesc || '';
+  cat.packaging = cat.packaging || '25-30 kg Bidon / 1000 kg IBC / Dökme Tanker';
+  cat.subProducts = (cat.subcategories || []).map((s) => ({
+    name: s.name,
+    detail: `${s.activeChemical} — ${s.desc}`
+  }));
+});
+
+export const companyInfo = {
+  name: 'Elif Kimya',
+  legalName: 'Elif Kimya Endüstriyel Kimyasallar ve Su Arıtma Sistemleri',
+  tagline: 'Endüstriyel Kimyasal Satışları ve Su Arıtma Sistemleri Mühendisliği',
+  phoneDisplay: '+90 (542) 590 36 26',
+  phoneRaw: '+905425903626',
+  whatsappNumber: '905425903626',
+  whatsappUrl: 'https://wa.me/905425903626',
+  email: 'info@elifkimya.com.tr',
+  salesEmail: 'satis@elifkimya.com.tr',
+  address: 'Adana Hacı Sabancı OSB / Seyhan Sanayi Bölgesi, Adana / Türkiye',
+  city: 'Adana',
+  workingHours: 'Pazartesi – Cumartesi: 08:00 – 18:30'
+};
+
+export const heroStats = [
+  {
+    value: '6 Mega Sektör',
+    label: 'Proses Formülasyon Matrisi',
+    detail: 'Demir-Çelik, Deterjan, Kağıt, Cam, Kalsit ve Galvaniz'
+  },
+  {
+    value: '2 – 6 Saat',
+    label: 'Çukurova & OSB Sevkiyatı',
+    detail: 'Adana, Mersin, Osmaniye, İskenderun, Kayseri, Niğde'
+  },
+  {
+    value: '%99.5+',
+    label: 'RO & EDI Saf Su Verimi',
+    detail: '< 0.1 µS/cm iletkenlik ve yüksek silis giderimi'
+  },
+  {
+    value: '%100 Doğrulanmış',
+    label: 'SDS / TDS / COA Belgeleri',
+    detail: 'Parti bazlı analiz ve yerinde Jar-Test doğrulaması'
+  }
+];
+
+export const waterTreatmentSystems = [
+  {
+    id: 'endustriyel-ro',
+    code: 'SYS-RO',
+    title: 'Endüstriyel Ters Ozmoz (Reverse Osmosis) Sistemleri',
+    capacityRange: '1 – 250 m³/saat',
+    summary: 'Kuyu suyu, nehir suyu ve şebeke sularında yüksek tuzluluk ve iletkenliği %99.5’e varan oranda gideren, PLC/SCADA otomasyonlu ağır hizmet RO üniteleri.',
+    features: [
+      'Düşük enerjili TFC poliamid membran dizilimi ve antiskalant dozaj otomasyonu',
+      'AISI 304/316 paslanmaz çelik yüksek basınç kollektörleri ve şase',
+      'Online iletkenlik, pH, ORP, basınç ve debi izleme panosu',
+      'Entegre membran kimyasal yıkama (CIP) istasyonu'
+    ],
+    useCases: 'Buhar kazanı besi suyu, tekstil boyahane, gıda/içecek, kimya ve enerji santralleri'
+  },
+  {
+    id: 'edi-ultra-saf-su',
+    code: 'SYS-EDI',
+    title: 'EDI (Elektrodeiyonizasyon) & Çift Kademe Ultra Saf Su Sistemleri',
+    capacityRange: '0.5 – 100 m³/saat (< 0.06 µS/cm)',
+    summary: 'Asit ve kostik rejenerasyonuna ihtiyaç duymadan, elektrik alanıyla kesintisiz 18.2 MΩ·cm / <0.1 µS/cm ultra saf su üreten çevre dostu sistemler.',
+    features: [
+      'Çift geçişli RO (Double Pass) + Membran Degazör + EDI konfigürasyonu',
+      'Asit/kostik atığı olmadan 7/24 kesintisiz yüksek saflık',
+      '> %99.5 çözünmüş silis (SiO₂) ve bor giderimi',
+      'Cam yıkama (ayna/low-E), yüksek basınçlı türbin kazanları ve laboratuvarlar'
+    ],
+    useCases: 'Düzcam/ayna yıkama hatları, yüksek basınçlı buhar kazanları, ilaç ve elektronik sanayi'
+  },
+  {
+    id: 'ultrafiltrasyon-uf',
+    code: 'SYS-UF',
+    title: 'Ultrafiltrasyon (UF) ve İleri Ön Arıtma Sistemleri',
+    capacityRange: '5 – 300 m³/saat (0.02 Mikron)',
+    summary: 'Yüzey suları ve kuyu sularındaki bulanıklık, askıda katı madde, kolloidal silis ve bakterileri 0.02 mikron PVDF membranlarla filtreleyen tam otomatik sistemler.',
+    features: [
+      'RO membranları öncesinde SDI < 2.0 garantisi',
+      'Otomatik ters yıkama (Backwash) ve kimyasal destekli yıkama (CEB)',
+      'Düşük kimyasal ve enerji sarfiyatı'
+    ],
+    useCases: 'Nehir/baraj suyu arıtımı, atıksu geri kazanım (ZLD) ön arıtması, içme ve proses suyu'
+  },
+  {
+    id: 'yumusatma-demineralizasyon',
+    code: 'SYS-SOFT',
+    title: 'Otomatik Su Yumuşatma ve Demineralizasyon Sistemleri',
+    capacityRange: '2 – 200 m³/saat',
+    summary: 'Kalsiyum ve magnezyum sertliğini sıfırlayan tandem reçineli yumuşatma üniteleri ile katyonik-anyonik deiyonizasyon kolonları.',
+    features: [
+      'Debi ve sertlik sensörü kontrollü tandem (kesintisiz) çalışma',
+      'FRP veya epoksi kaplı karbon çelik tank seçenekleri',
+      'Yüksek kapasiteli gıda ve endüstriyel sınıf iyon değiştirici reçineler'
+    ],
+    useCases: 'Soğutma kulesi besi suyu, alçak/orta basınçlı buhar kazanları, tekstil ve çamaşırhaneler'
+  },
+  {
+    id: 'kum-karbon-demir-mangan',
+    code: 'SYS-FILT',
+    title: 'Multimedya Kum, Aktif Karbon ve Demir-Mangan Filtrasyonu',
+    capacityRange: '2 – 250 m³/saat',
+    summary: 'Ham sudaki askıda katı madde, serbest klor, organik madde, renk, koku ile çözünmüş demir ve manganı gideren otomatik filtrasyon bataryaları.',
+    features: [
+      'Kademeli kuvars kumu, antrasit, yüksek iyotlu aktif karbon ve katalitik medya',
+      'Pnömatik veya elektrik aktüatörlü yüzey borulamalı otomatik vanalar',
+      'Fark basınç (ΔP) ve zaman bazlı otomatik ters yıkama'
+    ],
+    useCases: 'Kuyu suyu ön arıtımı, proses suyu hazırlama, RO membran koruma'
+  },
+  {
+    id: 'dozaj-ve-otomasyon',
+    code: 'SYS-DOSE',
+    title: 'Otomatik Kimyasal Dozaj, Blöf ve Kule/Kazan Kontrol Üniteleri',
+    capacityRange: 'PLC & Sensör Kontrollü',
+    summary: 'Soğutma kuleleri ve buhar kazanlarında iletkenlik, pH, ORP ve korozyon hızını anlık ölçerek otomatik blöf ve kimyasal dozajı yapan akıllı kontrol panoları.',
+    features: [
+      'Toroidal (indüktif) iletkenlik sensörü ile kirlilikten etkilenmeyen blöf kontrolü',
+      'Oransal (4-20 mA / Pulse) diyaframlı dozaj pompaları ve seviye şamandıralı PE tanklar',
+      'Uzaktan izleme ve veri kaydı (Data Logging)'
+    ],
+    useCases: 'Açık/kapalı soğutma kuleleri, buhar jeneratörleri, atıksu nötralizasyon tesisleri'
+  }
+];
+
+export const waterSystems = waterTreatmentSystems;
+
+export const sectorsData = [
+  {
+    id: 'demir-celik',
+    title: 'Demir-Çelik, Haddehane ve Boru/Galvaniz Sanayi',
+    region: 'İskenderun, Payas, Osmaniye, Adana, Kayseri',
+    summary: 'Tufal çukuru ultra yüksek molekül ağırlıklı A-PAM polimerleri, HCl asitleme inhibitörleri, kristalizatör kapalı devre inhibitörleri ve yağ emülsiyon kırıcılar.',
+    keyChemicals: ['Anyonik PAM (IV>16)', 'Mannich Asit İnhibitörü', 'Molibdat/Azol İnhibitörü', 'PoliDADMAC Demülsifiyer']
+  },
+  {
+    id: 'deterjan-kimya',
+    title: 'Deterjan, Sülfonasyon ve Kimya Tesisleri',
+    region: 'Adana AOSB, Mersin, Gaziantep',
+    summary: '%96 LABSA, %70 SLES, sodyum sülfat, zeolit 4A, kostik soda tedariki ve ekzotermik sülfonasyon reaktör ceketleri için yüksek termal kararlılıklı PBTC şartlandırma.',
+    keyChemicals: ['LABSA %96 & SLES %70', 'PBTC/HEDP Antiskalant', 'Kostik Soda %48/%99', 'Sodyum Poliakrilat']
+  },
+  {
+    id: 'kagit-ambalaj',
+    title: 'Kağıt, Oluklu Mukavva ve Selüloz Sanayi',
+    region: 'Adana, Mersin, Kahramanmaraş, Kayseri',
+    summary: 'Kağıt makinesi yaş kısım retansiyon polimerleri, silikonsuz yağ alkolü köpük kesiciler, PAE yaş mukavemet reçineleri ve DBNPA slime biyositleri.',
+    keyChemicals: ['Katyonik PAM Retansiyon', 'Silikonsuz Antifoam', 'PAE Reçinesi', 'DBNPA Biyosit']
+  },
+  {
+    id: 'cam-seramik',
+    title: 'Düzcam, Cam Ambalaj ve Soda Sanayi',
+    region: 'Mersin, Adana, Eskişehir, Yenişehir',
+    summary: 'Float kalay banyosu ve fırın kapalı devreleri için nitritsiz molibdat inhibitörleri, EDI ultra saf cam yıkama sistemleri ve lehr soğutma şartlandırıcıları.',
+    keyChemicals: ['Sodyum Molibdat İnhibitörü', 'Çift Kademe RO + EDI', 'Sentetik Rodaj Sıvısı', 'Lehr Antiskalantı']
+  },
+  {
+    id: 'maden-kalsit',
+    title: 'Mikronize Kalsit, Maden ve Çimento Tesisleri',
+    region: 'Niğde OSB, Adana, Mersin, Karaman',
+    summary: 'Yaş öğütme değirmenleri için düşük molekül ağırlıklı sodyum poliakrilat dispersantlar, stearik asit yüzey kaplama ajanları ve tikiner flokülantları.',
+    keyChemicals: ['NaPA Dispersant (MW 4000)', 'Stearik Asit (Triple Pressed)', 'A-PAM Tikiner Polimeri', 'Kuvars Flotasyon Ajanı']
+  },
+  {
+    id: 'tekstil-gida-enerji',
+    title: 'Tekstil Boyahane, Gıda ve Enerji Santralleri',
+    region: 'Adana AOSB, Tarsus, Kayseri, Kahramanmaraş',
+    summary: 'Sıfır sertlikte yumuşatma ve RO proses suyu tesisleri, buhar kazanı DEHA oksijen tutucuları, tekstil renk giderici koagülantlar ve kule biyositleri.',
+    keyChemicals: ['DEHA Oksijen Tutucu', 'Renk Giderici Polimer', 'RO Antiskalant & CIP', 'Kule Biyosit & Dispersant']
+  }
+];
+
+export const serviceRegions = [
+  {
+    region: 'Adana Merkez & Hacı Sabancı OSB (AOSB)',
+    badge: 'Merkez Üs — Aynı Gün Teslimat',
+    details: 'Adana Hacı Sabancı OSB, Seyhan, Yüreğir ve Ceyhan enerji/endüstri bölgesindeki fabrikalara 2 saat içinde acil kimyasal sevkiyatı, yerinde su analizi ve RO/EDI teknik servisi.',
+    highlights: ['Adana AOSB', 'Ceyhan Endüstri Bölgesi', '2 Saatte Saha Müdahalesi', 'Konsinye IBC Stok']
+  },
+  {
+    region: 'Mersin-Tarsus OSB (MTOSB), Serbest Bölge & Liman',
+    badge: '2–3 Saat Lojistik Koridoru',
+    details: 'Mersin-Tarsus OSB, Cam ve Soda tesisleri, Mersin Serbest Bölgesi ve Liman koridorundaki fabrikalara günlük düzenli ADR’li sevkiyat ve periyodik su şartlandırma kontrolü.',
+    highlights: ['Mersin MTOSB', 'Tarsus OSB', 'Mersin Serbest Bölge', 'Cam & Gıda Sanayi']
+  },
+  {
+    region: 'İskenderun, Payas, Dörtyol & Osmaniye Demir-Çelik Hattı',
+    badge: 'Ağır Sanayi Özel Sevkiyat',
+    details: 'Türkiye çelik üretiminin kalbi olan Osmaniye OSB, Payas ve İskenderun haddehane/çelikhane tesislerine dökme tanker, IBC ve 25 kg paletli polimer/inhibitör tedariki.',
+    highlights: ['Osmaniye OSB', 'İskenderun & Payas', 'Haddehane Tufal & Pickling', 'Dökme Tanker Sevkiyat']
+  },
+  {
+    region: 'Niğde Mikronize Kalsit & Kayseri OSB Sanayi Koridoru',
+    badge: 'İç Anadolu Güney Aksı',
+    details: 'Niğde OSB ve Bor bölgesindeki mikronize kalsit madenleri ile Kayseri OSB ve Mimarsinan OSB’deki boru, profil, galvaniz, tekstil ve mobilya tesislerine hızlı sevkiyat.',
+    highlights: ['Niğde OSB (Kalsit)', 'Kayseri OSB', 'Boru & Galvaniz Hatları', '4–5 Saatte Teslimat']
+  },
+  {
+    region: 'Gaziantep, Kahramanmaraş & Güneydoğu Sanayi Havzası',
+    badge: 'Bölgesel Dağıtım Ağı',
+    details: 'Gaziantep Başpınar OSB ve Kahramanmaraş tekstil, kağıt ve gıda tesislerine düzenli su şartlandırma kimyasalları, atıksu polimerleri ve RO membran sistemleri.',
+    highlights: ['Gaziantep Başpınar OSB', 'Kahramanmaraş Tekstil & Kağıt', 'Atıksu Renk Giderimi', 'Periyodik Bakım']
+  },
+  {
+    region: '81 İl Türkiye Geneli & Uluslararası İhracat',
+    badge: 'Ulusal & İhracat Lojistiği',
+    details: 'Mersin ve İskenderun limanlarına yakınlığımızla Orta Doğu, Kuzey Afrika, Türk Cumhuriyetleri ve Balkanlar’a IMO/ADR belgeli konteyner ihracatı ve 81 ile sevkiyat.',
+    highlights: ['81 İle Ambar & Filo Sevk', 'Mersin Limanı FOB/CIF İhracat', 'TR/EN SDS & COA Belgeleri', 'Teknik Destek']
+  }
+];
+
+export const faqItems = [
+  {
+    question: 'Soğutma kulesi ve buhar kazanı kimyasal dozajı neye göre belirlenir?',
+    answer: 'Kesin kimyasal dozajı; ham suyun ve sistem blöf suyunun pH, iletkenlik (µS/cm), toplam sertlik (°Fr), M-alkalinite, klorür ve silis (SiO₂) analizleri yapıldıktan ve Langelier Doygunluk İndeksi (LSI) hesaplandıktan sonra belirlenir. Eksik su analiziyle tahmini dozaj önerilmez.'
+  },
+  {
+    question: 'Sıvı kimyasallarda kg ile litre arasında nasıl dönüşüm yapıyorsunuz?',
+    answer: 'Elif Kimya mühendislik kuralları gereği, ürünün Teknik Bilgi Formunda (TDS) doğrulanmış özgül ağırlık (yoğunluk, g/cm³ veya kg/L) değeri bulunmadan kg ile litre arasında dönüşüm yapılmaz. Örneğin %48 sıvı kostik (~1.50 kg/L) ile %32 hidroklorik asit (~1.16 kg/L) farklı yoğunluklara sahiptir.'
+  },
+  {
+    question: 'Tesisimizde kimyasal değişikliği öncesinde ücretsiz Jar-Test veya su analizi yapıyor musunuz?',
+    answer: 'Evet. Adana, Mersin, Osmaniye, Hatay, Niğde ve Kayseri başta olmak üzere sanayi tesislerinize mobil laboratuvarımızla gelerek kendi atıksuyunuz, tufal suyunuz veya kule/kazan suyunuz üzerinde canlı Jar-Test ve LSI korozyon etüdü gerçekleştiriyor, raporu yönetiminize sunuyoruz.'
+  },
+  {
+    question: 'Ürünlerinizle birlikte SDS (GBF), TDS ve Parti Analiz Sertifikası (COA) veriliyor mu?',
+    answer: 'Evet. Teslim edilen her parti kimyasal ürünümüz için güncel mevzuata uygun Güvenlik Bilgi Formu (SDS/GBF), Teknik Bilgi Formu (TDS) ve üretim partisine ait Analiz Sertifikası (COA) paylaşılmaktadır.'
+  },
+  {
+    question: 'Su arıtma sistemlerinde (RO, EDI, Yumuşatma) periyodik bakım ve membran CIP yıkama hizmetiniz var mı?',
+    answer: 'Evet. Kurulumunu yaptığımız veya fabrikanızda mevcut olan Ters Ozmoz (RO), EDI, Ultrafiltrasyon ve Yumuşatma sistemleri için periyodik bakım sözleşmesi, membran CIP kimyasal yıkama, reçine/kum/karbon medya değişimi ve yedek parça desteği sağlıyoruz.'
+  }
+];
+
+export const geoKnowledgeArticles = [
+  {
+    title: 'Haddehane Tufal Çukurlarında Anyonik Poliakrilamid (A-PAM) Seçimi ve Sıcaklık Etkisi',
+    content: 'Sıcak haddeleme hatlarında 60°C üzerindeki tufal sularında standart polimerler hidrolize olarak flokülasyon gücünü kaybeder. İntrinsik viskozitesi >16 dl/g olan yüksek molekül ağırlıklı A-PAM kopolimerleri, demir oksit (Fe₂O₃/Fe₃O₄) partiküllerini <10 mg/L AKM seviyesine indirerek yüksek basınçlı descaling nozullarını korur.',
+    metrics: ['İntrinsik Viskozite > 16 dl/g', 'Çıkış AKM < 10 mg/L', '0.8 – 2.5 ppm Dozaj']
+  },
+  {
+    title: 'Buhar Kazanlarında Kireç ve Silikat Taşının Doğalgaz Tüketimine Etkisi',
+    content: 'Kazan duman boruları veya su boruları üzerinde oluşan 1 mm kalınlığındaki kalsiyum karbonat tabakası yakıt tüketimini %4–5 artırırken, düşük ısı iletkenliğine sahip silikatlı kışır tabakası %8–12 arasında fazladan doğalgaz yakılmasına yol açar. Doğru RO ön arıtması ve fosfonat/terpolimer şartlandırması bu kaybı sıfırlar.',
+    metrics: ['1 mm Kireç = %5–8 Ek Yakıt', 'DEHA ile < 5 ppb O₂', 'EN 12952 Uyumlu']
+  },
+  {
+    title: 'Ters Ozmoz (RO) Membranlarında Silis ve Kalsiyum Sülfat Tıkanmasını Önleme',
+    content: 'Kuyu sularında yüksek silis (>40 ppm) ve yüksek sertlik bulunan Çukurova ve İç Anadolu tesislerinde, standart hekzametafosfat (SHMP) kullanımı membranlarda geri dönüşsüz tıkanmaya neden olur. Dendrimerik ve fosfonat bazlı özel RO antiskalantları 240 ppm silis seviyesine kadar çökeltisiz çalışmayı mümkün kılar.',
+    metrics: ['240 ppm Silis Toleransı', 'Geri Kazanım %75–82', '2–4 ppm Dozaj']
+  }
+];
+
+export const pageSEO = {
+  '/': {
+    title: 'Elif Kimya | Endüstriyel Kimyasal Satışları ve Su Arıtma Sistemleri (Adana & Türkiye)',
+    description: 'Adana merkezli Elif Kimya; endüstriyel proses kimyasalları, soğutma kulesi ve kazan suyu şartlandırma, haddehane/kağıt/deterjan kimyasalları ve RO/EDI su arıtma sistemleri sunar.',
+    canonical: 'https://elifkimya.web.app/'
+  },
+  '/urunler': {
+    title: 'Endüstriyel Kimyasal Ürünler ve Proses Formülasyonları | Elif Kimya',
+    description: 'Soğutma kulesi, kazan suyu, RO antiskalant, poliakrilamid flokülant, asitleme inhibitörü, LABSA, SLES, kostik ve endüstriyel bakım kimyasalları kataloğu.',
+    canonical: 'https://elifkimya.web.app/urunler'
+  },
+  '/sistemler': {
+    title: 'Endüstriyel Su Arıtma, Ters Ozmoz (RO) ve EDI Saf Su Sistemleri | Elif Kimya',
+    description: 'Ham su analizine dayalı endüstriyel Ters Ozmoz (RO), Elektrodeiyonizasyon (EDI), Ultrafiltrasyon (UF), su yumuşatma ve dozaj otomasyon sistemleri.',
+    canonical: 'https://elifkimya.web.app/sistemler'
+  },
+  '/sektorler': {
+    title: 'Çukurova Mega Sanayi Proses Çözümleri ve Canlı ROI Simülatörleri | Elif Kimya',
+    description: 'Demir-çelik haddehaneleri, deterjan sülfonasyon, kağıt/oluklu mukavva, düzcam, Niğde mikronize kalsit ve Kayseri boru/galvaniz tesisleri için kimyasal çözümler.',
+    canonical: 'https://elifkimya.web.app/sektorler'
+  },
+  '/hizmet-bolgeleri': {
+    title: 'Hizmet Bölgeleri: Adana AOSB, Mersin, İskenderun, Osmaniye, Kayseri, Niğde | Elif Kimya',
+    description: 'Adana merkez depomuzdan Çukurova, İç Anadolu ve Türkiye genelindeki organize sanayi bölgelerine 2-6 saat içinde ADR sertifikalı kimyasal sevkiyatı.',
+    canonical: 'https://elifkimya.web.app/hizmet-bolgeleri'
+  },
+  '/teknik-bilgi': {
+    title: 'Teknik Belge Merkezi (SDS / GBF, TDS, COA) ve Mühendislik Rehberi | Elif Kimya',
+    description: 'Kimyasal ürünlerimize ait doğrulanmış Güvenlik Bilgi Formları (SDS/GBF), Teknik Bilgi Formları (TDS), Analiz Sertifikaları (COA) ve proses mühendisliği makaleleri.',
+    canonical: 'https://elifkimya.web.app/teknik-bilgi'
+  },
+  '/teklif-al': {
+    title: 'Kurumsal Teklif, Canlı Jar-Test ve Su Analizi Başvurusu | Elif Kimya',
+    description: 'Fabrikanız için endüstriyel kimyasal fiyat teklifi, yerinde 6’lı Jar-Test, ücretsiz korozyon/LSI risk etüdü ve su arıtma sistemi projelendirme talebi oluşturun.',
+    canonical: 'https://elifkimya.web.app/teklif-al'
+  },
+  '/iletisim': {
+    title: 'İletişim & Adana Merkez Ofis / Depo | Elif Kimya',
+    description: 'Elif Kimya Adana merkez ofis, depo ve teknik satış iletişim bilgileri.',
+    canonical: 'https://elifkimya.web.app/iletisim'
+  }
+};
+

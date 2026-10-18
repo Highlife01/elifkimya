@@ -599,11 +599,15 @@ export async function saveChemicalProduct(productData, actor) {
    4. TEKNİK BELGE MERKEZİ (SDS/GBF, TDS, COA, SERTİFİKALAR)
    ========================================================================== */
 
-export async function uploadAndSaveTechnicalDocument(file, docMeta, actor) {
+export async function uploadAndSaveTechnicalDocument(arg1, arg2, actor) {
   if (!db) throw new Error('Veritabanı bağlantısı yok.');
   if (!hasPermission(actor?.role, 'manage_documents')) {
     throw new Error('Teknik belge yükleme yetkiniz bulunmuyor.');
   }
+
+  const isFirstFile = typeof Blob !== 'undefined' && arg1 instanceof Blob;
+  const file = isFirstFile ? arg1 : (typeof Blob !== 'undefined' && arg2 instanceof Blob ? arg2 : null);
+  const docMeta = (isFirstFile ? arg2 : arg1) || {};
 
   let fileUrl = optStr(docMeta.fileUrl);
   let storagePath = optStr(docMeta.storagePath);
@@ -703,14 +707,16 @@ export async function saveWaterProject(projectData, actor) {
     throw new Error('Su arıtma projelerini yönetme yetkiniz bulunmuyor.');
   }
 
+  const phVal = projectData.pH ?? projectData.ph;
   const waterAnalysis = {
-    ph: projectData.ph !== '' && projectData.ph !== undefined ? String(projectData.ph).trim() : '',
-    conductivityUsCm: projectData.conductivityUsCm !== '' && projectData.conductivityUsCm !== undefined ? String(projectData.conductivityUsCm).trim() : '',
-    tdsPpm: projectData.tdsPpm !== '' && projectData.tdsPpm !== undefined ? String(projectData.tdsPpm).trim() : '',
-    hardnessFr: projectData.hardnessFr !== '' && projectData.hardnessFr !== undefined ? String(projectData.hardnessFr).trim() : '',
-    silicaPpm: projectData.silicaPpm !== '' && projectData.silicaPpm !== undefined ? String(projectData.silicaPpm).trim() : '',
-    ironPpm: projectData.ironPpm !== '' && projectData.ironPpm !== undefined ? String(projectData.ironPpm).trim() : '',
-    chloridePpm: projectData.chloridePpm !== '' && projectData.chloridePpm !== undefined ? String(projectData.chloridePpm).trim() : '',
+    pH: phVal !== '' && phVal !== undefined && phVal !== null ? String(phVal).trim() : '',
+    ph: phVal !== '' && phVal !== undefined && phVal !== null ? String(phVal).trim() : '',
+    conductivityUsCm: projectData.conductivityUsCm !== '' && projectData.conductivityUsCm !== undefined && projectData.conductivityUsCm !== null ? String(projectData.conductivityUsCm).trim() : '',
+    tdsPpm: projectData.tdsPpm !== '' && projectData.tdsPpm !== undefined && projectData.tdsPpm !== null ? String(projectData.tdsPpm).trim() : '',
+    hardnessFr: projectData.hardnessFr !== '' && projectData.hardnessFr !== undefined && projectData.hardnessFr !== null ? String(projectData.hardnessFr).trim() : '',
+    silicaPpm: projectData.silicaPpm !== '' && projectData.silicaPpm !== undefined && projectData.silicaPpm !== null ? String(projectData.silicaPpm).trim() : '',
+    ironPpm: projectData.ironPpm !== '' && projectData.ironPpm !== undefined && projectData.ironPpm !== null ? String(projectData.ironPpm).trim() : '',
+    chloridePpm: projectData.chloridePpm !== '' && projectData.chloridePpm !== undefined && projectData.chloridePpm !== null ? String(projectData.chloridePpm).trim() : '',
     analysisDate: String(projectData.analysisDate || '').trim()
   };
 
@@ -722,6 +728,16 @@ export async function saveWaterProject(projectData, actor) {
   );
   waterAnalysis.isComplete = isAnalysisComplete;
 
+  const recEquipText = typeof projectData.recommendedEquipment === 'string'
+    ? projectData.recommendedEquipment.trim()
+    : Array.isArray(projectData.recommendedEquipment)
+      ? projectData.recommendedEquipment.join(', ').trim()
+      : String(projectData.recommendedEquipmentText || '').trim();
+
+  if (recEquipText && !isAnalysisComplete) {
+    throw new Error('Eksik su analizi (pH, İletkenlik ve Sertlik zorunludur) ile kesin arıtma ekipmanı veya kimyasal dozaj önerisi üretilemez!');
+  }
+
   let approvalStatus = String(projectData.approvalStatus || 'pending_analysis');
   if (!isAnalysisComplete && approvalStatus === 'approved') {
     throw new Error('Eksik su analizi verisiyle (pH, İletkenlik/TDS ve Sertlik zorunludur) kesin teknik onay ve kapasite/performans garantisi verilemez!');
@@ -732,32 +748,34 @@ export async function saveWaterProject(projectData, actor) {
 
   const nowIso = new Date().toISOString();
   const projectName = String(projectData.projectName || '').trim();
+  const customerName = String(projectData.customerName || projectData.companyName || '').trim();
   const stage = String(projectData.stage || 'Keşif');
 
   const payload = {
     title: projectName,
     projectName,
     projectCode: String(projectData.projectCode || `PRJ-${Date.now().toString().slice(-5)}`).trim(),
-    customerName: String(projectData.customerName || '').trim(),
+    companyName: customerName,
+    customerName,
     customerUid: optStr(projectData.customerUid),
     facilityName: optStr(projectData.facilityName),
     location: String(projectData.location || 'Adana').trim(),
     rawWaterSource: String(projectData.rawWaterSource || 'Kuyu Suyu'),
+    hasVerifiedWaterAnalysis: isAnalysisComplete,
     waterAnalysis,
     requestedCapacity: projectData.requestedCapacity ? Number(projectData.requestedCapacity) : null,
     capacityUnit: String(projectData.capacityUnit || 'm³/saat'),
     targetUsage: optStr(projectData.targetUsage),
     customerRequirements: optStr(projectData.customerRequirements),
+    technicalApprovalStatus: isAnalysisComplete ? approvalStatus : 'pending_analysis',
     technicalEvaluation: {
       notes: String(projectData.technicalNotes || '').trim(),
       approvalStatus: isAnalysisComplete ? approvalStatus : 'pending_analysis',
       approvedBy: approvalStatus === 'approved' ? (actor.email || actor.uid) : null,
       approvedAt: approvalStatus === 'approved' ? nowIso : null
     },
-    recommendedEquipment: Array.isArray(projectData.recommendedEquipment)
-      ? projectData.recommendedEquipment
-      : String(projectData.recommendedEquipmentText || '').split('\n').map((s) => s.trim()).filter(Boolean),
-    assignedStaff: optStr(projectData.assignedStaff || actor.displayName || actor.email),
+    recommendedEquipment: recEquipText,
+    assignedStaff: optStr(projectData.assignedStaff || projectData.assignedEngineer || actor.displayName || actor.email),
     plannedStartDate: optStr(projectData.plannedStartDate),
     plannedCommissioningDate: optStr(projectData.plannedCommissioningDate),
     stage,
@@ -795,8 +813,18 @@ export async function saveWaterProject(projectData, actor) {
  *   totalCost, grossProfit ve profitMarginPercent değerlerini null döner (costIncomplete = true).
  * - Farklı para birimlerini kur ve tarih kaydı olmadan doğrudan toplamaz.
  */
-export function calculateProposalFinancials(input) {
-  const proposalCurrency = String(input.currency || 'TRY');
+export function calculateProposalFinancials(inputOrItems, currencyArg = 'TRY', exchangeRateArg = null, exchangeRateDateArg = '') {
+  const input = Array.isArray(inputOrItems)
+    ? {
+        items: inputOrItems,
+        currency: currencyArg,
+        exchangeRate: exchangeRateArg,
+        exchangeRateDate: exchangeRateDateArg,
+        shippingPrice: inputOrItems.reduce((s, i) => s + Number(i.shippingCost || 0) + Number(i.installationCost || 0) + Number(i.commissioningCost || 0), 0),
+        shippingCost: 0
+      }
+    : (inputOrItems || {});
+  const proposalCurrency = String(input.currency || input.baseCurrency || 'TRY');
   const exchangeRateValue = input.exchangeRate ? Number(input.exchangeRate) : null;
   const exchangeRateDate = String(input.exchangeRateDate || '').trim();
 
@@ -842,7 +870,8 @@ export function calculateProposalFinancials(input) {
 
     return {
       code: String(item.code || '').trim(),
-      description: String(item.description || '').trim(),
+      productName: String(item.productName || item.description || item.code || '').trim(),
+      description: String(item.description || item.productName || '').trim(),
       itemType: String(item.itemType || 'chemical'),
       quantity: qty,
       unit: String(item.unit || 'kg'),
@@ -912,6 +941,7 @@ export function calculateProposalFinancials(input) {
 
   return {
     currency: proposalCurrency,
+    baseCurrency: proposalCurrency,
     exchangeRate: exchangeRateValue,
     exchangeRateDate,
     items: computedItems,
@@ -923,8 +953,10 @@ export function calculateProposalFinancials(input) {
     commissioningCost,
     subtotalExclVat,
     discountTotal,
+    totalDiscount: discountTotal,
     netExclVat,
     vatTotal,
+    totalVat: vatTotal,
     grandTotal,
     hasMissingCost,
     totalCost,
@@ -975,7 +1007,7 @@ export async function saveProposalOrCreateRevision(proposalData, actor) {
 
   const status = forceNewDoc ? 'draft' : String(proposalData.status || 'draft');
   const isImmutable = ['sent', 'approved', 'rejected'].includes(status);
-  const customerName = String(proposalData.customerName || '').trim();
+  const customerName = String(proposalData.customerName || proposalData.companyName || '').trim();
 
   const payload = {
     proposalNo,
@@ -988,7 +1020,8 @@ export async function saveProposalOrCreateRevision(proposalData, actor) {
     customerId: optStr(proposalData.customerId),
     customerUid: optStr(proposalData.customerUid),
     contactName: optStr(proposalData.contactName),
-    customerEmail: optStr(proposalData.customerEmail),
+    customerEmail: optStr(proposalData.customerEmail || proposalData.contactEmail),
+    contactEmail: optStr(proposalData.contactEmail || proposalData.customerEmail),
     customerPhone: optStr(proposalData.customerPhone),
     customerAddress: optStr(proposalData.customerAddress),
     crmRequestId: optStr(proposalData.crmRequestId),
@@ -1185,22 +1218,35 @@ export async function executeStockMovementTransaction(movementInput, actor) {
     throw new Error('Stok hareket miktarı sıfırdan büyük olmalıdır.');
   }
 
-  const productCode = String(movementInput.productCode || '').trim();
-  const productName = String(movementInput.productName || '').trim();
-  const warehouse = String(movementInput.warehouse || 'Adana Merkez Depo').trim();
-  const unit = String(movementInput.unit || 'kg').trim();
-  const variantCode = String(movementInput.variantCode || 'STD').trim();
+  let productCode = String(movementInput.productCode || '').trim();
+  let productName = String(movementInput.productName || '').trim();
+  let warehouse = String(movementInput.warehouse || 'Adana Merkez Depo').trim();
+  let unit = String(movementInput.unit || 'kg').trim();
+  let variantCode = String(movementInput.variantCode || 'STD').trim();
+  let resolvedItemDocId = movementInput.itemId ? String(movementInput.itemId).trim() : '';
+
+  if (resolvedItemDocId && (!productCode || !productName)) {
+    const existingSnap = await getDoc(doc(db, COLLECTIONS.INVENTORY_ITEMS, resolvedItemDocId));
+    if (existingSnap.exists()) {
+      const d = existingSnap.data();
+      productCode = d.productCode || d.sku || resolvedItemDocId;
+      productName = d.productName || d.name || resolvedItemDocId;
+      warehouse = d.warehouse || warehouse;
+      unit = d.unit || unit;
+      variantCode = d.variantCode || variantCode;
+    }
+  }
 
   if (!productCode || !productName) {
     throw new Error('Ürün kodu ve ürün adı zorunludur.');
   }
 
-  if (movementType === 'ADJUSTMENT' && !String(movementInput.reason || '').trim()) {
-    throw new Error('Stok düzeltme hareketlerinde doğrulanmış açıklama/sebep girilmesi zorunludur.');
+  if (movementType === 'ADJUSTMENT' && !String(movementInput.reason || movementInput.referenceNo || '').trim()) {
+    throw new Error('Stok düzeltme hareketlerinde doğrulanmış açıklama/referans girilmesi zorunludur.');
   }
 
   // Depo + Ürün Kodu + Varyant + Birim bazında benzersiz stok anahtarı (Farklı ölçü birimleri asla doğrudan toplanmaz!)
-  const itemDocId = `${warehouse}_${productCode}_${variantCode}_${unit}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const itemDocId = resolvedItemDocId || `${warehouse}_${productCode}_${variantCode}_${unit}`.replace(/[^a-zA-Z0-9_-]/g, '_');
   const itemRef = doc(db, COLLECTIONS.INVENTORY_ITEMS, itemDocId);
   const movementRef = doc(collection(db, COLLECTIONS.INVENTORY_MOVEMENTS));
   const nowIso = new Date().toISOString();
@@ -1265,12 +1311,15 @@ export async function executeStockMovementTransaction(movementInput, actor) {
       warehouse,
       unit,
       onHandQty: nextOnHand,
+      currentStock: nextOnHand,
       reservedQty: nextReserved,
+      reservedStock: nextReserved,
       availableQty: nextAvailable,
       criticalThreshold: Number(movementInput.criticalThreshold ?? (itemSnap.exists() ? itemSnap.data().criticalThreshold : 100)),
       lotNumber: optStr(movementInput.lotNumber || (itemSnap.exists() ? itemSnap.data().lotNumber : null)),
       expiryDate: optStr(movementInput.expiryDate || (itemSnap.exists() ? itemSnap.data().expiryDate : null)),
       initialCountVerified: initialVerified,
+      stockInitialized: initialVerified,
       isTestRecord: Boolean(movementInput.isTestRecord),
       updatedAt: serverTimestamp(),
       updatedAtIso: nowIso
@@ -1292,8 +1341,8 @@ export async function executeStockMovementTransaction(movementInput, actor) {
       lotNumber: optStr(movementInput.lotNumber),
       expiryDate: optStr(movementInput.expiryDate),
       referenceNo: optStr(movementInput.referenceNo),
-      notes: optStr(movementInput.reason),
-      reason: optStr(movementInput.reason),
+      notes: optStr(movementInput.reason || movementInput.referenceNo),
+      reason: optStr(movementInput.reason || movementInput.referenceNo),
       performedByUid: actor.uid,
       performedByEmail: optStr(actor.email),
       isTestRecord: Boolean(movementInput.isTestRecord),
@@ -1363,23 +1412,24 @@ export async function saveServiceRecord(serviceData, actor) {
   }
 
   const status = String(serviceData.status || 'Planlandı'); // Planlandı, Atandı, İşlemde, Müşteri Bekleniyor, Tamamlandı
-  const plannedDate = String(serviceData.plannedDate || '').trim();
+  const plannedDate = String(serviceData.plannedDate || serviceData.lastServiceDate || serviceData.completedDate || '').trim();
   const todayStr = new Date().toISOString().slice(0, 10);
+  const actionsText = String(serviceData.actionsTaken || serviceData.technicianNotes || '').trim();
 
   // Kural: Gerçekleşmemiş (gelecek tarihli veya yapılan işlem girilmemiş) işi 'Tamamlandı' gösterme!
   if (status === 'Tamamlandı') {
     if (plannedDate && plannedDate > todayStr) {
       throw new Error('İleri tarihli (henüz gerçekleşmemiş) bir bakım/servis kaydı "Tamamlandı" olarak işaretlenemez!');
     }
-    if (!String(serviceData.actionsTaken || '').trim()) {
+    if (!actionsText) {
       throw new Error('Servisi "Tamamlandı" olarak işaretlemek için yapılan teknik işlemlerin yazılması zorunludur.');
     }
   }
 
   const intervalDays = Number(serviceData.maintenanceIntervalDays || 0);
   const baseDateStr = status === 'Tamamlandı'
-    ? todayStr
-    : (serviceData.lastMaintenanceDate || serviceData.installationDate || '');
+    ? (plannedDate || todayStr)
+    : (serviceData.lastServiceDate || serviceData.lastMaintenanceDate || serviceData.installationDate || '');
 
   let nextPlannedDate = String(serviceData.nextPlannedDate || '').trim();
   if (intervalDays > 0 && baseDateStr) {
@@ -1390,7 +1440,7 @@ export async function saveServiceRecord(serviceData, actor) {
   }
 
   const nowIso = new Date().toISOString();
-  const customerName = String(serviceData.customerName || '').trim();
+  const customerName = String(serviceData.customerName || serviceData.companyName || '').trim();
   const payload = {
     serviceNo: String(serviceData.serviceNo || `SRV-${Date.now().toString().slice(-5)}`).trim(),
     companyName: customerName,
@@ -1407,9 +1457,11 @@ export async function saveServiceRecord(serviceData, actor) {
     plannedDate: optStr(plannedDate),
     maintenanceIntervalDays: intervalDays > 0 ? intervalDays : null,
     nextPlannedDate: optStr(nextPlannedDate),
+    nextServiceDate: optStr(nextPlannedDate),
     assignedTechnician: optStr(serviceData.assignedTechnician),
     faultDescription: optStr(serviceData.faultDescription),
-    actionsTaken: optStr(serviceData.actionsTaken),
+    actionsTaken: optStr(actionsText),
+    technicianNotes: optStr(actionsText),
     partsAndConsumablesUsed: optStr(serviceData.partsAndConsumablesUsed),
     isTestRecord: Boolean(serviceData.isTestRecord),
     completedAtIso: status === 'Tamamlandı' ? nowIso : null,
@@ -1617,3 +1669,319 @@ export async function deleteDocumentById(collectionName, docId, actor) {
   }
   await deleteDoc(doc(db, COLLECTIONS.AUDIT_LOGS === collectionName ? '_blocked_' : collectionName, docId));
 }
+
+/* ==========================================================================
+   11. UI ADAPTER EXPORTS & DURUM SABİTLERİ
+   ========================================================================== */
+
+export const CRM_RESOLUTION_STATUSES = CRM_RESOLUTIONS;
+
+export const PROPOSAL_STATUSES = [
+  { id: 'draft', label: 'Taslak' },
+  { id: 'sent', label: 'Gönderildi (Kilitli)' },
+  { id: 'revised', label: 'Revize Edildi' },
+  { id: 'approved', label: 'Müşteri Onayladı' },
+  { id: 'rejected', label: 'Reddedildi' },
+  { id: 'expired', label: 'Süresi Doldu' }
+];
+
+export const ORDER_STATUSES = [
+  'Sipariş Alındı',
+  'Hazırlanıyor',
+  'Sevk Edildi',
+  'Teslim Edildi',
+  'Faturalandı',
+  'Tamamlandı',
+  'İptal'
+];
+
+export const PAYMENT_STATUSES = [
+  'Bekliyor',
+  'Kısmi Tahsilat',
+  'Tahsil Edildi'
+];
+
+export const STOCK_MOVEMENT_TYPES = [
+  { id: 'INITIAL_COUNT', label: 'Başlangıç Fiziksel Stok Sayımı (INITIAL_COUNT)' },
+  { id: 'INBOUND', label: 'Üretim / Tedarikçi Girişi (INBOUND)' },
+  { id: 'OUTBOUND', label: 'Sipariş Sevkiyat Çıkışı (OUTBOUND)' },
+  { id: 'RESERVATION', label: 'Sipariş Stok Rezervasyonu (RESERVATION)' },
+  { id: 'RETURN', label: 'Müşteri İade Girişi (RETURN)' },
+  { id: 'ADJUSTMENT', label: 'Sayım Farkı / Düzeltme (ADJUSTMENT)' }
+];
+
+export const PROJECT_STAGES = [
+  'Keşif',
+  'Su Analizi & Değerlendirme',
+  'Projelendirme',
+  'Teklif Hazırlık',
+  'Onay Bekliyor',
+  'Uygulama & Montaj',
+  'Devreye Alma',
+  'Bakım / Tamamlandı'
+];
+
+export async function fetchPublicProducts() {
+  const list = await fetchPublicPublishedProducts();
+  return list.map((p) => ({
+    ...p,
+    productCode: p.productCode || p.code || '',
+    applicationArea: p.applicationArea || p.usageArea || p.description || '',
+    minOrderQty: p.minOrderQty ?? p.minOrderQuantity ?? null
+  }));
+}
+
+export async function fetchPublicDocuments() {
+  const list = await fetchPublicPublishedDocuments();
+  return list.map((d) => ({
+    ...d,
+    revisionNo: d.revisionNo || d.revisionNumber || 1,
+    batchNumber: d.batchNumber || d.lotBatchNumber || ''
+  }));
+}
+
+export async function saveProduct(productData, actor) {
+  return saveChemicalProduct({
+    ...productData,
+    code: productData.productCode || productData.code,
+    categoryName: productData.category || productData.categoryName || 'Su Şartlandırma Kimyasalları',
+    usageArea: productData.applicationArea || productData.usageArea,
+    minOrderQuantity: productData.minOrderQty ?? productData.minOrderQuantity
+  }, actor);
+}
+
+export async function deleteProductRecord(productId, actor) {
+  return deleteDocumentById(COLLECTIONS.PRODUCTS, productId, actor);
+}
+
+export async function approveWaterProjectTechnical(projectId, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'approve_technical')) {
+    throw new Error('Teknik onay yalnızca Teknik Ekip veya Süperadmin tarafından verilebilir.');
+  }
+  const ref = doc(db, COLLECTIONS.PROJECTS, projectId);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) throw new Error('Proje bulunamadı.');
+  const data = snap.data();
+  const wa = data.waterAnalysis || {};
+  const isComplete = Boolean((wa.pH || wa.ph) && (wa.conductivityUsCm || wa.tdsPpm) && wa.hardnessFr);
+  if (!isComplete) {
+    throw new Error('Eksik su analizi (pH, İletkenlik ve Sertlik zorunludur) bulunan projeye teknik onay verilemez!');
+  }
+  const nowIso = new Date().toISOString();
+  await updateDoc(ref, {
+    technicalApprovalStatus: 'approved',
+    approvedByEmail: actor.email || actor.uid,
+    'technicalEvaluation.approvalStatus': 'approved',
+    'technicalEvaluation.approvedBy': actor.email || actor.uid,
+    'technicalEvaluation.approvedAt': nowIso,
+    updatedAt: serverTimestamp(),
+    updatedAtIso: nowIso
+  });
+  await writeAuditLog('APPROVE_PROJECT_TECHNICAL', 'projects', projectId, {}, actor);
+}
+
+export async function updateProposalCustomerStatus(proposalId, newStatus, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'manage_proposals')) {
+    throw new Error('Teklif durumu güncelleme yetkiniz bulunmuyor.');
+  }
+  const nowIso = new Date().toISOString();
+  const ref = doc(db, COLLECTIONS.PROPOSALS, proposalId);
+  await updateDoc(ref, {
+    status: String(newStatus),
+    updatedAt: serverTimestamp(),
+    updatedAtIso: nowIso
+  });
+  await writeAuditLog('UPDATE_PROPOSAL_STATUS', 'proposals', proposalId, { status: newStatus }, actor);
+}
+
+export async function saveOrderRecord(orderData, actor) {
+  return createOrUpdateOrder({
+    ...orderData,
+    customerName: orderData.companyName || orderData.customerName,
+    fulfillmentStatus: orderData.status || orderData.fulfillmentStatus || 'Sipariş Alındı',
+    paidAmount: orderData.collectedAmount ?? orderData.paidAmount ?? 0
+  }, actor);
+}
+
+export async function saveInventoryItemCard(cardData, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'manage_inventory')) {
+    throw new Error('Stok kartı tanımlama yetkiniz bulunmuyor.');
+  }
+  const sku = String(cardData.sku || '').trim();
+  const name = String(cardData.name || '').trim();
+  const unit = String(cardData.unit || 'kg').trim();
+  const warehouse = String(cardData.warehouse || 'Adana Merkez Depo').trim();
+  if (!sku || !name) throw new Error('Stok kodu (SKU) ve stok kalemi adı zorunludur.');
+
+  const itemDocId = `${warehouse}_${sku}_STD_${unit}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const nowIso = new Date().toISOString();
+  const payload = {
+    sku,
+    name,
+    productCode: sku,
+    productName: name,
+    variantCode: 'STD',
+    warehouse,
+    unit,
+    onHandQty: 0,
+    reservedQty: 0,
+    availableQty: 0,
+    minThreshold: Number(cardData.minThreshold || 500),
+    criticalThreshold: Number(cardData.minThreshold || 500),
+    initialCountVerified: false,
+    stockInitialized: false,
+    updatedAt: serverTimestamp(),
+    updatedAtIso: nowIso
+  };
+  await setDoc(doc(db, COLLECTIONS.INVENTORY_ITEMS, itemDocId), payload, { merge: true });
+  await writeAuditLog('CREATE_INVENTORY_CARD', 'inventoryItems', itemDocId, { sku, name }, actor);
+  return { id: itemDocId, ...payload };
+}
+
+export async function sendTestNotificationLog(channel, recipient, actor) {
+  const settings = await fetchAllSiteSettings();
+  return sendTestNotificationChannel({
+    channel: String(channel || 'email').toLowerCase(),
+    recipient,
+    message: 'Elif Kimya Yönetim Paneli Test Bildirimi',
+    settings: settings.notifications || {}
+  }, actor);
+}
+
+export async function loadAdminAllData() {
+  if (!db) {
+    return {
+      crmRequests: [],
+      customers: [],
+      products: [],
+      documents: [],
+      projects: [],
+      proposals: [],
+      orders: [],
+      inventoryItems: [],
+      inventoryMovements: [],
+      suppliers: [],
+      serviceRecords: [],
+      users: [],
+      auditLogs: [],
+      settings: {}
+    };
+  }
+
+  const safeFetch = async (col) => {
+    try {
+      return await fetchCollectionList(col, 250);
+    } catch (_e) {
+      return [];
+    }
+  };
+
+  const [
+    crmRequests,
+    customers,
+    rawProducts,
+    rawDocuments,
+    rawProjects,
+    rawProposals,
+    rawOrders,
+    rawInventoryItems,
+    inventoryMovements,
+    suppliers,
+    rawServices,
+    users,
+    auditLogs,
+    settings
+  ] = await Promise.all([
+    safeFetch(COLLECTIONS.CRM_REQUESTS),
+    safeFetch(COLLECTIONS.CUSTOMERS),
+    safeFetch(COLLECTIONS.PRODUCTS),
+    safeFetch(COLLECTIONS.DOCUMENTS),
+    safeFetch(COLLECTIONS.PROJECTS),
+    safeFetch(COLLECTIONS.PROPOSALS),
+    safeFetch(COLLECTIONS.ORDERS),
+    safeFetch(COLLECTIONS.INVENTORY_ITEMS),
+    safeFetch(COLLECTIONS.INVENTORY_MOVEMENTS),
+    safeFetch(COLLECTIONS.SUPPLIERS),
+    safeFetch(COLLECTIONS.SERVICE_RECORDS),
+    safeFetch(COLLECTIONS.USERS),
+    safeFetch(COLLECTIONS.AUDIT_LOGS),
+    fetchAllSiteSettings()
+  ]);
+
+  const products = rawProducts.map((p) => ({
+    ...p,
+    productCode: p.productCode || p.code || '',
+    applicationArea: p.applicationArea || p.usageArea || p.description || '',
+    minOrderQty: p.minOrderQty ?? p.minOrderQuantity ?? null
+  }));
+
+  const documents = rawDocuments.map((d) => ({
+    ...d,
+    revisionNo: d.revisionNo || d.revisionNumber || 1,
+    batchNumber: d.batchNumber || d.lotBatchNumber || ''
+  }));
+
+  const projects = rawProjects.map((prj) => ({
+    ...prj,
+    companyName: prj.companyName || prj.customerName || '',
+    hasVerifiedWaterAnalysis: Boolean(prj.hasVerifiedWaterAnalysis ?? prj.waterAnalysis?.isComplete),
+    technicalApprovalStatus: prj.technicalApprovalStatus || prj.technicalEvaluation?.approvalStatus || 'pending_analysis',
+    approvedByEmail: prj.approvedByEmail || prj.technicalEvaluation?.approvedBy || '',
+    recommendedEquipment: Array.isArray(prj.recommendedEquipment)
+      ? prj.recommendedEquipment.join(', ')
+      : (prj.recommendedEquipment || '')
+  }));
+
+  const proposals = rawProposals.map((pr) => ({
+    ...pr,
+    companyName: pr.companyName || pr.customerName || '',
+    baseCurrency: pr.baseCurrency || pr.currency || 'TRY',
+    totalVat: pr.totalVat ?? pr.vatTotal ?? 0,
+    totalDiscount: pr.totalDiscount ?? pr.discountTotal ?? 0
+  }));
+
+  const orders = rawOrders.map((o) => ({
+    ...o,
+    companyName: o.companyName || o.customerName || '',
+    status: o.status || o.fulfillmentStatus || 'Sipariş Alındı',
+    collectedAmount: o.collectedAmount ?? o.paidAmount ?? 0
+  }));
+
+  const inventoryItems = rawInventoryItems.map((it) => ({
+    ...it,
+    sku: it.sku || it.productCode || '',
+    name: it.name || it.productName || '',
+    currentStock: it.currentStock ?? it.onHandQty ?? 0,
+    reservedStock: it.reservedStock ?? it.reservedQty ?? 0,
+    minThreshold: it.minThreshold ?? it.criticalThreshold ?? 100,
+    stockInitialized: Boolean(it.stockInitialized ?? it.initialCountVerified)
+  }));
+
+  const serviceRecords = rawServices.map((s) => ({
+    ...s,
+    companyName: s.companyName || s.customerName || '',
+    nextServiceDate: s.nextServiceDate || s.nextPlannedDate || '',
+    technicianNotes: s.technicianNotes || s.actionsTaken || s.faultDescription || ''
+  }));
+
+  return {
+    crmRequests,
+    customers,
+    products,
+    documents,
+    projects,
+    proposals,
+    orders,
+    inventoryItems,
+    inventoryMovements,
+    suppliers,
+    serviceRecords,
+    users,
+    auditLogs,
+    settings
+  };
+}
+
