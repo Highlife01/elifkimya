@@ -5,6 +5,7 @@
 
 import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
 import { LANGUAGES, fold, getLanguage, languageHaystack, setLanguage, t } from '../utils/i18n.js';
+import { localizePath, stripLanguagePrefix } from '../utils/translation-catalog.js';
 
 export const NAV_ITEMS = [
   { path: '/', labelKey: 'nav_home' },
@@ -17,17 +18,20 @@ export const NAV_ITEMS = [
 
 function renderLanguageOptions() {
   return LANGUAGES.map((lang) => `
-    <button
-      type="button"
+    <a
+      href="${escapeAttr(localizePath(typeof window !== 'undefined' ? window.location.pathname + window.location.search + window.location.hash : '/', lang.code))}"
+      hreflang="${escapeAttr(lang.code)}"
+      lang="${escapeAttr(lang.code)}"
       class="lang-option"
       data-lang-option="${escapeAttr(lang.code)}"
       data-lang-hay="${escapeAttr(languageHaystack(lang))}"
-      aria-pressed="${lang.code === getLanguage() ? 'true' : 'false'}"
+      role="option"
+      aria-selected="${lang.code === getLanguage() ? 'true' : 'false'}"
     >
       <span class="lang-option-code">${escapeHtml(lang.code.toUpperCase())}</span>
-      <span class="lang-option-name">${escapeHtml(lang.native)}</span>
+      <span class="lang-option-name" dir="auto">${escapeHtml(lang.native)}</span>
       <span class="lang-option-en">${escapeHtml(lang.english)}</span>
-    </button>
+    </a>
   `).join('');
 }
 
@@ -201,7 +205,9 @@ function bindLanguageMenus(root) {
     });
 
     options.forEach((button) => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', (event) => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
         const code = button.getAttribute('data-lang-option') || 'tr';
         setLanguage(code);
       });
@@ -252,8 +258,12 @@ export function createNavbar(navigate, currentPath = '/') {
 }
 
 export function updateActiveNav(currentPath = '/') {
+  document.querySelectorAll('#header [data-lang-option]').forEach((option) => {
+    const code = option.getAttribute('data-lang-option') || 'tr';
+    option.setAttribute('href', localizePath(window.location.pathname, code) + window.location.search + window.location.hash);
+  });
   document.querySelectorAll('#header a.nav-item').forEach((link) => {
-    const path = link.getAttribute('href') || '';
+    const path = stripLanguagePrefix(link.getAttribute('href') || '');
     const isActive =
       currentPath === path || (path !== '/' && currentPath.startsWith(path));
     link.className = isActive

@@ -2,6 +2,12 @@
  * Elif Kimya - Bildirim (Toast) ve Güvenli Onay Modalı Yöneticisi
  * innerHTML veya native alert/confirm/prompt kullanmadan güvenli DOM oluşturur.
  */
+import { getLanguage } from '../utils/i18n.js';
+import { translateText, isPrivatePath } from '../utils/translation-catalog.js';
+
+function localizedMessage(message) {
+  return isPrivatePath(window.location.pathname) ? String(message || '') : translateText(message, getLanguage());
+}
 
 export function showToast(message, type = 'info', duration = 4500) {
   let container = document.getElementById('toast-container');
@@ -22,12 +28,12 @@ export function showToast(message, type = 'info', duration = 4500) {
 
   const contentDiv = document.createElement('div');
   contentDiv.className = 'toast-content';
-  contentDiv.textContent = String(message || '');
+  contentDiv.textContent = localizedMessage(message);
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'toast-close';
   closeBtn.type = 'button';
-  closeBtn.setAttribute('aria-label', 'Kapat');
+  closeBtn.setAttribute('aria-label', localizedMessage('Kapat'));
   closeBtn.textContent = '×';
 
   closeBtn.addEventListener('click', () => {

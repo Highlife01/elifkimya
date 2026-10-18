@@ -12,6 +12,7 @@ import {
   waterTreatmentSystems
 } from '../data/products.js';
 import { TECHNICAL_BLOG_POSTS } from '../data/technical-blog.js';
+import { TURKEY_81_PROVINCES, TURKEY_7_REGIONS_SUMMARY } from '../data/provinces-81.js';
 
 const SITE = 'https://www.elifcevrekimya.com.tr';
 
@@ -24,17 +25,11 @@ export const REGION_SLUGS = [
   'turkiye-geneli'
 ];
 
-function clip(text, max = 158) {
-  const clean = String(text || '').replace(/\s+/g, ' ').trim();
-  if (clean.length <= max) return clean;
-  return `${clean.slice(0, max - 1).trim()}…`;
-}
-
 function route(path, title, description, h1, kind, body) {
   return {
     path,
     title,
-    description: clip(description),
+    description: String(description || '').replace(/\s+/g, ' ').trim(),
     h1,
     kind,
     canonical: path === '/' ? `${SITE}/` : `${SITE}${path}`,
@@ -121,6 +116,18 @@ export function buildPublicRoutes() {
   serviceRegions.forEach((region, index) => {
     const slug = REGION_SLUGS[index];
     if (!slug) return;
+    const extraRegionItems = slug === 'turkiye-geneli'
+      ? TURKEY_7_REGIONS_SUMMARY.map((reg) => ({
+          title: reg.region,
+          text: reg.summary,
+          facts: [
+            `Kapsanan İller: ${reg.provinces}`,
+            ...TURKEY_81_PROVINCES
+              .filter((prov) => reg.region.startsWith(prov.region))
+              .map((prov) => `${prov.plate} ${prov.name} (${prov.delivery}): ${prov.focus}`)
+          ]
+        }))
+      : [];
     routes.push(route(
       `/hizmet-bolgeleri/${slug}`,
       `${region.region} | Elif Çevre Kimya Sevkiyat`,
@@ -130,13 +137,16 @@ export function buildPublicRoutes() {
       {
         paragraphs: [
           region.details,
-          'Kayıtlı adres Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana’dır. Site adresi www.elifcevrekimya.com.tr. Bu sayfa sevkiyat bölgesini anlatır; ayrı şube adresi ilan etmez.'
+          'Kayıtlı adres Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana’dır. Site adresi www.elifcevrekimya.com.tr. Bu sayfa 01 Adana’dan 81 Düzce’ye tüm Türkiye sevkiyat kapsamını anlatır; ayrı şube adresi ilan etmez.'
         ],
-        items: [{
-          title: region.badge,
-          text: 'Öne çıkan hatlar mevcut bölge kaydındandır.',
-          facts: region.highlights || []
-        }],
+        items: [
+          {
+            title: region.badge,
+            text: 'Öne çıkan hatlar mevcut bölge kaydındandır.',
+            facts: region.highlights || []
+          },
+          ...extraRegionItems
+        ],
         quote: region.region
       }
     ));
@@ -206,6 +216,11 @@ export function buildPublicRoutes() {
   }
   const regions = routes.find((item) => item.path === '/hizmet-bolgeleri');
   if (regions) {
+    regions.body.items = TURKEY_7_REGIONS_SUMMARY.map((reg) => ({
+      title: reg.region,
+      text: reg.summary,
+      facts: [`Kapsanan İller: ${reg.provinces}`]
+    }));
     regions.body.links = serviceRegions.map((region, index) => ({
       href: `/hizmet-bolgeleri/${REGION_SLUGS[index]}`,
       label: region.region
@@ -376,8 +391,16 @@ export function renderPublicLanding(record) {
         <h1 class="mt-3 font-display text-3xl font-extrabold text-slate-900 sm:text-4xl">${escapeHtml(record.h1)}</h1>
         ${(record.body.paragraphs || []).map((p) => `<p class="mt-4 text-base leading-relaxed text-slate-700">${escapeHtml(p)}</p>`).join('')}
         ${items.map((item) => `
-          <section class="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-            <h2 class="font-display text-xl font-extrabold text-slate-900">${escapeHtml(item.title)}</h2>
+          <section class="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-5 ${record.kind === 'product' ? 'cursor-pointer hover:border-emerald-500 transition' : ''}" ${record.kind === 'product' ? `data-landing-chem="${escapeAttr(item.title)}"` : ''}>
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <h2 class="font-display text-xl font-extrabold text-slate-900">${escapeHtml(item.title)}</h2>
+              ${record.kind === 'product' ? `
+                <div class="flex items-center gap-2">
+                  <button type="button" data-chem-open="detail" class="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-extrabold text-slate-800 hover:border-emerald-500 transition">📋 Açıklama</button>
+                  <button type="button" data-chem-open="order" class="rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-700 transition">🛒 Sipariş Ver</button>
+                </div>
+              ` : ''}
+            </div>
             <p class="mt-2 text-sm leading-relaxed text-slate-700">${escapeHtml(item.text)}</p>
             <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-700">
               ${item.facts.map((fact) => `<li>${escapeHtml(fact)}</li>`).join('')}
@@ -426,7 +449,8 @@ export function renderNotFoundPage() {
 export function renderCrawlableDocument(record) {
   const parent = crumb(record.kind);
   return `
-    <main class="sr-only" data-prerender-seo="true">
+    <main class="section bg-white" data-prerender-seo="true">
+      <div class="container-x">
       <p><a href="/">Ana sayfa</a> / <a href="${escapeAttr(parent.href)}">${escapeHtml(parent.label)}</a></p>
       <h1>${escapeHtml(record.h1)}</h1>
       ${(record.body.paragraphs || []).map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
@@ -439,6 +463,7 @@ export function renderCrawlableDocument(record) {
       `).join('')}
       ${(record.body.links || []).length ? `<ul>${record.body.links.map((link) => `<li><a href="${escapeAttr(link.href)}">${escapeHtml(link.label)}</a></li>`).join('')}</ul>` : ''}
       <p><a href="/teklif-al">Teklif isteyin</a> · <a href="tel:${escapeAttr(companyInfo.phoneRaw)}">${escapeHtml(companyInfo.phoneDisplay)}</a></p>
+      </div>
     </main>
   `;
 }

@@ -3,8 +3,10 @@
  * Kaynak: https://www.medipure.com.tr/ (18 Ekim 2026 çekimi).
  * Liste fiyatı Medipure vitrin fiyatıdır; Elif Kimya teslimat teklifi ayrıca verilir.
  */
-export const MEDIPURE_SOURCE = 'https://www.medipure.com.tr/';
-export const MEDIPURE_CATALOG_DATE = '2026-10-18';
+import { MEDIPURE_DETAILS_BY_CODE } from './medipure-details-locale.js';
+
+export const MEDIPURE_SOURCE = "https://www.medipure.com.tr/";
+export const MEDIPURE_CATALOG_DATE = "2026-10-18";
 export const MEDIPURE_PRODUCT_COUNT = 163;
 
 export const MEDIPURE_GROUPS = [
@@ -1627,11 +1629,15 @@ export const MEDIPURE_CATEGORIES = [
 
 export function allMedipureProducts() {
   return MEDIPURE_CATEGORIES.flatMap((category) =>
-    category.products.map((product) => ({
-      ...product,
-      categoryId: category.id,
-      categoryTitle: category.title,
-      group: category.group
-    }))
+    category.products.map((product) => {
+      const details = MEDIPURE_DETAILS_BY_CODE[product.code] || {};
+      return {
+        ...product,
+        ...details,
+        categoryId: category.id,
+        categoryTitle: category.title,
+        group: category.group
+      };
+    })
   );
 }

@@ -13,6 +13,7 @@ import {
   SEO_KEYWORD_CLUSTERS
 } from '../utils/seo-geo.js';
 import { bindMedipureCatalog, renderMedipureShowcase } from '../components/medipure-catalog.js';
+import { openChemicalProductModal } from '../components/product-order-modal.js';
 
 const HERO_SLIDES = [
   {
@@ -83,6 +84,20 @@ const HERO_SLIDES = [
       'Adana Merkez Depo Stok Güvencesi',
       'ADR Sertifikalı Tanker & Filo',
       'TR / EN İhracat Dokümantasyonu'
+    ]
+  },
+  {
+    id: '06',
+    image: '/assets/hero-medipure-edi.jpg',
+    tag: 'MEDIPURE® SU SAFLAŞTIRMA • SAF SU & ULTRA SAF SU EDI SİSTEMLER',
+    shortNav: 'MEDIPURE SAF SU & ULTRA SAF SU EDI SİSTEMLER',
+    title: 'Medipure Su Saflaştırma: Saf Su ve Ultra Saf Su EDI Sistemleri',
+    subtitle:
+      'Laboratuvar, medikal, sterilizasyon ve endüstriyel prosesler için 18.2 MΩ·cm (0.055 µS/cm) Tip-1/Tip-2 ultra saf su cihazları, Elektrodeiyonizasyon (EDI) sistemleri ve 163 model Medipure kataloğu.',
+    highlights: [
+      '18.2 MΩ·cm (0.055 µS/cm) Ultra Saf Su',
+      'Saf Su & Elektrodeiyonizasyon (EDI) Sistemler',
+      'Laboratuvardan Endüstriye 163 Model'
     ]
   }
 ];
@@ -258,6 +273,7 @@ const SECTORS_LIST = [
 ];
 
 const MARQUEE_ITEMS = [
+  'Medipure® Su Saflaştırma & Ultra Saf Su EDI (18.25 MΩ·cm)',
   'Sodyum Hipoklorit (%15–16)',
   'Kostik Soda (NaOH %48 / %99)',
   'Hidroklorik & Sülfürik Asit',
@@ -375,10 +391,10 @@ export async function renderHomePage(container, navigate) {
         </div>
       </div>
 
-      <!-- Alt 5'li Slayt Seçici Kart Şeridi (Yüksek Kontrast Koyu Cam) -->
+      <!-- Alt 6'lı Slayt Seçici Kart Şeridi (Yüksek Kontrast Koyu Cam) -->
       <div class="relative z-10 border-t border-white/15 bg-slate-900/90 backdrop-blur-xl py-4">
         <div class="container-x">
-          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="hero-selector-grid">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3" id="hero-selector-grid">
             ${HERO_SLIDES.map((s, idx) => `
               <button
                 type="button"
@@ -429,14 +445,13 @@ export async function renderHomePage(container, navigate) {
         </div>
 
         <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          ${HOME_CATEGORY_CARDS.map((card) => `
-            <a
+          ${HOME_CATEGORY_CARDS.map((card, idx) => `
+            <article
               id="${escapeAttr(card.id)}"
-              href="${escapeAttr(card.href)}"
-              data-nav="${escapeAttr(card.href)}"
-              class="group relative rounded-3xl border-2 border-slate-200 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-brand-green hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              data-home-chem-card="${idx}"
+              class="group cursor-pointer relative rounded-3xl border-2 border-slate-200 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-brand-green hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
               <div>
-                <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-900">
+                <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-900" data-chem-open="detail">
                   <img
                     src="${escapeAttr(card.image)}"
                     alt="${escapeAttr(card.title)}"
@@ -452,7 +467,7 @@ export async function renderHomePage(container, navigate) {
                     ${escapeHtml(card.specPill)}
                   </span>
                 </div>
-                <div class="pt-4 px-1">
+                <div class="pt-4 px-1" data-chem-open="detail">
                   <h3 class="font-display text-lg font-extrabold text-slate-900 group-hover:text-brand-green transition">
                     ${escapeHtml(card.title)}
                   </h3>
@@ -461,11 +476,15 @@ export async function renderHomePage(container, navigate) {
                   </p>
                 </div>
               </div>
-              <div class="mt-4 pt-3 border-t border-slate-200 px-1 flex items-center justify-between text-xs font-extrabold text-brand-green-dark">
-                <span>Teknik Spesifikasyonlar</span>
-                <span class="group-hover:translate-x-1 transition-transform">→</span>
+              <div class="mt-4 pt-3 border-t border-slate-200 px-1 flex items-center justify-between gap-2">
+                <button type="button" data-chem-open="detail" class="inline-flex items-center rounded-xl border border-slate-300 bg-slate-50 px-2.5 py-1.5 text-[11px] font-extrabold text-slate-800 hover:border-emerald-500 hover:text-emerald-800 transition">
+                  📋 Açıklama
+                </button>
+                <button type="button" data-chem-open="order" class="inline-flex items-center rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-700 shadow-xs transition">
+                  🛒 Sipariş Ver
+                </button>
               </div>
-            </a>
+            </article>
           `).join('')}
         </div>
       </div>
@@ -716,10 +735,10 @@ export async function renderHomePage(container, navigate) {
         </div>
 
         <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          ${FEATURED_PRODUCTS.map((item) => `
-            <article class="group relative rounded-3xl border-2 border-slate-200 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-brand-green hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+          ${FEATURED_PRODUCTS.map((item, idx) => `
+            <article data-featured-chem="${idx}" class="group cursor-pointer relative rounded-3xl border-2 border-slate-200 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-brand-green hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
               <div>
-                <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-900">
+                <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-900" data-chem-open="detail">
                   <img
                     src="${escapeAttr(item.image)}"
                     alt="${escapeAttr(item.title)}"
@@ -737,25 +756,25 @@ export async function renderHomePage(container, navigate) {
                     ${escapeHtml(item.materialSpec)}
                   </span>
                 </div>
-                <div class="pt-4 px-1">
+                <div class="pt-4 px-1" data-chem-open="detail">
                   <h3 class="font-display text-lg font-extrabold text-slate-900 group-hover:text-brand-green transition">
-                    <a href="/teklif-al?product=${encodeURIComponent(item.title)}" data-nav="/teklif-al?product=${encodeURIComponent(item.title)}">
-                      ${escapeHtml(item.title)}
-                    </a>
+                    ${escapeHtml(item.title)}
                   </h3>
                   <p class="mt-1.5 text-xs leading-relaxed text-slate-700 font-medium line-clamp-2">
                     ${escapeHtml(item.desc)}
                   </p>
+                  <p class="mt-2 text-[11px] font-mono text-slate-600 font-bold">
+                    Ambalaj: <strong class="text-slate-900">${escapeHtml(item.moq)}</strong>
+                  </p>
                 </div>
               </div>
-              <div class="mt-5 pt-3.5 border-t border-slate-200 px-1 flex items-center justify-between">
-                <span class="text-[11px] font-mono text-slate-700 font-bold">
-                  Ambalaj: <strong class="text-slate-950">${escapeHtml(item.moq)}</strong>
-                </span>
-                <a class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-green-dark hover:text-brand-green group-hover:translate-x-0.5 transition-transform" href="/teklif-al?product=${encodeURIComponent(item.title)}" data-nav="/teklif-al?product=${encodeURIComponent(item.title)}">
-                  <span>Toplu fiyat isteyin</span>
-                  <span>→</span>
-                </a>
+              <div class="mt-4 pt-3 border-t border-slate-200 px-1 flex items-center justify-between gap-2">
+                <button type="button" data-chem-open="detail" class="inline-flex items-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-extrabold text-slate-800 hover:border-emerald-500 hover:text-emerald-800 transition">
+                  📋 Açıklama &amp; Detay
+                </button>
+                <button type="button" data-chem-open="order" class="inline-flex items-center rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-extrabold text-white hover:bg-emerald-700 shadow-xs transition">
+                  🛒 Sipariş Ver
+                </button>
               </div>
             </article>
           `).join('')}
@@ -1202,24 +1221,63 @@ export async function renderHomePage(container, navigate) {
     });
   }
 
+  // Anasayfa Kategori & Çözüm Kartları -> Kimyasal Açıklama & Sipariş Modalı
+  container.querySelectorAll('[data-home-chem-card]').forEach((cardEl) => {
+    cardEl.addEventListener('click', (e) => {
+      const idx = Number(cardEl.getAttribute('data-home-chem-card') || 0);
+      const item = HOME_CATEGORY_CARDS[idx];
+      if (!item) return;
+      const actionEl = e.target.closest('[data-chem-open]');
+      const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
+      e.preventDefault();
+      openChemicalProductModal({
+        title: item.title,
+        activeChemical: item.specPill,
+        description: item.desc,
+        image: item.image
+      }, { mode });
+    });
+  });
+
+  // Anasayfa Öne Çıkan Kimyasal Kartları -> Kimyasal Açıklama & Sipariş Modalı
+  container.querySelectorAll('[data-featured-chem]').forEach((cardEl) => {
+    cardEl.addEventListener('click', (e) => {
+      const idx = Number(cardEl.getAttribute('data-featured-chem') || 0);
+      const item = FEATURED_PRODUCTS[idx];
+      if (!item) return;
+      const actionEl = e.target.closest('[data-chem-open]');
+      const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
+      e.preventDefault();
+      openChemicalProductModal({
+        title: item.title,
+        categoryTitle: item.badgeText,
+        activeChemical: item.materialSpec,
+        description: item.desc,
+        packaging: item.moq,
+        image: item.image
+      }, { mode });
+    });
+  });
+
   // Canlı Firestore ürünlerini varsa yükle
   const liveContainer = container.querySelector('#home-live-products');
   if (liveContainer) {
     try {
       const liveItems = await fetchPublicProducts();
       if (liveItems && liveItems.length > 0) {
+        const sliced = liveItems.slice(0, 6);
         const liveHtml = `
           <div class="mt-8 pt-8 border-t border-slate-200">
             <p class="chip mb-3">Canlı Stok &amp; Katalog</p>
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 mt-4">
-              ${liveItems.slice(0, 6).map((p) => {
+              ${sliced.map((p, idx) => {
                 const priceLabel =
                   p.unitPrice !== null && p.unitPrice !== undefined && Number(p.unitPrice) > 0
                     ? `${Number(p.unitPrice).toLocaleString('tr-TR')} ${escapeHtml(p.currency || 'TRY')} / ${escapeHtml(p.salesUnit || 'kg')}`
                     : 'Toplu fiyat isteyin';
                 return `
-                  <article class="group relative rounded-3xl border-2 border-slate-200 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-brand-green hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
-                    <div class="pt-2 px-1">
+                  <article data-home-live-chem="${idx}" class="group cursor-pointer relative rounded-3xl border-2 border-slate-200 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-brand-green hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+                    <div class="pt-2 px-1" data-chem-open="detail">
                       <div class="flex items-center justify-between gap-2 mb-2">
                         <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-[10px] font-mono font-extrabold text-emerald-900 border border-emerald-300">
                           ${escapeHtml(p.productCode || 'STOK ÜRÜNÜ')}
@@ -1232,15 +1290,17 @@ export async function renderHomePage(container, navigate) {
                       <p class="mt-1.5 text-xs leading-relaxed text-slate-700 font-medium line-clamp-2">
                         ${escapeHtml(p.applicationArea || p.technicalSpecs || '')}
                       </p>
+                      <p class="mt-2 text-[11px] font-mono text-slate-700 font-bold">
+                        Ambalaj: <strong class="text-slate-950">${escapeHtml(p.packagingType || 'Endüstriyel')}</strong> • <span class="text-emerald-700">${escapeHtml(priceLabel)}</span>
+                      </p>
                     </div>
-                    <div class="mt-5 pt-3.5 border-t border-slate-200 px-1 flex items-center justify-between">
-                      <span class="text-[11px] font-mono text-slate-700 font-bold">
-                        Ambalaj: <strong class="text-slate-950">${escapeHtml(p.packagingType || 'Endüstriyel')}</strong>
-                      </span>
-                      <a class="inline-flex items-center gap-1 text-xs font-extrabold text-brand-green-dark hover:text-brand-green group-hover:translate-x-0.5 transition-transform" href="/teklif-al?product=${encodeURIComponent(p.tradeName || p.name)}" data-nav="/teklif-al?product=${encodeURIComponent(p.tradeName || p.name)}">
-                        <span>${escapeHtml(priceLabel)}</span>
-                        <span>→</span>
-                      </a>
+                    <div class="mt-4 pt-3 border-t border-slate-200 px-1 flex items-center justify-between gap-2">
+                      <button type="button" data-chem-open="detail" class="inline-flex items-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-extrabold text-slate-800 hover:border-emerald-500 transition">
+                        📋 Açıklama
+                      </button>
+                      <button type="button" data-chem-open="order" class="inline-flex items-center rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-700 transition">
+                        🛒 Sipariş Ver
+                      </button>
                     </div>
                   </article>
                 `;
@@ -1249,7 +1309,24 @@ export async function renderHomePage(container, navigate) {
           </div>
         `;
         renderSafeHtml(liveContainer, liveHtml);
-        bindNavLinks(liveContainer);
+        liveContainer.querySelectorAll('[data-home-live-chem]').forEach((cardEl) => {
+          cardEl.addEventListener('click', (e) => {
+            const idx = Number(cardEl.getAttribute('data-home-live-chem') || 0);
+            const p = sliced[idx];
+            if (!p) return;
+            const actionEl = e.target.closest('[data-chem-open]');
+            const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
+            e.preventDefault();
+            openChemicalProductModal({
+              code: p.productCode || 'KIMYASAL',
+              title: p.tradeName || p.name,
+              categoryTitle: p.category || 'Endüstriyel Kimyasal',
+              activeChemical: [p.chemicalName, p.casNumber ? `CAS: ${p.casNumber}` : '', p.concentrationPurity].filter(Boolean).join(' • '),
+              description: p.applicationArea || p.technicalSpecs || '',
+              packaging: `${p.packagingType || 'Standart Endüstriyel Ambalaj'} (${p.salesUnit || 'kg'})`
+            }, { mode });
+          });
+        });
       }
     } catch (_e) {
       // Sessizce geç

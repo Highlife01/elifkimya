@@ -9,9 +9,10 @@
 - **Google Haritalar Konumu:** https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111
 - **Koordinatlar (GEO):** 36.9854, 35.2658 (TR-01 Seyhan/Adana)
 - **Telefon / WhatsApp B2B Masa:** 0546 499 23 42 (+90 546 499 23 42)
-- **Kurumsal E-posta:** info@elifkimya.com.tr
-- **Satış:** satis@elifkimya.com.tr
-- **Hizmet Bölgeleri:** Adana Hacı Sabancı OSB, Mersin-Tarsus OSB (MTOSB), İskenderun-Payas-Osmaniye Demir-Çelik Koridoru, Gaziantep Başpınar OSB, Kayseri OSB, Niğde OSB (Mikronize Kalsit), Kahramanmaraş, Denizli-Aydın-Manisa-Afyon Jeotermal Sahaları ve 81 İl Türkiye Geneli + Mersin Limanı İhracat.
+- **Kurumsal E-posta:** info@elifcevrekimya.com.tr
+- **Satış:** satis@elifcevrekimya.com.tr
+- **Hizmet Bölgeleri (81 İl Türkiye Geneli & OSB Lojistiği):** Adana Hacı Sabancı OSB, Mersin-Tarsus OSB (MTOSB), İskenderun-Payas-Osmaniye Demir-Çelik Koridoru, Gaziantep Başpınar OSB, Kayseri OSB, Niğde OSB (Mikronize Kalsit), Kahramanmaraş, Denizli-Aydın-Manisa-Afyon Jeotermal Sahaları ve 81 İl Türkiye Geneli + Mersin Limanı İhracat.
+- **81 İl Tam Sevkiyat Kapsamı (01–81):** 01 Adana, 02 Adıyaman, 03 Afyonkarahisar, 04 Ağrı, 05 Amasya, 06 Ankara, 07 Antalya, 08 Artvin, 09 Aydın, 10 Balıkesir, 11 Bilecik, 12 Bingöl, 13 Bitlis, 14 Bolu, 15 Burdur, 16 Bursa, 17 Çanakkale, 18 Çankırı, 19 Çorum, 20 Denizli, 21 Diyarbakır, 22 Edirne, 23 Elazığ, 24 Erzincan, 25 Erzurum, 26 Eskişehir, 27 Gaziantep, 28 Giresun, 29 Gümüşhane, 30 Hakkari, 31 Hatay, 32 Isparta, 33 Mersin, 34 İstanbul, 35 İzmir, 36 Kars, 37 Kastamonu, 38 Kayseri, 39 Kırklareli, 40 Kırşehir, 41 Kocaeli, 42 Konya, 43 Kütahya, 44 Malatya, 45 Manisa, 46 Kahramanmaraş, 47 Mardin, 48 Muğla, 49 Muş, 50 Nevşehir, 51 Niğde, 52 Ordu, 53 Rize, 54 Sakarya, 55 Samsun, 56 Siirt, 57 Sinop, 58 Sivas, 59 Tekirdağ, 60 Tokat, 61 Trabzon, 62 Tunceli, 63 Şanlıurfa, 64 Uşak, 65 Van, 66 Yozgat, 67 Zonguldak, 68 Aksaray, 69 Bayburt, 70 Karaman, 71 Kırıkkale, 72 Batman, 73 Şırnak, 74 Bartın, 75 Ardahan, 76 Iğdır, 77 Yalova, 78 Karabük, 79 Kilis, 80 Osmaniye, 81 Düzce.
 
 ## Temel Ürün ve Mühendislik Kategorileri
 1. **Baz Kimyasallar, Asitler & Alkaliler:** Sodyum Hipoklorit (NaOCl %15-%16), Kostik Soda (NaOH %48 Sıvı / %99 Payet), Hidroklorik Asit (HCl %32-%33), Sülfürik Asit (H2SO4 %98), Nitrik Asit (%56-%65), Hidrojen Peroksit (%50). Ambalaj: 25 Ton ADR Dökme Tanker, 1000 kg IBC, 30-60 kg Bidon.

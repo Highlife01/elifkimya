@@ -16,15 +16,20 @@ import { renderAdminPage } from './pages/admin.js';
 import { applyDynamicPageSeoAndGeo } from './utils/seo-geo.js';
 import { findPublicRoute, renderNotFoundPage, renderPublicLanding } from './pages/seo-landings.js';
 import { renderSafeHtml } from './utils/security.js';
+import { closeProductOrderModal, openChemicalProductModal } from './components/product-order-modal.js';
 import { applyDocumentLanguage, initDomTranslator, subscribeLanguage, translatePageDom } from './utils/i18n.js';
+import { getLanguageFromPath, localizePath, stripLanguagePrefix, isPrivatePath, loadTranslationCatalog } from './utils/translation-catalog.js';
 
 const appRoot = document.getElementById('app');
 let navbarEl = null;
 let mainEl = null;
 let footerEl = null;
+let routeRequest = 0;
+let layoutLanguage = null;
 
 function ensurePublicLayout(currentPath) {
   if (!appRoot) return;
+  if (layoutLanguage !== getLanguageFromPath(window.location.pathname)) mainEl = null;
   if (!mainEl || !appRoot.contains(mainEl)) {
     appRoot.replaceChildren();
     navbarEl = createNavbar(navigate, currentPath);
@@ -32,6 +37,7 @@ function ensurePublicLayout(currentPath) {
     mainEl.id = 'main-view';
     footerEl = createFooter(navigate);
     appRoot.append(navbarEl, mainEl, footerEl);
+    layoutLanguage = getLanguageFromPath(window.location.pathname);
   } else {
     updateActiveNav(currentPath);
   }
@@ -43,6 +49,12 @@ function updateSeoAndRobotsMeta(pathname) {
 
 export function navigate(targetUrl, replace = false) {
   if (!targetUrl) return;
+  const target = new URL(targetUrl, window.location.href);
+  if (target.origin !== window.location.origin) return;
+  const targetLanguage = stripLanguagePrefix(target.pathname) !== target.pathname
+    ? getLanguageFromPath(target.pathname)
+    : getLanguageFromPath(window.location.pathname);
+  targetUrl = localizePath(target.pathname, targetLanguage) + target.search + target.hash;
   const currentFull = window.location.pathname + window.location.search + window.location.hash;
   if (targetUrl !== currentFull) {
     if (replace) {
@@ -63,19 +75,32 @@ function normalizePathname() {
     window.history.replaceState({}, '', '/admin');
   }
 
-  let pathname = window.location.pathname || '/';
+  let pathname = stripLanguagePrefix(window.location.pathname || '/');
   if (pathname.length > 1 && pathname.endsWith('/')) {
     pathname = pathname.slice(0, -1);
   }
   if (pathname === '/uygulama-alanlari') pathname = '/sektorler';
   if (pathname === '/cozumler') pathname = '/urunler';
-  return pathname;
+  return stripLanguagePrefix(pathname);
 }
 
-function routeCurrentUrl() {
+async function routeCurrentUrl() {
   if (!appRoot) return;
-  applyDocumentLanguage();
+  const request = ++routeRequest;
   const pathname = normalizePathname();
+  // Private records always use their original, unprefixed application routes.
+  if (isPrivatePath(window.location.pathname) && stripLanguagePrefix(window.location.pathname) !== window.location.pathname) {
+    window.history.replaceState({}, '', stripLanguagePrefix(window.location.pathname) + window.location.search + window.location.hash);
+  }
+  try {
+    await loadTranslationCatalog(getLanguageFromPath(window.location.pathname));
+  } catch (error) {
+    console.error('The language catalog could not be loaded.', error);
+    return;
+  }
+  if (request !== routeRequest) return;
+  closeProductOrderModal();
+  applyDocumentLanguage();
   updateSeoAndRobotsMeta(pathname);
 
   // Admin rotası tam ekran bağımsız kabukta çalışır
@@ -103,6 +128,16 @@ function routeCurrentUrl() {
           event.preventDefault();
           navigate(href);
         }
+      });
+    });
+    mainEl.querySelectorAll('[data-landing-chem]').forEach((sec) => {
+      sec.addEventListener('click', (event) => {
+        const title = sec.getAttribute('data-landing-chem');
+        if (!title) return;
+        const actionEl = event.target.closest('[data-chem-open]');
+        const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
+        event.preventDefault();
+        openChemicalProductModal({ title }, { mode });
       });
     });
     initDomTranslator(appRoot);
@@ -166,7 +201,9 @@ function routeCurrentUrl() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-subscribeLanguage(() => {
+subscribeLanguage((code) => {
+  const targetUrl = localizePath(window.location.pathname, code) + window.location.search + window.location.hash;
+  window.history.pushState({}, '', targetUrl);
   mainEl = null;
   routeCurrentUrl();
 });

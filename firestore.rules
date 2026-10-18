@@ -395,6 +395,7 @@ service cloud.firestore {
         isValidOptionalString('partyName', 1, 250) &&
         isValidOptionalString('currency', 1, 20) &&
         isValidOptionalString('paymentStatus', 1, 60) &&
+        (!('lines' in data) || (data.lines is list && data.lines.size() <= 100)) &&
         isValidOptionalString('notes', 0, 10000);
     }
 
@@ -613,6 +614,17 @@ service cloud.firestore {
       allow create, update: if hasRole(['superadmin', 'sales']) &&
         isValidChequeOrNote(request.resource.data);
       allow delete: if isSuperAdmin();
+    }
+
+    // Muhasebe programı entegrasyonu: yalnızca Cloud Functions (Admin SDK) yazar, personel okur.
+    match /accountingSyncState/{stateId} {
+      allow read: if hasRole(['superadmin', 'sales', 'viewer']);
+      allow write: if false;
+    }
+
+    match /accountingSyncLogs/{logId} {
+      allow read: if hasRole(['superadmin', 'sales', 'viewer']);
+      allow write: if false;
     }
 
     // 18. Legacy Collections Compatibility

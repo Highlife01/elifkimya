@@ -618,11 +618,11 @@ export const solutionLines = [
   },
   {
     id: 'ham-su',
-    title: 'Ham Su, RO ve Saf Su',
-    badge: 'RO • EDI • Medipure Cihazlar',
-    image: '/assets/cat-water-systems.jpg',
-    summary: 'Ön arıtma, ters ozmoz, EDI ve Medipure laboratuvar / endüstri cihazları.',
-    points: ['Kum, karbon, yumuşatma', 'RO ve antiskalant', 'EDI ve deiyonize', 'Medipure model kataloğu'],
+    title: 'Medipure Su Saflaştırma: Saf Su & Ultra Saf Su EDI',
+    badge: '18.25 MΩ·cm • EDI • 163 Model',
+    image: '/assets/hero-medipure-edi.jpg',
+    summary: 'Medipure su saflaştırma cihazları, çift geçişli RO, Elektrodeiyonizasyon (EDI) ve Tip-1/Tip-2 ultra saf su sistemleri.',
+    points: ['Saf Su & Ultra Saf Su (18.25 MΩ·cm)', 'Elektrodeiyonizasyon (EDI) sistemler', 'Deiyonize, medikal ve mobil cihazlar', '163 model Medipure GEN-6 kataloğu'],
     href: '/sistemler#medipure-katalog'
   },
   {
@@ -688,8 +688,8 @@ export const companyInfo = {
   phoneRaw: '+905464992342',
   whatsappNumber: '905464992342',
   whatsappUrl: 'https://wa.me/905464992342',
-  email: 'info@elifkimya.com.tr',
-  salesEmail: 'satis@elifkimya.com.tr',
+  email: 'info@elifcevrekimya.com.tr',
+  salesEmail: 'satis@elifcevrekimya.com.tr',
   address: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
   mapsUrl: 'https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111',
   city: 'Adana',
@@ -992,7 +992,7 @@ export const pageSEO = {
   },
   '/iletisim': {
     title: 'İletişim & Adana Merkez Depo (Ova Mah. Şakirpaşa Cd. No:269) | Elif Çevre Kimya',
-    description: 'Elif Çevre Kimya Adana merkez ofis ve depo (Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana). İletişim: info@elifkimya.com.tr ve satis@elifkimya.com.tr.',
+    description: 'Elif Çevre Kimya Adana merkez ofis ve depo (Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana). İletişim: info@elifcevrekimya.com.tr ve satis@elifcevrekimya.com.tr.',
     canonical: 'https://www.elifcevrekimya.com.tr/iletisim'
   }
 };

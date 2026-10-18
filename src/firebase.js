@@ -31,6 +31,9 @@ import {
   where,
   orderBy,
   limit,
+  startAfter,
+  documentId,
+  getCountFromServer,
   onSnapshot,
   runTransaction,
   serverTimestamp
@@ -47,6 +50,8 @@ import {
   buildSanitizedPortalShare,
   optStr
 } from './utils/security.js';
+import { computeInvoiceTotals, derivePaymentStatus } from './utils/invoice-calc.js';
+import { TAX_RULES_REVIEWED_AT, invoiceSeriesFor, nextInvoiceNumber, validateInvoiceCompliance } from './utils/tax-rules.js';
 
 export const COLLECTIONS = {
   USERS: 'users',
@@ -68,7 +73,9 @@ export const COLLECTIONS = {
   AUDIT_LOGS: 'auditLogs',
   ACCOUNTING_INVOICES: 'accountingInvoices',
   ACCOUNTING_TRANSACTIONS: 'accountingTransactions',
-  CHEQUES_AND_NOTES: 'chequesAndNotes'
+  CHEQUES_AND_NOTES: 'chequesAndNotes',
+  ACCOUNTING_SYNC_STATE: 'accountingSyncState',
+  ACCOUNTING_SYNC_LOGS: 'accountingSyncLogs'
 };
 
 export const CRM_STAGES = [
@@ -1188,7 +1195,7 @@ export async function createOrUpdateOrder(orderData, actor) {
       lineNetExclVat: Number(i.lineNetExclVat) || 0
     })) : [],
     netExclVat: Number(orderData.netExclVat || 0),
-    vatTotal: Number(orderData.vatTotal || 0),
+    vatTotal: Number(orderData.vatTotal ?? orderData.totalVat ?? 0),
     grandTotal,
     paidAmount,
     paymentStatus,
@@ -1620,19 +1627,62 @@ export async function sendTestNotificationChannel({ channel, recipient, message,
    10. VERİ ÇEKME & MÜŞTERİ PORTALI SORGULARI
    ========================================================================== */
 
-export async function fetchCollectionList(collectionName, maxDocs = 250) {
+const newestFirst = (a, b) => {
+  const tA = a.updatedAtIso || a.createdAtIso || '';
+  const tB = b.updatedAtIso || b.createdAtIso || '';
+  return tB.localeCompare(tA);
+};
+
+/**
+ * Koleksiyonun EN YENİ kayıtlarını getirir (createdAtIso azalan). createdAtIso alanı olmayan eski kayıtlar
+ * belge kimliğiyle sayfalanarak tamamlanır. Dönen dizide `totalCount` kayıt sayısını verir;
+ * `totalCount > length` ise yükleme sınırı aşılmıştır.
+ */
+export async function fetchCollectionList(collectionName, maxDocs = 250, { byDocumentId = false } = {}) {
   if (!db) return [];
-  const q = query(collection(db, collectionName), limit(maxDocs));
-  const snap = await getDocs(q);
+  const col = collection(db, collectionName);
+  const toItem = (d) => ({ id: d.id, ...d.data() });
   const items = [];
-  snap.forEach((d) => {
-    items.push({ id: d.id, ...d.data() });
-  });
-  return items.sort((a, b) => {
-    const tA = a.updatedAtIso || a.createdAtIso || '';
-    const tB = b.updatedAtIso || b.createdAtIso || '';
-    return tB.localeCompare(tA);
-  });
+  const seen = new Set();
+
+  if (!byDocumentId) {
+    const ordered = await getDocs(query(col, orderBy('createdAtIso', 'desc'), limit(maxDocs)));
+    ordered.docs.forEach((d) => {
+      seen.add(d.id);
+      items.push(toItem(d));
+    });
+  }
+
+  // Tek bir sayım sorgusu (ucuz); tüm kayıtların sıralı sorguya girip girmediğini ve sınırın aşılıp aşılmadığını gösterir.
+  let total = items.length;
+  try {
+    total = (await getCountFromServer(col)).data().count;
+  } catch {
+    // Sayım alınamazsa sıralı sonuçla devam edilir.
+  }
+
+  // createdAtIso alanı olmayan eski kayıtlar belge kimliğiyle sayfalanarak tamamlanır.
+  if (byDocumentId || (items.length < maxDocs && total > items.length)) {
+    const PAGE = 200;
+    let cursor = null;
+    while (items.length < maxDocs) {
+      const constraints = [orderBy(documentId()), limit(PAGE)];
+      if (cursor) constraints.push(startAfter(cursor));
+      const snap = await getDocs(query(col, ...constraints));
+      snap.docs.forEach((d) => {
+        if (!seen.has(d.id) && items.length < maxDocs) {
+          seen.add(d.id);
+          items.push(toItem(d));
+        }
+      });
+      if (snap.size < PAGE) break;
+      cursor = snap.docs[snap.docs.length - 1];
+    }
+  }
+
+  items.sort(newestFirst);
+  Object.defineProperty(items, 'totalCount', { value: Math.max(total, items.length), enumerable: false });
+  return items;
 }
 
 export async function fetchPublicPublishedProducts() {
@@ -2016,28 +2066,13 @@ export async function saveAccountingInvoice(invoiceData, actor) {
   const nowIso = new Date().toISOString();
   const invoiceType = String(invoiceData.invoiceType || 'SATIS').toUpperCase();
   const eDocumentType = String(invoiceData.docCategory || invoiceData.eDocumentType || 'E-FATURA').toUpperCase();
-  const currency = String(invoiceData.currency || 'TRY').toUpperCase();
-  const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(invoiceData.exchangeRate || 1), 0.0001);
 
-  const subtotalExclVat = Math.max(Number(invoiceData.subtotal ?? invoiceData.subtotalExclVat ?? 0), 0);
-  const discountTotal = Math.max(Number(invoiceData.discountTotal || 0), 0);
-  const netMatrah = Math.max(subtotalExclVat - discountTotal, 0);
-  const vatRate = Math.max(Number(invoiceData.vatRate ?? 20), 0);
-  const rawVat = Number(((netMatrah * vatRate) / 100).toFixed(2));
-
-  // KDV Tevkifatı (Örn: '2/10', '5/10', 'Yok' veya 0, 2, 5, 7, 9 -> X/10)
-  let withholdingNumer = Number(invoiceData.withholdingNumerator ?? 0);
-  const rawWithholdingStr = String(invoiceData.withholdingRate || '').trim();
-  if (!withholdingNumer && rawWithholdingStr.includes('/')) {
-    const parsed = Number(rawWithholdingStr.split('/')[0]);
-    if (Number.isFinite(parsed) && parsed > 0) withholdingNumer = parsed;
-  }
-  withholdingNumer = Math.min(Math.max(withholdingNumer, 0), 10);
-  const withholdingRate = withholdingNumer > 0 ? `${withholdingNumer}/10` : 'Yok';
-  const withholdingAmount = withholdingNumer > 0 ? Number(((rawVat * withholdingNumer) / 10).toFixed(2)) : 0;
-  const payableVat = Number((rawVat - withholdingAmount).toFixed(2));
-  const grandTotal = Number((netMatrah + payableVat).toFixed(2));
-  const grandTotalTry = Number((grandTotal * exchangeRate).toFixed(2));
+  const totals = computeInvoiceTotals(invoiceData);
+  const {
+    currency, exchangeRate, lines, subtotal: subtotalExclVat, discountTotal, netExclVat: netMatrah,
+    vatRate, vatMixed, vatAmount: rawVat, withholdingRate, withholdingNumerator: withholdingNumer,
+    withholdingAmount, payableVat, grandTotal, grandTotalTry
+  } = totals;
 
   const rawPaidTry = invoiceData.paidAmountTry !== undefined && invoiceData.paidAmountTry !== null
     ? Number(invoiceData.paidAmountTry)
@@ -2045,19 +2080,48 @@ export async function saveAccountingInvoice(invoiceData, actor) {
   const paidAmountTry = Math.max(Number(rawPaidTry.toFixed(2)), 0);
   const remainingAmountTry = Math.max(Number((grandTotalTry - paidAmountTry).toFixed(2)), 0);
 
-  let paymentStatus = invoiceData.paymentStatus || 'Ödeme Bekliyor';
-  if (paidAmountTry >= grandTotalTry && grandTotalTry > 0) {
-    paymentStatus = 'Ödendi';
-  } else if (paidAmountTry > 0) {
-    paymentStatus = 'Kısmi Ödeme';
-  } else if (invoiceData.dueDate && new Date(invoiceData.dueDate).getTime() < Date.now()) {
-    paymentStatus = 'Vadesi Geçti';
+  const paymentStatus = derivePaymentStatus({
+    grandTotalTry,
+    paidAmountTry,
+    dueDate: invoiceData.dueDate,
+    fallback: invoiceData.paymentStatus || 'Ödeme Bekliyor'
+  });
+
+  const issueDate = String(invoiceData.issueDate || nowIso.slice(0, 10)).slice(0, 10);
+  const providedInvoiceNo = String(invoiceData.invoiceNo || '').trim();
+
+  // Mevzuat kontrolleri: KDV oranları, istisna/tevkifat kodları, GİB fatura numarası biçimi
+  const compliance = validateInvoiceCompliance(
+    { ...invoiceData, invoiceType, docCategory: eDocumentType, issueDate, invoiceNo: providedInvoiceNo },
+    totals
+  );
+  if (compliance.errors.length > 0) throw new Error(compliance.errors.join(' '));
+
+  let invoiceNo = providedInvoiceNo;
+  if (!invoiceNo) {
+    // Kesilen faturalarda seri/yıl bazında ardışık GİB biçimli numara üretilir (ELF2026000000001)
+    const series = invoiceSeriesFor(eDocumentType);
+    const prefix = `${series}${issueDate.slice(0, 4)}`;
+    const lastSnap = await getDocs(query(
+      collection(db, COLLECTIONS.ACCOUNTING_INVOICES),
+      where('invoiceNo', '>=', `${prefix}000000000`),
+      where('invoiceNo', '<=', `${prefix}999999999`),
+      orderBy('invoiceNo', 'desc'),
+      limit(1)
+    ));
+    invoiceNo = nextInvoiceNumber({ series, year: issueDate.slice(0, 4), lastNumber: lastSnap.docs[0]?.data().invoiceNo });
   }
 
-  const invoiceNo = String(
-    invoiceData.invoiceNo ||
-    `ELF${new Date().getFullYear()}${String(Date.now()).slice(-6)}`
-  ).trim();
+  // Aynı fatura numarası ikinci kez kaydedilmesin (Alış faturalarında numara tedarikçiye göre benzersizdir)
+  if (!invoiceData.id) {
+    const sameNo = await getDocs(query(collection(db, COLLECTIONS.ACCOUNTING_INVOICES), where('invoiceNo', '==', invoiceNo.slice(0, 95)), limit(10)));
+    const duplicate = sameNo.docs.some((d) => {
+      const existing = d.data();
+      return existing.invoiceType === invoiceType &&
+        (invoiceType !== 'ALIS' || String(existing.partyName || '').toLowerCase() === partyName.toLowerCase());
+    });
+    if (duplicate) throw new Error(`${invoiceNo} numaralı fatura zaten kayıtlı. Aynı numara tekrar kullanılamaz.`);
+  }
 
   const linkedOrderId = optStr(invoiceData.orderId || invoiceData.linkedOrderId, 120) || '';
   const linkedOrderNo = optStr(invoiceData.orderNo || invoiceData.linkedOrderNo, 120) || '';
@@ -2077,6 +2141,8 @@ export async function saveAccountingInvoice(invoiceData, actor) {
     dueDate: String(invoiceData.dueDate || nowIso.slice(0, 10)),
     currency,
     exchangeRate,
+    lines,
+    vatMixed,
     subtotal: subtotalExclVat,
     subtotalExclVat,
     discountTotal,
@@ -2086,6 +2152,9 @@ export async function saveAccountingInvoice(invoiceData, actor) {
     vatAmount: rawVat,
     withholdingRate,
     withholdingNumerator: withholdingNumer,
+    withholdingCode: withholdingNumer > 0 ? String(invoiceData.withholdingCode || '').trim() : '',
+    vatExemptionCode: String(invoiceData.vatExemptionCode || '').trim().slice(0, 3),
+    taxRulesReviewedAt: TAX_RULES_REVIEWED_AT,
     withholdingAmount,
     payableVat,
     grandTotal,
@@ -2116,8 +2185,8 @@ export async function saveAccountingInvoice(invoiceData, actor) {
     await writeAuditLog('CREATE_ACCOUNTING_INVOICE', COLLECTIONS.ACCOUNTING_INVOICES, docId, { invoiceNo, grandTotalTry }, actor);
   }
 
-  // Eğer onaylı bir siparişten faturalandıysa siparişi "Faturalandı" olarak işaretle
-  if (linkedOrderId) {
+  // Eğer onaylı bir siparişten faturalandıysa siparişi "Faturalandı" olarak işaretle (proforma vergi belgesi değildir)
+  if (linkedOrderId && eDocumentType !== 'PROFORMA') {
     try {
       await updateDoc(doc(db, COLLECTIONS.ORDERS, linkedOrderId), {
         status: 'Faturalandı',
@@ -2131,7 +2200,7 @@ export async function saveAccountingInvoice(invoiceData, actor) {
     }
   }
 
-  return normalizeAccountingInvoice({ id: docId, ...payload });
+  return { ...normalizeAccountingInvoice({ id: docId, ...payload }), complianceWarnings: compliance.warnings };
 }
 
 export async function saveAccountingTransaction(trxData, actor) {
@@ -2390,7 +2459,41 @@ export async function convertCrmRequestToOrder(crmReq, grandTotalTry, actor) {
   return createdOrder;
 }
 
-export async function loadAdminAllData() {
+const ADMIN_STORE_KEYS = [
+  'crmRequests', 'customers', 'products', 'documents', 'projects', 'proposals', 'orders',
+  'inventoryItems', 'inventoryMovements', 'suppliers', 'serviceRecords', 'accountingInvoices',
+  'accountingTransactions', 'chequesAndNotes', 'accountingSyncStates', 'users', 'auditLogs', 'settings'
+];
+
+// Firestore kurallarındaki okuma yetkileriyle aynı: yetkisiz koleksiyon için istek hiç atılmaz.
+function canLoadAdminKey(key, role) {
+  if (!role) return true;
+  switch (key) {
+    case 'accountingInvoices':
+    case 'accountingTransactions':
+    case 'chequesAndNotes':
+    case 'accountingSyncStates':
+      return hasPermission(role, 'view_accounting');
+    case 'auditLogs':
+      return role === ROLES.SUPERADMIN || role === ROLES.VIEWER;
+    case 'suppliers':
+      return [ROLES.SUPERADMIN, ROLES.WAREHOUSE, ROLES.SALES, ROLES.VIEWER].includes(role);
+    case 'proposals':
+      return hasPermission(role, 'view_costs');
+    default:
+      return hasPermission(role, 'view_admin');
+  }
+}
+
+/**
+ * @param {{ role?: string, only?: string[] }} [options]
+ *   role: yalnızca okunabilir koleksiyonları çeker. only: kısmi yenileme (yalnızca bu anahtarlar döner).
+ */
+export async function loadAdminAllData(options = {}) {
+  const role = options?.role;
+  const only = Array.isArray(options?.only) ? new Set(options.only) : null;
+  const wants = (key) => (!only || only.has(key)) && canLoadAdminKey(key, role);
+
   if (!db) {
     return {
       crmRequests: [],
@@ -2407,18 +2510,27 @@ export async function loadAdminAllData() {
       accountingInvoices: [],
       accountingTransactions: [],
       chequesAndNotes: [],
+      accountingSyncStates: [],
       users: [],
       auditLogs: [],
       settings: {}
     };
   }
 
-  const safeFetch = async (col) => {
-    try {
-      return await fetchCollectionList(col, 250);
-    } catch (_e) {
-      return [];
-    }
+  const skipped = Promise.resolve([]);
+  const loadLimits = {};
+  // Gün içinde hızla büyüyen kayıt dizileri 250 ile sınırlı kalır; iş kayıtları için sınır daha yüksektir.
+  const LIGHT_KEYS = new Set(['auditLogs', 'inventoryMovements']);
+  const safeFetch = (col, key) => {
+    if (!wants(key)) return skipped;
+    const options = key === 'accountingSyncStates' ? { byDocumentId: true } : {};
+    return fetchCollectionList(col, LIGHT_KEYS.has(key) ? 250 : 1000, options)
+      .then((list) => {
+        // Sınır aşıldıysa liste eksiktir; panel bunu kullanıcıya bildirir.
+        if (list.totalCount > list.length) loadLimits[key] = { loaded: list.length, total: list.totalCount };
+        return list;
+      })
+      .catch(() => []);
   };
 
   const [
@@ -2438,29 +2550,31 @@ export async function loadAdminAllData() {
     rawAccountingInvoices,
     rawAccountingTransactions,
     rawChequesAndNotes,
+    rawSyncStates,
     users,
     auditLogs,
     settings
   ] = await Promise.all([
-    safeFetch(COLLECTIONS.CRM_REQUESTS),
-    safeFetch('contactMessages'),
-    safeFetch('quoteRequests'),
-    safeFetch(COLLECTIONS.CUSTOMERS),
-    safeFetch(COLLECTIONS.PRODUCTS),
-    safeFetch(COLLECTIONS.DOCUMENTS),
-    safeFetch(COLLECTIONS.PROJECTS),
-    safeFetch(COLLECTIONS.PROPOSALS),
-    safeFetch(COLLECTIONS.ORDERS),
-    safeFetch(COLLECTIONS.INVENTORY_ITEMS),
-    safeFetch(COLLECTIONS.INVENTORY_MOVEMENTS),
-    safeFetch(COLLECTIONS.SUPPLIERS),
-    safeFetch(COLLECTIONS.SERVICE_RECORDS),
-    safeFetch(COLLECTIONS.ACCOUNTING_INVOICES),
-    safeFetch(COLLECTIONS.ACCOUNTING_TRANSACTIONS),
-    safeFetch(COLLECTIONS.CHEQUES_AND_NOTES),
-    safeFetch(COLLECTIONS.USERS),
-    safeFetch(COLLECTIONS.AUDIT_LOGS),
-    fetchAllSiteSettings()
+    safeFetch(COLLECTIONS.CRM_REQUESTS, 'crmRequests'),
+    safeFetch('contactMessages', 'crmRequests'),
+    safeFetch('quoteRequests', 'crmRequests'),
+    safeFetch(COLLECTIONS.CUSTOMERS, 'customers'),
+    safeFetch(COLLECTIONS.PRODUCTS, 'products'),
+    safeFetch(COLLECTIONS.DOCUMENTS, 'documents'),
+    safeFetch(COLLECTIONS.PROJECTS, 'projects'),
+    safeFetch(COLLECTIONS.PROPOSALS, 'proposals'),
+    safeFetch(COLLECTIONS.ORDERS, 'orders'),
+    safeFetch(COLLECTIONS.INVENTORY_ITEMS, 'inventoryItems'),
+    safeFetch(COLLECTIONS.INVENTORY_MOVEMENTS, 'inventoryMovements'),
+    safeFetch(COLLECTIONS.SUPPLIERS, 'suppliers'),
+    safeFetch(COLLECTIONS.SERVICE_RECORDS, 'serviceRecords'),
+    safeFetch(COLLECTIONS.ACCOUNTING_INVOICES, 'accountingInvoices'),
+    safeFetch(COLLECTIONS.ACCOUNTING_TRANSACTIONS, 'accountingTransactions'),
+    safeFetch(COLLECTIONS.CHEQUES_AND_NOTES, 'chequesAndNotes'),
+    safeFetch(COLLECTIONS.ACCOUNTING_SYNC_STATE, 'accountingSyncStates'),
+    safeFetch(COLLECTIONS.USERS, 'users'),
+    safeFetch(COLLECTIONS.AUDIT_LOGS, 'auditLogs'),
+    wants('settings') ? fetchAllSiteSettings() : Promise.resolve({})
   ]);
 
   const mergedCrmMap = new Map();
@@ -2545,8 +2659,9 @@ export async function loadAdminAllData() {
   const accountingInvoices = rawAccountingInvoices.map(normalizeAccountingInvoice);
   const accountingTransactions = rawAccountingTransactions.map(normalizeAccountingTransaction);
   const chequesAndNotes = rawChequesAndNotes.map(normalizeChequeOrNote);
+  const accountingSyncStates = rawSyncStates.filter((s) => !String(s.id).startsWith('_'));
 
-  return {
+  const result = {
     crmRequests,
     customers,
     products,
@@ -2561,9 +2676,15 @@ export async function loadAdminAllData() {
     accountingInvoices,
     accountingTransactions,
     chequesAndNotes,
+    accountingSyncStates,
     users,
     auditLogs,
     settings
+  };
+  if (!only) return { ...result, loadLimits };
+  return {
+    ...Object.fromEntries(ADMIN_STORE_KEYS.filter((key) => only.has(key)).map((key) => [key, result[key]])),
+    loadLimits
   };
 }
 

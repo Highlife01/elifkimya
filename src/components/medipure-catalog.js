@@ -7,6 +7,7 @@ import {
   MEDIPURE_SOURCE,
   allMedipureProducts
 } from '../data/medipure-catalog.js';
+import { openMedipureProductModal } from './product-order-modal.js';
 
 const SHOWCASE_CODES = [
   'DT-5012',
@@ -19,11 +20,6 @@ const SHOWCASE_CODES = [
   'XH-8415'
 ];
 
-function quoteHref(product) {
-  const label = `${product.code} ${product.name} ${product.capacity}`;
-  return `/teklif-al?type=water_project&product=${encodeURIComponent(label)}`;
-}
-
 function capacityRank(capacity) {
   const match = String(capacity).match(/([\d.,]+)\s*(lt\/saat|m³\/saat|ton\/saat|ton\/gün)/);
   if (!match) return 0;
@@ -35,19 +31,21 @@ function capacityRank(capacity) {
 }
 
 function productCard(product, categoryTitle) {
-  const search = withLanguageSearch(`${product.code} ${product.name} ${product.capacity} ${categoryTitle}`);
-  const href = quoteHref(product);
+  const search = withLanguageSearch(`${product.code} ${product.name} ${product.capacity} ${categoryTitle} ${product.summary || ''}`);
+  const shortDesc = product.summary || (product.descriptionPoints && product.descriptionPoints[0]) || `${product.code} ${product.name} (${product.capacity}) su saflaştırma sistemi.`;
+  const qualitySpec = (product.specs || []).find((s) => /kalite|iletkenlik|direnç/i.test(s.label))?.value || '';
   return `
     <article
-      class="medipure-card group flex flex-col overflow-hidden rounded-3xl border-2 border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-lg"
+      class="medipure-card group cursor-pointer flex flex-col overflow-hidden rounded-3xl border-2 border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-lg"
       data-medipure-card
+      data-medipure-code="${escapeAttr(product.code)}"
       data-group="${escapeAttr(product.group)}"
       data-category="${escapeAttr(product.categoryId)}"
       data-search="${escapeAttr(search)}"
       data-price="${escapeAttr(String(product.listPriceValue || 0))}"
       data-capacity="${escapeAttr(String(capacityRank(product.capacity)))}"
     >
-      <div class="relative aspect-square bg-slate-50">
+      <div class="relative aspect-square bg-slate-50" data-medipure-open="detail">
         <img
           src="${escapeAttr(product.image)}"
           alt="${escapeAttr(`${product.code} ${product.name}`)}"
@@ -71,17 +69,28 @@ function productCard(product, categoryTitle) {
       </div>
       <div class="flex flex-1 flex-col p-4">
         <p class="text-[11px] font-bold uppercase tracking-wide text-emerald-700">${escapeHtml(categoryTitle)}</p>
-        <h3 class="mt-1 font-display text-base font-extrabold leading-snug text-slate-900">${escapeHtml(product.name)}</h3>
-        <div class="mt-4 flex items-end justify-between gap-3 border-t border-slate-100 pt-3">
-          <div>
-            <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Medipure liste</p>
-            <p class="font-display text-lg font-black text-slate-950">${escapeHtml(product.listPriceEur)} €</p>
+        <h3 class="mt-1 font-display text-base font-extrabold leading-snug text-slate-900 group-hover:text-emerald-800 transition" data-medipure-open="detail">${escapeHtml(product.name)}</h3>
+        ${qualitySpec ? `<p class="mt-1 font-mono text-[11px] font-bold text-slate-600">Su Kalitesi: ${escapeHtml(qualitySpec)}</p>` : ''}
+        <p class="mt-1.5 text-xs leading-relaxed text-slate-600 line-clamp-2" data-medipure-open="detail">${escapeHtml(shortDesc)}</p>
+        <div class="mt-auto pt-3">
+          <div class="flex items-end justify-between gap-2 border-t border-slate-100 pt-3">
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Medipure liste</p>
+              <p class="font-display text-lg font-black text-slate-950">${escapeHtml(product.listPriceEur)} €</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                data-medipure-open="detail"
+                class="inline-flex items-center rounded-xl border border-slate-300 bg-slate-50 px-2.5 py-2 text-[11px] font-extrabold text-slate-800 hover:border-emerald-500 hover:text-emerald-800 transition"
+              >📋 Açıklama</button>
+              <button
+                type="button"
+                data-medipure-open="order"
+                class="inline-flex items-center rounded-xl bg-emerald-600 px-3 py-2 text-xs font-extrabold text-white hover:bg-emerald-700 shadow-xs transition"
+              >🛒 Sipariş Ver</button>
+            </div>
           </div>
-          <a
-            class="inline-flex items-center rounded-xl bg-emerald-600 px-3 py-2 text-xs font-extrabold text-white hover:bg-emerald-700"
-            href="${escapeAttr(href)}"
-            data-nav="${escapeAttr(href)}"
-          >Teklif iste</a>
         </div>
       </div>
     </article>
@@ -98,22 +107,22 @@ export function renderMedipureShowcase() {
     <section class="section bg-slate-50 border-y border-slate-200" id="medipure-vitrin">
       <div class="container-x">
         <div class="flex flex-wrap items-end justify-between gap-4">
-          <div class="max-w-2xl">
-            <p class="chip mb-3">Medipure saf su cihazları</p>
-            <h2 class="h2-title">Laboratuvardan endüstriye ${MEDIPURE_PRODUCT_COUNT} model</h2>
+          <div class="max-w-3xl">
+            <p class="chip">Medipure® Su Saflaştırma • Saf Su &amp; Ultra Saf Su EDI Sistemler</p>
+            <h2 class="h2-title">Su Saflaştırma, Saf Su ve Ultra Saf Su EDI Sistemleri (${MEDIPURE_PRODUCT_COUNT} Model)</h2>
             <p class="mt-3 text-base leading-relaxed text-slate-700">
-              Laboratuvar, medikal, deiyonize, mobil ve endüstriyel saf su cihazları model kodu, saatlik kapasite ve EUR liste fiyatıyla listelenir.
+              Laboratuvar, medikal, sterilizasyon, deiyonize, elektrodeiyonizasyon (EDI), mobil ve endüstriyel <strong>Medipure GEN-6</strong> su saflaştırma cihazları; üzerine tıklayarak <strong>teknik açıklamalarını</strong> inceleyebilir ve <strong>Sipariş Ver</strong> butonuyla doğrudan sipariş oluşturabilirsiniz.
             </p>
           </div>
           <a class="btn-primary !px-5 !py-3 text-xs font-extrabold" href="/sistemler#medipure-katalog" data-nav="/sistemler#medipure-katalog">
-            Tüm modelleri gör →
+            Tüm ${MEDIPURE_PRODUCT_COUNT} Modeli İncele →
           </a>
         </div>
 
         <div class="mt-6 flex flex-wrap gap-2">
           ${MEDIPURE_GROUPS.map((group) => `
             <a
-              class="rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 hover:border-emerald-500 hover:text-emerald-800"
+              class="rounded-full border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-800 hover:border-emerald-500 hover:text-emerald-800"
               href="/sistemler?grup=${escapeAttr(group.id)}#medipure-katalog"
               data-nav="/sistemler?grup=${escapeAttr(group.id)}#medipure-katalog"
             >${escapeHtml(group.title)}</a>
@@ -134,12 +143,10 @@ export function renderMedipureCatalog() {
     <section id="medipure-katalog" class="mt-14" style="scroll-margin-top:7rem;" data-medipure-catalog>
       <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div class="max-w-2xl">
-          <span class="section-tag">Medipure cihaz kataloğu</span>
-          <h2 class="section-title" style="margin-top:0.4rem;">Saf su ve ultra saf su modelleri</h2>
+          <span class="section-tag">Medipure® Su Saflaştırma &amp; EDI Cihaz Kataloğu</span>
+          <h2 class="section-title" style="margin-top:0.4rem;">Saf Su, Ultra Saf Su ve Elektrodeiyonizasyon (EDI) Modelleri</h2>
           <p class="section-desc" style="margin:0.6rem 0 0;">
-            ${MEDIPURE_PRODUCT_COUNT} model; kapasite ve EUR liste fiyatı
-            <a href="${escapeAttr(MEDIPURE_SOURCE)}" target="_blank" rel="noopener noreferrer">Medipure</a>
-            kamu kataloğundan alınmıştır. Kur, teslimat ve güncel teklif Elif Kimya tarafından ayrıca verilir.
+            ${MEDIPURE_PRODUCT_COUNT} model; cihazların üzerine tıklayarak detaylı ürün açıklamasını ve teknik özellik tablosunu görebilir, <strong>Sipariş Ver</strong> butonuyla doğrudan sipariş oluşturabilirsiniz.
           </p>
         </div>
         <p class="text-sm font-bold text-slate-700">
@@ -199,6 +206,18 @@ export function bindMedipureCatalog(root) {
       img.hidden = true;
       const fallback = img.parentElement?.querySelector('[data-medipure-fallback]');
       if (fallback) fallback.hidden = false;
+    });
+  });
+
+  // Cihaz kartlarına tıklama -> Açıklama & Sipariş Modalı
+  root.querySelectorAll('[data-medipure-card]').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      const code = card.getAttribute('data-medipure-code');
+      if (!code) return;
+      const actionEl = e.target.closest('[data-medipure-open]');
+      const mode = actionEl?.getAttribute('data-medipure-open') || 'detail';
+      e.preventDefault();
+      openMedipureProductModal(code, { mode });
     });
   });
 

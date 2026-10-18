@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender-html.mjs",
-    "preview": "vite preview"
+    "build": "node scripts/extract-translations.mjs --check && node scripts/verify-translations.mjs && vite build && node scripts/prerender-html.mjs && node scripts/verify-multilingual-seo.mjs",
+    "preview": "vite preview",
+    "test": "node --test --test-isolation=none tests/*.test.mjs functions/test/*.test.mjs",
+    "translations:extract": "node scripts/extract-translations.mjs",
+    "translations:generate": "node scripts/generate-translations.mjs",
+    "translations:check": "node scripts/extract-translations.mjs --check && node scripts/verify-translations.mjs"
   },
   "dependencies": {
     "firebase": "^11.10.0",

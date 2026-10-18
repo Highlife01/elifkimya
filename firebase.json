@@ -1,4 +1,16 @@
 {
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "elifkimya",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "test",
+        "*.log"
+      ]
+    }
+  ],
   "firestore": {
     "database": "elifkimya",
     "rules": "firestore.rules",
@@ -144,19 +156,19 @@
     "rewrites": [
       {
         "source": "/admin",
-        "destination": "/index.html"
+        "destination": "/admin.html"
       },
       {
         "source": "/admin/**",
-        "destination": "/index.html"
+        "destination": "/admin.html"
       },
       {
         "source": "/portal",
-        "destination": "/index.html"
+        "destination": "/portal.html"
       },
       {
         "source": "/portal/**",
-        "destination": "/index.html"
+        "destination": "/portal.html"
       }
     ]
   }

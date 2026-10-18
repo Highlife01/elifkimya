@@ -26,10 +26,13 @@ import {
 } from '../firebase.js';
 import { showNotification } from '../components/notification.js';
 import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
-import { fold, t, withLanguageSearch } from '../utils/i18n.js';
+import { fold, t, withLanguageSearch, getLanguage } from '../utils/i18n.js';
+import { translateText } from '../utils/translation-catalog.js';
 import { REGION_SLUGS } from './seo-landings.js';
 import { bindMedipureCatalog, renderMedipureCatalog } from '../components/medipure-catalog.js';
+import { openChemicalProductModal } from '../components/product-order-modal.js';
 import { TECHNICAL_BLOG_CATEGORIES, TECHNICAL_BLOG_POSTS } from '../data/technical-blog.js';
+import { TURKEY_81_PROVINCES, TURKEY_7_REGIONS_SUMMARY } from '../data/provinces-81.js';
 
 function attachSpaLinks(container, navigate) {
   container.querySelectorAll('[data-nav]').forEach((link) => {
@@ -85,8 +88,8 @@ export async function renderProductsPage(container, navigate) {
       <div class="container-x">
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           ${productCategories.map((cat, idx) => `
-            <a href="/urunler/${escapeAttr(cat.id)}" data-nav class="group relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
-              <div>
+            <article data-cat-chem-idx="${idx}" class="group cursor-pointer relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              <div data-chem-open="detail">
                 <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100">
                   <img src="${escapeAttr(categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="1200" height="896" loading="lazy" class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
                   <div class="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity"></div>
@@ -98,11 +101,15 @@ export async function renderProductsPage(container, navigate) {
                   <p class="mt-1.5 text-xs leading-relaxed text-slate-600 line-clamp-2">${escapeHtml(cat.description)}</p>
                 </div>
               </div>
-              <div class="mt-4 pt-3 border-t border-slate-100 px-1 flex items-center justify-between text-xs font-bold text-brand-green">
-                <span>Teknik Spesifikasyonlar</span>
-                <span class="group-hover:translate-x-1 transition-transform">→</span>
+              <div class="mt-4 pt-3 border-t border-slate-100 px-1 flex items-center justify-between gap-2">
+                <button type="button" data-chem-open="detail" class="inline-flex items-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-1.5 text-xs font-extrabold text-slate-800 hover:border-emerald-500 transition">
+                  📋 Açıklama
+                </button>
+                <button type="button" data-chem-open="order" class="inline-flex items-center rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-700 transition">
+                  🛒 Sipariş Ver
+                </button>
               </div>
-            </a>
+            </article>
           `).join('')}
         </div>
       </div>
@@ -173,7 +180,7 @@ export async function renderProductsPage(container, navigate) {
         <div class="section-header" style="margin-top:3rem;">
           <span class="section-tag">Endüstriyel Ürün Grupları</span>
           <h2 class="section-title">Teknik Kimyasal Kategorilerimiz</h2>
-          <p class="section-desc">Fiyatlandırma; talep edilen ambalaj tipi (25 kg bidon, 200 kg varil, 1000 kg IBC veya dökme tanker), saflık derecesi ve teslimat noktasına göre belirlenir.</p>
+          <p class="section-desc">Herhangi bir kimyasal satırının üzerine tıklayarak teknik açıklamasını ve parametrelerini görüntüleyebilir, <strong>Sipariş Ver</strong> butonuyla doğrudan sipariş oluşturabilirsiniz.</p>
         </div>
 
         <div class="categories-detailed-list" id="static-categories-list">
@@ -188,9 +195,14 @@ export async function renderProductsPage(container, navigate) {
                     <p>${escapeHtml(cat.description)}</p>
                   </div>
                 </div>
-                <a href="/teklif-al?product=${encodeURIComponent(cat.title)}" class="btn btn-primary" data-nav>
-                  Teklif İste
-                </a>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                  <button type="button" class="btn btn-secondary btn-sm" data-cat-chem-idx="${idx}" data-chem-open="detail">
+                    📋 Grup Açıklaması
+                  </button>
+                  <button type="button" class="btn btn-primary btn-sm" data-cat-chem-idx="${idx}" data-chem-open="order">
+                    🛒 Sipariş Ver
+                  </button>
+                </div>
               </div>
               <div class="products-table-wrapper">
                 <table class="data-table">
@@ -199,21 +211,33 @@ export async function renderProductsPage(container, navigate) {
                       <th>Ticari / Teknik Ürün Adı</th>
                       <th>Proses Uygulama ve Teknik Özellik</th>
                       <th>Ambalaj Seçenekleri</th>
-                      <th>Fiyat / Tedarik</th>
-                      <th>İşlem</th>
+                      <th>Detay &amp; Sipariş</th>
                     </tr>
                   </thead>
                   <tbody>
-                    ${cat.subProducts.map((sub) => `
-                      <tr class="searchable-product-row" data-search="${escapeAttr(withLanguageSearch(`${sub.name} ${sub.detail} ${cat.title}`))}">
-                        <td><strong>${escapeHtml(sub.name)}</strong></td>
-                        <td>${escapeHtml(sub.detail)}</td>
-                        <td><span class="badge badge-neutral">${escapeHtml(cat.packaging)}</span></td>
-                        <td><span class="badge badge-teal">Teklif isteyin</span></td>
+                    ${(cat.subcategories || []).map((sub, subIdx) => `
+                      <tr
+                        class="searchable-product-row"
+                        style="cursor:pointer;"
+                        data-sub-chem-cat="${idx}"
+                        data-sub-chem-idx="${subIdx}"
+                        data-search="${escapeAttr(withLanguageSearch(`${sub.name} ${sub.activeChemical} ${sub.desc} ${cat.title}`))}"
+                      >
+                        <td data-chem-open="detail">
+                          <strong style="color:var(--text-primary);text-decoration:underline;text-underline-offset:3px;">${escapeHtml(sub.name)}</strong>
+                          <div style="font-size:0.75rem;color:var(--accent-teal);font-weight:700;margin-top:0.2rem;">${escapeHtml(sub.activeChemical)}</div>
+                        </td>
+                        <td data-chem-open="detail">${escapeHtml(sub.desc)}</td>
+                        <td data-chem-open="detail"><span class="badge badge-neutral">${escapeHtml(cat.packaging)}</span></td>
                         <td>
-                          <a href="/teklif-al?product=${encodeURIComponent(sub.name)}" class="btn btn-sm btn-secondary" data-nav>
-                            Teklif İste
-                          </a>
+                          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+                            <button type="button" class="btn btn-sm btn-secondary" data-chem-open="detail">
+                              📋 Açıklama
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" data-chem-open="order">
+                              🛒 Sipariş Ver
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     `).join('')}
@@ -230,6 +254,52 @@ export async function renderProductsPage(container, navigate) {
   renderSafeHtml(container, html);
   attachSpaLinks(container, navigate);
 
+  // Üst Kategori Kartları & Grup Butonları -> Kimyasal Açıklama & Sipariş Modalı
+  container.querySelectorAll('[data-cat-chem-idx]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      const idx = Number(el.getAttribute('data-cat-chem-idx') || 0);
+      const cat = productCategories[idx];
+      if (!cat) return;
+      const actionEl = e.target.closest('[data-chem-open]');
+      const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
+      e.preventDefault();
+      openChemicalProductModal({
+        code: `KAT-${cat.code || '01'}`,
+        title: cat.title,
+        categoryTitle: cat.shortTitle,
+        activeChemical: (cat.subcategories || []).map((s) => s.activeChemical).slice(0, 3).join(' • '),
+        description: cat.description,
+        specs: (cat.subcategories || []).map((s) => `${s.name}: ${s.desc}`),
+        packaging: cat.packaging,
+        image: categoryImages[idx % categoryImages.length]
+      }, { mode });
+    });
+  });
+
+  // Alt Kimyasal Satırları (tr[data-sub-chem-idx]) -> Kimyasal Açıklama & Sipariş Modalı
+  container.querySelectorAll('[data-sub-chem-idx]').forEach((rowEl) => {
+    rowEl.addEventListener('click', (e) => {
+      const catIdx = Number(rowEl.getAttribute('data-sub-chem-cat') || 0);
+      const subIdx = Number(rowEl.getAttribute('data-sub-chem-idx') || 0);
+      const cat = productCategories[catIdx];
+      const sub = cat?.subcategories?.[subIdx];
+      if (!cat || !sub) return;
+      const actionEl = e.target.closest('[data-chem-open]');
+      const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
+      e.preventDefault();
+      openChemicalProductModal({
+        code: `KIM-${cat.code || '01'}-${subIdx + 1}`,
+        title: sub.name,
+        categoryTitle: cat.title,
+        activeChemical: sub.activeChemical,
+        description: sub.desc,
+        specs: sub.specs || [],
+        packaging: cat.packaging,
+        image: categoryImages[catIdx % categoryImages.length]
+      }, { mode });
+    });
+  });
+
   // Yoğunluk hesaplayıcı
   const calcBtn = container.querySelector('#conv-calc-btn');
   const resultBox = container.querySelector('#conv-result-box');
@@ -241,10 +311,10 @@ export async function renderProductsPage(container, navigate) {
       const density = container.querySelector('#conv-density')?.value;
       try {
         const res = convertMassVolumeUnit(amount, fromUnit, toUnit, density ? Number(density) : null);
-        resultBox.textContent = `Doğrulanmış Sonuç: ${Number(amount).toLocaleString('tr-TR')} ${fromUnit} = ${res.toLocaleString('tr-TR')} ${toUnit} (Baz alınan yoğunluk: ${density} kg/L)`;
+        resultBox.textContent = `${translateText('Doğrulanmış Sonuç:', getLanguage())} ${Number(amount).toLocaleString(getLanguage())} ${fromUnit} = ${res.toLocaleString(getLanguage())} ${toUnit} (${translateText('Baz alınan yoğunluk:', getLanguage())} ${density} kg/L)`;
         resultBox.className = 'density-result-box success';
       } catch (err) {
-        resultBox.textContent = err.message;
+        resultBox.textContent = translateText(err.message, getLanguage());
         resultBox.className = 'density-result-box warning';
       }
     });
@@ -257,7 +327,7 @@ export async function renderProductsPage(container, navigate) {
     if (liveProducts.length === 0) {
       renderSafeHtml(liveBox, `
         <div class="info-callout">
-          <strong>Canlı Ürün Kataloğu Bilgilendirmesi:</strong> Yönetim panelinden yayımlanan özel stok/ambalaj kartları burada listelenir. Aşağıdaki endüstriyel ürün gruplarımızdan ihtiyacınız olan kimyasal için doğrudan teknik teklif talep edebilirsiniz.
+          <strong>Canlı Ürün Kataloğu Bilgilendirmesi:</strong> Yönetim panelinden yayımlanan özel stok/ambalaj kartları burada listelenir. Aşağıdaki endüstriyel ürün gruplarımızdan ihtiyacınız olan kimyasalın üzerine tıklayarak açıklamasını inceleyebilir ve doğrudan sipariş verebilirsiniz.
         </div>
       `);
     } else {
@@ -268,28 +338,31 @@ export async function renderProductsPage(container, navigate) {
             <h2 class="section-title" style="font-size:1.5rem;">Aktif Kimyasal Ürün Kataloğu (${liveProducts.length} Ürün)</h2>
           </div>
           <div class="categories-grid">
-            ${liveProducts.map((p) => {
+            ${liveProducts.map((p, idx) => {
               const priceLabel = (p.unitPrice !== null && p.unitPrice !== undefined && Number(p.unitPrice) > 0)
                 ? `${Number(p.unitPrice).toLocaleString('tr-TR')} ${escapeHtml(p.currency || 'TRY')} / ${escapeHtml(p.salesUnit || 'kg')}`
-                : 'Teklif isteyin';
+                : 'Toptan Sipariş';
               return `
-                <div class="category-card searchable-live-card" data-cat="${escapeAttr(p.category || 'all')}" data-search="${escapeAttr(withLanguageSearch(`${p.tradeName || ''} ${p.chemicalName || ''} ${p.productCode || ''} ${p.casNumber || ''} ${p.applicationArea || ''}`))}">
-                  <div class="category-card-top">
+                <div class="category-card searchable-live-card" style="cursor:pointer;" data-live-chem-idx="${idx}" data-cat="${escapeAttr(p.category || 'all')}" data-search="${escapeAttr(withLanguageSearch(`${p.tradeName || ''} ${p.chemicalName || ''} ${p.productCode || ''} ${p.casNumber || ''} ${p.applicationArea || ''}`))}">
+                  <div class="category-card-top" data-chem-open="detail">
                     <span class="badge badge-teal">${escapeHtml(p.productCode || 'ÜRÜN')}</span>
                     ${p.casNumber ? `<span class="badge badge-neutral">CAS: ${escapeHtml(p.casNumber)}</span>` : ''}
                   </div>
-                  <h3>${escapeHtml(p.tradeName || p.name)}</h3>
-                  ${p.chemicalName ? `<p style="font-size:0.84rem;color:var(--accent-teal);font-weight:600;margin-bottom:0.4rem;">Kimyasal Adı: ${escapeHtml(p.chemicalName)}</p>` : ''}
-                  <p>${escapeHtml(p.applicationArea || p.technicalSpecs || '')}</p>
-                  <div class="category-sublist">
+                  <h3 data-chem-open="detail">${escapeHtml(p.tradeName || p.name)}</h3>
+                  ${p.chemicalName ? `<p data-chem-open="detail" style="font-size:0.84rem;color:var(--accent-teal);font-weight:600;margin-bottom:0.4rem;">Kimyasal Adı: ${escapeHtml(p.chemicalName)}</p>` : ''}
+                  <p data-chem-open="detail">${escapeHtml(p.applicationArea || p.technicalSpecs || '')}</p>
+                  <div class="category-sublist" data-chem-open="detail">
                     ${p.concentrationPurity ? `<div class="subproduct-pill"><strong>Saflık/Konsantrasyon:</strong> ${escapeHtml(p.concentrationPurity)}</div>` : ''}
                     <div class="subproduct-pill"><strong>Ambalaj & Birim:</strong> ${escapeHtml(p.packagingType || 'Standart Endüstriyel Ambalaj')} (${escapeHtml(p.salesUnit || 'kg')})</div>
                     ${p.minOrderQty ? `<div class="subproduct-pill"><strong>Min. Sipariş:</strong> ${Number(p.minOrderQty).toLocaleString('tr-TR')} ${escapeHtml(p.salesUnit || 'kg')}</div>` : ''}
                     ${p.verifiedDensity ? `<div class="subproduct-pill"><strong>Doğrulanmış Yoğunluk:</strong> ${Number(p.verifiedDensity)} kg/L</div>` : ''}
                   </div>
-                  <div class="category-card-footer">
+                  <div class="category-card-footer" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
                     <span class="packaging-badge" style="font-weight:700;color:var(--accent-teal);">${escapeHtml(priceLabel)}</span>
-                    <a href="/teklif-al?product=${encodeURIComponent(p.tradeName || p.name)}" class="category-link" data-nav>Teklif İste →</a>
+                    <div style="display:flex;gap:0.4rem;">
+                      <button type="button" class="btn btn-sm btn-secondary" data-chem-open="detail">📋 Açıklama</button>
+                      <button type="button" class="btn btn-sm btn-primary" data-chem-open="order">🛒 Sipariş Ver</button>
+                    </div>
                   </div>
                 </div>
               `;
@@ -297,7 +370,24 @@ export async function renderProductsPage(container, navigate) {
           </div>
         </div>
       `);
-      attachSpaLinks(liveBox, navigate);
+      liveBox.querySelectorAll('[data-live-chem-idx]').forEach((cardEl) => {
+        cardEl.addEventListener('click', (e) => {
+          const idx = Number(cardEl.getAttribute('data-live-chem-idx') || 0);
+          const p = liveProducts[idx];
+          if (!p) return;
+          const actionEl = e.target.closest('[data-chem-open]');
+          const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
+          e.preventDefault();
+          openChemicalProductModal({
+            code: p.productCode || 'KIMYASAL',
+            title: p.tradeName || p.name,
+            categoryTitle: p.category || 'Endüstriyel Kimyasal',
+            activeChemical: [p.chemicalName, p.casNumber ? `CAS: ${p.casNumber}` : '', p.concentrationPurity].filter(Boolean).join(' • '),
+            description: p.applicationArea || p.technicalSpecs || '',
+            packaging: `${p.packagingType || 'Standart Endüstriyel Ambalaj'} (${p.salesUnit || 'kg'})`
+          }, { mode });
+        });
+      });
     }
   } catch (_err) {
     renderSafeHtml(liveBox, '');
@@ -808,10 +898,10 @@ export function renderSectorsPage(container, navigate) {
     const box = container.querySelector('#roi1-results');
     if (box) {
       renderSafeHtml(box, `
-        <div class="roi-metric-row"><span>Kurtarılan Sağlam Çelik:</span> <strong>${res.savedSteelTonsPerYear.toLocaleString('tr-TR')} ton/yıl</strong></div>
-        <div class="roi-metric-row"><span>Metal Kaybı Önleme Kazancı:</span> <strong>$${res.savedSteelValueUsd.toLocaleString('tr-TR')} / yıl</strong></div>
-        <div class="roi-metric-row"><span>Taze HCl Asit Tasarrufu:</span> <strong>${res.savedAcidTonsPerYear.toLocaleString('tr-TR')} ton ($${res.savedAcidValueUsd.toLocaleString('tr-TR')})</strong></div>
-        <div class="roi-metric-highlight"><span>Yıllık Toplam Kazanç:</span> <strong>$${res.totalAnnualSavingsUsd.toLocaleString('tr-TR')} USD / yıl</strong></div>
+        <div class="roi-metric-row"><span>Kurtarılan Sağlam Çelik:</span> <strong>${res.savedSteelTonsPerYear.toLocaleString(getLanguage())} <span>ton/yıl</span></strong></div>
+        <div class="roi-metric-row"><span>Metal Kaybı Önleme Kazancı:</span> <strong>$${res.savedSteelValueUsd.toLocaleString(getLanguage())} / <span>yıl</span></strong></div>
+        <div class="roi-metric-row"><span>Taze HCl Asit Tasarrufu:</span> <strong>${res.savedAcidTonsPerYear.toLocaleString(getLanguage())} <span>ton</span> ($${res.savedAcidValueUsd.toLocaleString(getLanguage())})</strong></div>
+        <div class="roi-metric-highlight"><span>Yıllık Toplam Kazanç:</span> <strong>$${res.totalAnnualSavingsUsd.toLocaleString(getLanguage())} <span>USD / yıl</span></strong></div>
       `);
     }
   }
@@ -829,10 +919,10 @@ export function renderSectorsPage(container, navigate) {
     const box = container.querySelector('#roi2-results');
     if (box) {
       renderSafeHtml(box, `
-        <div class="roi-metric-row"><span>Mevcut → Hedef Yaş Çamur:</span> <strong>${res.currentWetSludgeTonsPerDay} → ${res.targetWetSludgeTonsPerDay} ton/gün</strong></div>
-        <div class="roi-metric-row"><span>Yıllık Azalan Yaş Çamur:</span> <strong>${res.annualWetReductionTons.toLocaleString('tr-TR')} ton/yıl</strong></div>
-        <div class="roi-metric-row"><span>İptal Edilen Nakliye Seferi:</span> <strong>${res.savedTruckTripsPerYear.toLocaleString('tr-TR')} kamyon/yıl</strong></div>
-        <div class="roi-metric-highlight"><span>Yıllık Bertaraf Kazancı:</span> <strong>₺${res.annualDisposalSavingsTry.toLocaleString('tr-TR')} TL / yıl</strong></div>
+        <div class="roi-metric-row"><span>Mevcut → Hedef Yaş Çamur:</span> <strong>${res.currentWetSludgeTonsPerDay} → ${res.targetWetSludgeTonsPerDay} <span>ton/gün</span></strong></div>
+        <div class="roi-metric-row"><span>Yıllık Azalan Yaş Çamur:</span> <strong>${res.annualWetReductionTons.toLocaleString(getLanguage())} <span>ton/yıl</span></strong></div>
+        <div class="roi-metric-row"><span>İptal Edilen Nakliye Seferi:</span> <strong>${res.savedTruckTripsPerYear.toLocaleString(getLanguage())} <span>kamyon/yıl</span></strong></div>
+        <div class="roi-metric-highlight"><span>Yıllık Bertaraf Kazancı:</span> <strong>₺${res.annualDisposalSavingsTry.toLocaleString(getLanguage())} <span>TL / yıl</span></strong></div>
       `);
     }
   }
@@ -850,9 +940,9 @@ export function renderSectorsPage(container, navigate) {
     const box = container.querySelector('#roi3-results');
     if (box) {
       renderSafeHtml(box, `
-        <div class="roi-metric-row"><span>Kireç Kaynaklı Yakıt Cezası:</span> <strong>%${res.fuelPenaltyPercent} ek yakıt kaybı</strong></div>
-        <div class="roi-metric-row"><span>Yıllık Boşa Yanan Doğalgaz:</span> <strong>${res.wastedGasSm3PerYear.toLocaleString('tr-TR')} Sm³/yıl</strong></div>
-        <div class="roi-metric-highlight"><span>Yıllık Önlenebilir Yakıt Cezası:</span> <strong>₺${res.annualFuelPenaltyTry.toLocaleString('tr-TR')} TL / yıl</strong></div>
+        <div class="roi-metric-row"><span>Kireç Kaynaklı Yakıt Cezası:</span> <strong>%${res.fuelPenaltyPercent} <span>ek yakıt kaybı</span></strong></div>
+        <div class="roi-metric-row"><span>Yıllık Boşa Yanan Doğalgaz:</span> <strong>${res.wastedGasSm3PerYear.toLocaleString(getLanguage())} <span>Sm³/yıl</span></strong></div>
+        <div class="roi-metric-highlight"><span>Yıllık Önlenebilir Yakıt Cezası:</span> <strong>₺${res.annualFuelPenaltyTry.toLocaleString(getLanguage())} <span>TL / yıl</span></strong></div>
       `);
     }
   }
@@ -950,12 +1040,101 @@ export function renderRegionsPage(container, navigate) {
             </tbody>
           </table>
         </div>
+
+        <!-- 81 İl Türkiye Geneli Sanayi, Kimyasal & Medipure Saf Su Sevkiyat Matrisi -->
+        <div class="section-header" id="turkiye-81-il-seo" style="margin-top:4.5rem;">
+          <span class="section-tag">81 İl Ulusal Lojistik & Teknik Kapsam (01 – 81)</span>
+          <h2 class="section-title">Türkiye Geneli 81 İl OSB Kimyasal & Medipure Saf Su Sevkiyat Rehberi</h2>
+          <p class="section-desc">Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana merkez depomuzdan 7 coğrafi bölge ve 81 ilin tamamındaki Organize Sanayi Bölgelerine (OSB), fabrikalara, laboratuvarlara ve sağlık kurumlarına ADR standartlarında kimyasal ve Medipure saf su / EDI cihaz sevkiyatı sağlıyoruz.</p>
+        </div>
+
+        <div class="regions-grid" style="margin-bottom:2.25rem;">
+          ${TURKEY_7_REGIONS_SUMMARY.map((reg) => `
+            <div class="region-card">
+              <div class="region-badge">${escapeHtml(reg.delivery)}</div>
+              <h3>${escapeHtml(reg.region)}</h3>
+              <p>${escapeHtml(reg.summary)}</p>
+              <div style="margin-top:0.75rem;font-size:0.82rem;color:var(--text-secondary);line-height:1.55;">
+                <strong>İller:</strong> ${escapeHtml(reg.provinces)}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="card" style="padding:1.5rem;margin-bottom:1.75rem;">
+          <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+            <input
+              type="search"
+              id="province-81-search"
+              class="form-input"
+              style="max-width:420px;"
+              placeholder="İl adı, plaka kodu (01-81), OSB veya proses ara..."
+              aria-label="81 İl içinde ara"
+            />
+            <div class="filter-pills" id="province-81-region-pills" style="margin:0;">
+              <button type="button" class="filter-pill active" data-prov-region="all">Tüm Türkiye (81 İl)</button>
+              <button type="button" class="filter-pill" data-prov-region="Akdeniz">Akdeniz (8)</button>
+              <button type="button" class="filter-pill" data-prov-region="İç Anadolu">İç Anadolu (13)</button>
+              <button type="button" class="filter-pill" data-prov-region="Güneydoğu Anadolu">Güneydoğu (9)</button>
+              <button type="button" class="filter-pill" data-prov-region="Marmara">Marmara (11)</button>
+              <button type="button" class="filter-pill" data-prov-region="Ege">Ege (8)</button>
+              <button type="button" class="filter-pill" data-prov-region="Karadeniz">Karadeniz (18)</button>
+              <button type="button" class="filter-pill" data-prov-region="Doğu Anadolu">Doğu Anadolu (14)</button>
+            </div>
+          </div>
+
+          <div class="categories-grid" id="provinces-81-grid">
+            ${TURKEY_81_PROVINCES.map((prov) => `
+              <article
+                class="category-card province-81-card"
+                data-prov-region="${escapeAttr(prov.region)}"
+                data-prov-search="${escapeAttr(withLanguageSearch(`${prov.plate} ${prov.name} ${prov.region} ${prov.delivery} ${prov.focus}`))}"
+              >
+                <div class="category-card-top">
+                  <span class="badge badge-teal">Plaka ${escapeHtml(prov.plate)} • ${escapeHtml(prov.name)}</span>
+                  <span class="badge badge-neutral">${escapeHtml(prov.region)}</span>
+                </div>
+                <h3 style="margin-bottom:0.35rem;">${escapeHtml(prov.name)} Endüstriyel Kimya & Saf Su Tedariki</h3>
+                <p style="font-size:0.88rem;line-height:1.55;">${escapeHtml(prov.focus)}</p>
+                <div class="category-card-footer" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;margin-top:0.85rem;">
+                  <span class="packaging-badge">🚚 ${escapeHtml(prov.delivery)}</span>
+                  <a href="/teklif-al?city=${encodeURIComponent(`${prov.plate} ${prov.name}`)}" class="btn btn-sm btn-primary" data-nav>
+                    🛒 ${escapeHtml(prov.name)} Sipariş / Teklif
+                  </a>
+                </div>
+              </article>
+            `).join('')}
+          </div>
+        </div>
       </div>
     </section>
   `;
 
   renderSafeHtml(container, html);
   attachSpaLinks(container, navigate);
+
+  const provSearch = container.querySelector('#province-81-search');
+  const provPills = container.querySelectorAll('#province-81-region-pills .filter-pill');
+  let activeProvRegion = 'all';
+
+  function filterProvinces81() {
+    const q = fold(provSearch?.value || '');
+    container.querySelectorAll('.province-81-card').forEach((card) => {
+      const regMatch = activeProvRegion === 'all' || card.getAttribute('data-prov-region') === activeProvRegion;
+      const textMatch = !q || (card.getAttribute('data-prov-search') || '').includes(q);
+      card.style.display = (regMatch && textMatch) ? '' : 'none';
+    });
+  }
+
+  provSearch?.addEventListener('input', filterProvinces81);
+  provPills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      provPills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeProvRegion = pill.getAttribute('data-prov-region') || 'all';
+      filterProvinces81();
+    });
+  });
 }
 
 /* ==========================================================================

@@ -47,7 +47,30 @@ import { SEO_KEYWORD_CLUSTERS } from '../utils/seo-geo.js';
 import { openProposalA4Modal } from '../utils/pdf-proposal.js';
 import { showNotification, showConfirmModal } from '../components/notification.js';
 import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
+import { renderIntegrationPanel } from './admin-accounting-integration.js';
+import { describeSyncState, indexSyncStates } from '../utils/sync-status.js';
+import { computeInvoiceTotals } from '../utils/invoice-calc.js';
+import { deriveOrderBilling, vatAmountFromGross } from '../utils/order-billing.js';
+import { KNOWN_WITHHOLDING_CODES, TAX_RULES_REVIEWED_AT, INVOICE_ISSUANCE_LIMITS } from '../utils/tax-rules.js';
+import { downloadUblTrInvoiceXml } from '../utils/ubl-tr-invoice.js';
 
+const ACCOUNTING_REFRESH_KEYS = ['accountingInvoices', 'accountingTransactions', 'chequesAndNotes', 'orders'];
+
+// Proforma vergi belgesi değildir: ciro, KDV, cari ve tahsilat hesaplarına girmez.
+const isTaxDocument = (invoice) => String(invoice?.docCategory || invoice?.eDocumentType || '').toUpperCase() !== 'PROFORMA';
+
+const STORE_KEY_LABELS = {
+  crmRequests: 'Talepler', customers: 'Müşteriler', products: 'Ürünler', documents: 'Belgeler', projects: 'Projeler',
+  proposals: 'Teklifler', orders: 'Siparişler', inventoryItems: 'Stok kartları', inventoryMovements: 'Stok hareketleri',
+  suppliers: 'Tedarikçiler', serviceRecords: 'Servis kayıtları', accountingInvoices: 'Faturalar',
+  accountingTransactions: 'Kasa/Banka hareketleri', chequesAndNotes: 'Çek/Senet', users: 'Kullanıcılar', auditLogs: 'Denetim günlüğü'
+};
+
+function orderItemsSummary(order) {
+  if (order?.itemsSummary) return String(order.itemsSummary);
+  const items = Array.isArray(order?.items) ? order.items : [];
+  return items.map((i) => String(i.description || i.code || '').trim()).filter(Boolean).join(', ').slice(0, 300);
+}
 const CRM_INBOX_STAGES = ['Yeni Talep', 'İlk Görüşme', 'İhtiyaç Analizi'];
 const CRM_STALE_DAYS = 3;
 const ORDER_PREP_STATUSES = ['Sipariş Alındı', 'Hazırlanıyor'];
@@ -125,8 +148,9 @@ export function renderAdminPage(container, navigate) {
   let crmSearchQuery = '';
   let crmChannelFilter = 'all';
   let pendingProposalSeed = null;
-  let accountingTab = 'overview'; // 'overview' | 'invoices' | 'cashbank' | 'cheques' | 'ledger'
+  let accountingTab = 'overview'; // 'overview' | 'invoices' | 'cashbank' | 'cheques' | 'ledger' | 'integration'
   let accountingInvoiceFilter = 'all'; // 'all' | 'SATIS' | 'ALIS' | 'OVERDUE'
+  let accountingInvoiceSearch = '';
 
   function computeCrmSignature(list) {
     if (!Array.isArray(list)) return '';
@@ -166,9 +190,12 @@ export function renderAdminPage(container, navigate) {
     }
     const syncMetaEl = container.querySelector('#admin-sync-status');
     if (syncMetaEl) {
-      syncMetaEl.textContent = isSyncingStore
+      const limited = Object.entries(store?.loadLimits || {})
+        .map(([key, info]) => `${STORE_KEY_LABELS[key] || key} (${info.loaded}/${info.total})`);
+      const limitNote = limited.length ? ` ⚠ Yükleme sınırı aşıldı, eski kayıtlar listelenmiyor: ${limited.join(', ')}.` : '';
+      syncMetaEl.textContent = (isSyncingStore
         ? 'Canlı veritabanı senkronize ediliyor...'
-        : (lastSyncedTimeStr ? `Son senkron: ${lastSyncedTimeStr} (Canlı)` : 'Canlı bağlantı aktif');
+        : (lastSyncedTimeStr ? `Son senkron: ${lastSyncedTimeStr} (Canlı)` : 'Canlı bağlantı aktif')) + limitNote;
     }
   }
 
@@ -192,7 +219,14 @@ export function renderAdminPage(container, navigate) {
     const ch = String(req?.formChannel || '').toLowerCase();
     const rt = String(req?.requestType || '').toLowerCase();
     const src = String(req?.source || '').toLowerCase();
+    const subj = String(req?.subject || req?.relatedProductOrSystem || '').toUpperCase();
     if (ch === 'order_form' || rt === 'order_request' || rt.includes('siparis') || rt.includes('sipariş')) {
+      if (subj.includes('MEDIPURE')) {
+        return { code: 'order', label: '🛒 MEDIPURE CİHAZ SİPARİŞİ', badgeClass: 'badge-teal', isOrderOrQuote: true };
+      }
+      if (subj.includes('KİMYASAL') || subj.includes('KIMYASAL')) {
+        return { code: 'order', label: '🧪 KİMYASAL SİPARİŞİ', badgeClass: 'badge-teal', isOrderOrQuote: true };
+      }
       return { code: 'order', label: '🛒 SİPARİŞ FORMU', badgeClass: 'badge-teal', isOrderOrQuote: true };
     }
     if (ch === 'quote_form' || src === 'website_rfq' || rt.includes('quote') || rt === 'water_project' || rt === 'technical_visit' || rt === 'periodic_supply') {
@@ -280,8 +314,10 @@ export function renderAdminPage(container, navigate) {
     });
   }
 
-  async function refreshStoreAndRender() {
+  // options.only: yalnızca belirtilen store anahtarlarını yeniden çeker (ör. muhasebe işlemlerinden sonra).
+  async function refreshStoreAndRender(options) {
     if (isSyncingStore) return;
+    const only = Array.isArray(options?.only) && store ? options.only : null;
     isSyncingStore = true;
     syncShellChrome();
     const mainArea = container.querySelector('#admin-module-content');
@@ -289,8 +325,15 @@ export function renderAdminPage(container, navigate) {
       renderSafeHtml(mainArea, `<div class="loading-banner">İzole <strong>${escapeHtml(DATABASE_ID)}</strong> veritabanından gerçek kayıtlar yükleniyor...</div>`);
     }
     try {
-      store = await loadAdminAllData();
-      lastInboxSignature = computeCrmSignature(store?.crmRequests);
+      const loaded = await loadAdminAllData({ role: currentProfile?.role, only });
+      if (only) {
+        const loadLimits = { ...(store?.loadLimits || {}) };
+        only.forEach((key) => delete loadLimits[key]);
+        store = { ...store, ...loaded, loadLimits: { ...loadLimits, ...(loaded.loadLimits || {}) } };
+      } else {
+        store = loaded;
+      }
+      if (!only || only.includes('crmRequests')) lastInboxSignature = computeCrmSignature(store?.crmRequests);
       lastSyncedTimeStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       isSyncingStore = false;
       renderShell();
@@ -398,9 +441,8 @@ export function renderAdminPage(container, navigate) {
       container.querySelector('#admin-logout-btn')?.addEventListener('click', async () => {
         await logoutCurrentUser();
       });
-    } else {
-      syncShellChrome();
     }
+    syncShellChrome();
 
     const contentBox = container.querySelector('#admin-module-content');
     if (!store) {
@@ -514,7 +556,7 @@ export function renderAdminPage(container, navigate) {
     const ordSplit = splitDated(store.orders, cutoffMs);
     const projSplit = splitDated(store.projects, cutoffMs);
     const srvSplit = splitDated(store.serviceRecords, cutoffMs);
-    const invSplit = splitDated(store.accountingInvoices || [], cutoffMs);
+    const invSplit = splitDated((store.accountingInvoices || []).filter(isTaxDocument), cutoffMs);
     const trxSplit = splitDated(store.accountingTransactions || [], cutoffMs);
     const chqSplit = splitDated(store.chequesAndNotes || [], cutoffMs);
     const crmList = crmSplit.included;
@@ -550,7 +592,7 @@ export function renderAdminPage(container, navigate) {
     const cashOutTry = trxList.filter((t) => t.direction !== 'TAHSILAT').reduce((s, t) => s + Number(t.amountTry || 0), 0);
     const portfolioChequesTry = chqList.filter((c) => String(c.instrumentType || '').startsWith('MUSTERI') && c.status === 'Portföyde').reduce((s, c) => s + Number(c.amountTry || 0), 0);
     const todayIso = new Date().toISOString().slice(0, 10);
-    const overdueSales = (store.accountingInvoices || []).filter((i) => i.invoiceType === 'SATIS' && Number(i.remainingAmountTry || 0) > 0 && i.dueDate && i.dueDate < todayIso);
+    const overdueSales = (store.accountingInvoices || []).filter((i) => isTaxDocument(i) && i.invoiceType === 'SATIS' && Number(i.remainingAmountTry || 0) > 0 && i.dueDate && i.dueDate < todayIso);
     const overdueTry = overdueSales.reduce((sum, i) => sum + Number(i.remainingAmountTry || 0), 0);
 
     // Gelen Kutusu (Sipariş Formu vs İletişim Formu ayrımı)
@@ -2564,7 +2606,7 @@ export function renderAdminPage(container, navigate) {
           companyName: 'Elif Çevre Kimya',
           address: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
           phone: '0546 499 23 42',
-          email: 'info@elifkimya.com.tr'
+          email: 'info@elifcevrekimya.com.tr'
         });
       } catch (err) {
         showNotification(err.message || 'PDF hazırlanamadı.', 'error');
@@ -2579,7 +2621,7 @@ export function renderAdminPage(container, navigate) {
             companyName: 'Elif Çevre Kimya',
             address: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
             phone: '0546 499 23 42',
-            email: 'info@elifkimya.com.tr'
+            email: 'info@elifcevrekimya.com.tr'
           });
         }
       });
@@ -2677,6 +2719,16 @@ export function renderAdminPage(container, navigate) {
             <div class="form-group">
               <label class="form-label">Genel Toplam (KDV Dahil) *</label>
               <input type="number" name="grandTotal" class="form-input" step="0.01" required placeholder="0.00" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">KDV Oranı (matrah ayrımı için)</label>
+              <select name="vatRate" class="form-select">
+                <option value="">Belirtilmedi (faturada girilecek)</option>
+                <option value="20">%20</option>
+                <option value="10">%10</option>
+                <option value="1">%1</option>
+                <option value="0">%0 (İstisna / İhracat)</option>
+              </select>
             </div>
             <div class="form-group">
               <label class="form-label">Tahsil Edilen Tutar</label>
@@ -2831,15 +2883,19 @@ export function renderAdminPage(container, navigate) {
     orderForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fd = new FormData(orderForm);
+      const grandTotal = Number(fd.get('grandTotal') || 0);
+      // KDV dağılımı yalnızca kullanıcı oran seçtiyse kaydedilir; aksi halde tahmin edilmez.
+      const chosenVatRate = String(fd.get('vatRate') || '');
+      const split = chosenVatRate === '' ? { netExclVat: 0, vatTotal: 0 } : vatAmountFromGross(grandTotal, Number(chosenVatRate));
       try {
         await saveOrderRecord({
           orderNo: fd.get('orderNo'),
           companyName: fd.get('companyName'),
           contactEmail: fd.get('contactEmail'),
           status: fd.get('status'),
-          grandTotal: Number(fd.get('grandTotal') || 0),
-          netExclVat: Number(fd.get('grandTotal') || 0) / 1.2,
-          totalVat: Number(fd.get('grandTotal') || 0) - Number(fd.get('grandTotal') || 0) / 1.2,
+          grandTotal,
+          netExclVat: split.netExclVat,
+          vatTotal: split.vatTotal,
           collectedAmount: Number(fd.get('collectedAmount') || 0),
           paymentStatus: fd.get('paymentStatus'),
           deliveryDate: fd.get('deliveryDate')
@@ -2908,7 +2964,8 @@ export function renderAdminPage(container, navigate) {
             <strong style="font-size:1rem;">A4 Resmi Belge & E-Fatura Önizleme: ${escapeHtml(inv.invoiceNo)}</strong>
             <span class="badge badge-teal" style="margin-left:0.5rem;">${escapeHtml(inv.docCategory || 'E-FATURA')}</span>
           </div>
-          <div style="display:flex;gap:0.5rem;">
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" id="export-ubl-inv-btn" title="GİB UBL-TR 2.1 E-Fatura / E-Arşiv XML İndir">📥 UBL-TR 2.1 XML İndir</button>
             <button type="button" class="btn btn-primary btn-sm" id="print-inv-btn">🖨️ A4 Yazdır / PDF Kaydet</button>
             <button type="button" class="btn btn-secondary btn-sm" id="close-inv-btn">Kapat</button>
           </div>
@@ -2947,28 +3004,67 @@ export function renderAdminPage(container, navigate) {
             </div>
           </div>
 
-          <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.84rem;">
-            <thead>
-              <tr style="background:#0f172a;color:#fff;">
-                <th style="padding:0.65rem;text-align:left;">Açıklama / Mal ve Hizmet Kalemi</th>
-                <th style="padding:0.65rem;text-align:right;">KDV Hariç Tutar</th>
-                <th style="padding:0.65rem;text-align:right;">İskonto</th>
-                <th style="padding:0.65rem;text-align:right;">KDV (%${Number(inv.vatRate || 20)})</th>
-                <th style="padding:0.65rem;text-align:right;">Tevkifat (${escapeHtml(inv.withholdingRate || 'Yok')})</th>
-                <th style="padding:0.65rem;text-align:right;">Genel Toplam</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom:1px solid #cbd5e1;">
-                <td style="padding:0.75rem;font-weight:700;">${escapeHtml(inv.description || `${inv.companyName} — Kimyasal / Su Arıtma Fatura Kalemleri`)}</td>
-                <td style="padding:0.75rem;text-align:right;">${curSym}${Number(inv.subtotal || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
-                <td style="padding:0.75rem;text-align:right;">${curSym}${Number(inv.discountTotal || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
-                <td style="padding:0.75rem;text-align:right;">${curSym}${Number(inv.vatAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
-                <td style="padding:0.75rem;text-align:right;color:#b91c1c;">-${curSym}${Number(inv.withholdingAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
-                <td style="padding:0.75rem;text-align:right;font-weight:800;">${curSym}${Number(inv.grandTotal || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
-              </tr>
-            </tbody>
-          </table>
+          ${Array.isArray(inv.lines) && inv.lines.length > 0 ? `
+            <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.83rem;">
+              <thead>
+                <tr style="background:#0f172a;color:#fff;">
+                  <th style="padding:0.6rem;text-align:left;">#</th>
+                  <th style="padding:0.6rem;text-align:left;">Açıklama / Mal ve Hizmet Kalemi</th>
+                  <th style="padding:0.6rem;text-align:right;">Miktar</th>
+                  <th style="padding:0.6rem;text-align:right;">Birim Fiyat</th>
+                  <th style="padding:0.6rem;text-align:right;">İskonto</th>
+                  <th style="padding:0.6rem;text-align:right;">KDV</th>
+                  <th style="padding:0.6rem;text-align:right;">Tevkifat</th>
+                  <th style="padding:0.6rem;text-align:right;">Net Matrah</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${inv.lines.map((ln, idx) => {
+                  const qty = Number(ln.quantity || 1);
+                  const unitPrice = Number(ln.unitPrice || 0);
+                  const discAmt = Number(ln.discountAmount ?? (qty * unitPrice * Number(ln.discountPercent ?? ln.discountRate ?? 0)) / 100);
+                  const lineNet = Number(ln.net ?? ln.netExclVat ?? Math.max(0, qty * unitPrice - discAmt));
+                  const lineVatRate = Number(ln.vatRate ?? inv.vatRate ?? 20);
+                  const lineWh = ln.withholdingRate || inv.withholdingRate || 'Yok';
+                  return `
+                    <tr style="border-bottom:1px solid #cbd5e1;">
+                      <td style="padding:0.6rem;">${idx + 1}</td>
+                      <td style="padding:0.6rem;font-weight:700;">${escapeHtml(ln.description || inv.description || 'Mal/Hizmet Kalemi')}</td>
+                      <td style="padding:0.6rem;text-align:right;">${qty.toLocaleString('tr-TR')} ${escapeHtml(ln.unit || 'Adet')}</td>
+                      <td style="padding:0.6rem;text-align:right;">${curSym}${unitPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                      <td style="padding:0.6rem;text-align:right;">${curSym}${discAmt.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                      <td style="padding:0.6rem;text-align:right;">%${lineVatRate}</td>
+                      <td style="padding:0.6rem;text-align:right;">${escapeHtml(lineWh)}</td>
+                      <td style="padding:0.6rem;text-align:right;font-weight:800;">${curSym}${lineNet.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          ` : `
+            <table style="width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:0.84rem;">
+              <thead>
+                <tr style="background:#0f172a;color:#fff;">
+                  <th style="padding:0.65rem;text-align:left;">Açıklama / Mal ve Hizmet Kalemi</th>
+                  <th style="padding:0.65rem;text-align:right;">KDV Hariç Tutar</th>
+                  <th style="padding:0.65rem;text-align:right;">İskonto</th>
+                  <th style="padding:0.65rem;text-align:right;">KDV (%${Number(inv.vatRate || 20)})</th>
+                  <th style="padding:0.65rem;text-align:right;">Tevkifat (${escapeHtml(inv.withholdingRate || 'Yok')})</th>
+                  <th style="padding:0.65rem;text-align:right;">Genel Toplam</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #cbd5e1;">
+                  <td style="padding:0.75rem;font-weight:700;">${escapeHtml(inv.description || `${inv.companyName} — Kimyasal / Su Arıtma Fatura Kalemleri`)}</td>
+                  <td style="padding:0.75rem;text-align:right;">${curSym}${Number(inv.subtotal || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                  <td style="padding:0.75rem;text-align:right;">${curSym}${Number(inv.discountTotal || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                  <td style="padding:0.75rem;text-align:right;">${curSym}${Number(inv.vatAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                  <td style="padding:0.75rem;text-align:right;color:#b91c1c;">-${curSym}${Number(inv.withholdingAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                  <td style="padding:0.75rem;text-align:right;font-weight:800;">${curSym}${Number(inv.grandTotal || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              </tbody>
+            </table>
+          `}
 
           <div style="display:flex;justify-content:flex-end;">
             <div style="width:340px;padding:1rem;background:#f8fafc;border:2px solid #0f172a;border-radius:8px;">
@@ -3009,6 +3105,14 @@ export function renderAdminPage(container, navigate) {
 
     modal.querySelector('#close-inv-btn')?.addEventListener('click', () => modal.remove());
     modal.querySelector('#print-inv-btn')?.addEventListener('click', () => window.print());
+    modal.querySelector('#export-ubl-inv-btn')?.addEventListener('click', () => {
+      try {
+        downloadUblTrInvoiceXml(inv, general);
+        showNotification(`${inv.invoiceNo} için GİB UBL-TR 2.1 XML dosyası indirildi.`, 'success');
+      } catch (err) {
+        showNotification(err.message || 'XML dosyası üretilemedi.', 'error');
+      }
+    });
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.remove();
     });
@@ -3106,15 +3210,16 @@ export function renderAdminPage(container, navigate) {
 
   function renderAccountingModule(box) {
     const invoices = store.accountingInvoices || [];
+    const taxInvoices = invoices.filter(isTaxDocument);
     const transactions = store.accountingTransactions || [];
     const cheques = store.chequesAndNotes || [];
     const orders = store.orders || [];
     const todayIso = new Date().toISOString().slice(0, 10);
 
     // 1. Gerçek Zamanlı Finansal & Vergi Hesaplamaları (Sıfır Sahte Veri)
-    const salesInvoices = invoices.filter((i) => i.invoiceType === 'SATIS');
-    const purchaseInvoices = invoices.filter((i) => i.invoiceType === 'ALIS');
-    const returnInvoices = invoices.filter((i) => i.invoiceType === 'IADE');
+    const salesInvoices = taxInvoices.filter((i) => i.invoiceType === 'SATIS');
+    const purchaseInvoices = taxInvoices.filter((i) => i.invoiceType === 'ALIS');
+    const returnInvoices = taxInvoices.filter((i) => i.invoiceType === 'IADE');
 
     const totalSalesTry = salesInvoices.reduce((s, i) => s + Number(i.grandTotalTry || 0), 0);
     const totalPurchasesTry = purchaseInvoices.reduce((s, i) => s + Number(i.grandTotalTry || 0), 0);
@@ -3124,10 +3229,13 @@ export function renderAdminPage(container, navigate) {
     const overdueReceivablesTry = overdueSalesInvoices.reduce((s, i) => s + Number(i.remainingAmountTry || 0), 0);
 
     // KDV & Tevkifat Dengesi (TL bazında kur çarpımlı gerçek hesap)
+    // Satıcı: tevkifat uygulanan kısım alıcı tarafından beyan edilir, satıcının hesaplanan KDV'si kalan kısımdır.
     const accruedSalesVatTry = salesInvoices.reduce((s, i) => s + (Number(i.vatAmount || 0) - Number(i.withholdingAmount || 0)) * Number(i.exchangeRate || 1), 0);
+    // Alıcı: faturadaki KDV'nin tamamı indirilir; tevkifat yaptığımız kısım için sorumlu sıfatıyla ayrıca KDV (KDV-2) ödenir.
     const deductiblePurchaseVatTry = purchaseInvoices.reduce((s, i) => s + Number(i.vatAmount || 0) * Number(i.exchangeRate || 1), 0);
-    const totalWithholdingTry = invoices.reduce((s, i) => s + Number(i.withholdingAmount || 0) * Number(i.exchangeRate || 1), 0);
-    const netVatBalanceTry = accruedSalesVatTry - deductiblePurchaseVatTry;
+    const responsibleVatTry = purchaseInvoices.reduce((s, i) => s + Number(i.withholdingAmount || 0) * Number(i.exchangeRate || 1), 0);
+    const totalWithholdingTry = taxInvoices.reduce((s, i) => s + Number(i.withholdingAmount || 0) * Number(i.exchangeRate || 1), 0);
+    const netVatBalanceTry = accruedSalesVatTry + responsibleVatTry - deductiblePurchaseVatTry;
 
     // Kasa & Banka Hareketleri
     const totalCashInTry = transactions.filter((t) => t.direction === 'TAHSILAT').reduce((s, t) => s + Number(t.amountTry || 0), 0);
@@ -3142,7 +3250,7 @@ export function renderAdminPage(container, navigate) {
     const issuedChequesTotalTry = issuedCompanyInstruments.reduce((s, c) => s + Number(c.amountTry || 0), 0);
 
     // Henüz Faturalanmamış Onaylı Siparişler (Tek Tıkla Faturalama için)
-    const unbilledOrders = orders.filter((o) => o.status !== 'İptal' && o.status !== 'Faturalandı' && !invoices.some((inv) => inv.orderId === o.id));
+    const unbilledOrders = orders.filter((o) => o.status !== 'İptal' && o.status !== 'Faturalandı' && !taxInvoices.some((inv) => inv.orderId === o.id));
 
     // Cari Hesap Ekstre Matrisi (Müşteriler + Tedarikçiler + Faturalar + Kasa Hareketleri)
     const ledgerMap = new Map();
@@ -3171,7 +3279,7 @@ export function renderAdminPage(container, navigate) {
     (store.customers || []).forEach((c) => ensureParty(c.companyName, 'Müşteri', c.taxInfo || '', c.email || c.phone || ''));
     (store.suppliers || []).forEach((s) => ensureParty(s.supplierName, 'Tedarikçi', '', s.contactInfo || ''));
 
-    invoices.forEach((inv) => {
+    taxInvoices.forEach((inv) => {
       const p = ensureParty(inv.companyName, inv.invoiceType === 'ALIS' ? 'Tedarikçi' : 'Müşteri', inv.taxNumber || '', inv.contactEmail || '');
       if (!p) return;
       const amtTry = Number(inv.grandTotalTry || 0);
@@ -3238,10 +3346,16 @@ export function renderAdminPage(container, navigate) {
       netBalanceTry: Math.round((entry.totalDebitTry - entry.totalCreditTry) * 100) / 100
     })).sort((a, b) => Math.abs(b.netBalanceTry) - Math.abs(a.netBalanceTry));
 
+    const syncStateById = indexSyncStates(store.accountingSyncStates);
+    const invoiceSearch = accountingInvoiceSearch.trim().toLowerCase();
     const filteredInvoices = invoices.filter((inv) => {
-      if (accountingInvoiceFilter === 'SATIS') return inv.invoiceType === 'SATIS';
-      if (accountingInvoiceFilter === 'ALIS') return inv.invoiceType === 'ALIS';
-      if (accountingInvoiceFilter === 'OVERDUE') return Number(inv.remainingAmountTry || 0) > 0 && inv.dueDate && inv.dueDate < todayIso;
+      if (invoiceSearch) {
+        const hay = `${inv.invoiceNo || ''} ${inv.companyName || ''} ${inv.taxNumber || ''} ${inv.description || ''}`.toLowerCase();
+        if (!hay.includes(invoiceSearch)) return false;
+      }
+      if (accountingInvoiceFilter === 'SATIS') return inv.invoiceType === 'SATIS' && isTaxDocument(inv);
+      if (accountingInvoiceFilter === 'ALIS') return inv.invoiceType === 'ALIS' && isTaxDocument(inv);
+      if (accountingInvoiceFilter === 'OVERDUE') return isTaxDocument(inv) && Number(inv.remainingAmountTry || 0) > 0 && inv.dueDate && inv.dueDate < todayIso;
       return true;
     });
 
@@ -3278,6 +3392,7 @@ export function renderAdminPage(container, navigate) {
           <button type="button" class="btn ${accountingTab === 'cashbank' ? 'btn-primary' : 'btn-secondary'} btn-sm acc-tab-btn" data-tab="cashbank">3. Kasa, Banka & Gider (${transactions.length})</button>
           <button type="button" class="btn ${accountingTab === 'cheques' ? 'btn-primary' : 'btn-secondary'} btn-sm acc-tab-btn" data-tab="cheques">4. Çek & Senet Portföyü (${cheques.length})</button>
           <button type="button" class="btn ${accountingTab === 'ledger' ? 'btn-primary' : 'btn-secondary'} btn-sm acc-tab-btn" data-tab="ledger">5. Cari Hesap Ekstreleri (${ledgerEntries.length})</button>
+          <button type="button" class="btn ${accountingTab === 'integration' ? 'btn-primary' : 'btn-secondary'} btn-sm acc-tab-btn" data-tab="integration">6. Muhasebe API Entegrasyonu</button>
         </div>
       </div>
       ${focusBannerHtml()}
@@ -3341,13 +3456,18 @@ export function renderAdminPage(container, navigate) {
                   <td style="text-align:right;font-weight:700;color:#0284c7;">₺${deductiblePurchaseVatTry.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
                 </tr>
                 <tr>
+                  <td><strong>Sorumlu Sıfatıyla Ödenecek KDV (Alışlarda Yaptığımız Tevkifat, KDV-2)</strong></td>
+                  <td>Tevkifatlı Alış Faturaları</td>
+                  <td style="text-align:right;font-weight:700;color:#d97706;">₺${responsibleVatTry.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                </tr>
+                <tr>
                   <td><strong>Uygulanan KDV Tevkifat Kesintisi Toplamı</strong></td>
                   <td>Tevkifatlı Faturalar</td>
                   <td style="text-align:right;font-weight:700;color:#d97706;">₺${totalWithholdingTry.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
                 </tr>
                 <tr>
                   <td><strong>Net KDV Durumu (${netVatBalanceTry >= 0 ? 'Ödenecek KDV' : 'Devreden KDV'})</strong></td>
-                  <td>Dönem Sonu KDV Farkı</td>
+                  <td>Dönem Sonu KDV Farkı (satış + sorumlu − indirilecek)</td>
                   <td style="text-align:right;font-weight:900;color:${netVatBalanceTry >= 0 ? '#dc2626' : '#059669'};">₺${Math.abs(netVatBalanceTry).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
                 </tr>
                 <tr>
@@ -3357,6 +3477,18 @@ export function renderAdminPage(container, navigate) {
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <div class="card" style="padding:1.25rem 1.5rem;margin-bottom:1.5rem;border-left:4px solid #0f766e;">
+            <h3 style="margin-bottom:0.4rem;">Uygulanan Mevzuat Parametreleri <small style="font-weight:400;color:var(--text-secondary);">(son gözden geçirme: ${escapeHtml(TAX_RULES_REVIEWED_AT)})</small></h3>
+            <ul style="margin:0 0 0 1.1rem;line-height:1.7;font-size:0.86rem;">
+              <li>KDV oranları: %20, %10, %1, %0 (10.07.2023 öncesi tarihli faturalarda %18, %8, %1, %0).</li>
+              <li>Fatura düzenleme sınırı (VUK m.232, KDV dahil): ${INVOICE_ISSUANCE_LIMITS[2026].toLocaleString('tr-TR')} TL (2026), ${INVOICE_ISSUANCE_LIMITS[2025].toLocaleString('tr-TR')} TL (2025). Kısmi tevkifat alt sınırı bu tutara endekslidir.</li>
+              <li>Kesilen e-belge numaraları GİB biçiminde (3 harf/rakam seri + yıl + 9 haneli sıra) ve seri/yıl bazında ardışık atanır.</li>
+              <li>KDV tevkifatında 3 haneli tevkifat kodu, %0 KDV'de istisna kodu zorunludur. Proforma faturalar ciro, KDV ve cari hesaplarına girmez.</li>
+              <li>Alışlarda yapılan tevkifat, sorumlu sıfatıyla ödenecek KDV olarak net KDV'ye eklenir.</li>
+            </ul>
+            <p style="font-size:0.78rem;color:var(--text-secondary);margin:0.5rem 0 0;">Oran ve sınırlar her yıl değişebilir; uygulamadan önce GİB duyuruları ve mali müşavirinizle doğrulayın. Bu ekran vergi danışmanlığı yerine geçmez.</p>
           </div>
 
           <div class="card" style="padding:1.5rem;">
@@ -3383,24 +3515,31 @@ export function renderAdminPage(container, navigate) {
                   <tbody>
                     ${unbilledOrders.map((ord) => {
                       const grand = Number(ord.grandTotal || 0);
-                      const sub = Math.round((grand / 1.2) * 100) / 100;
+                      const billing = deriveOrderBilling(ord);
                       return `
                         <tr>
                           <td><code>${escapeHtml(ord.orderNo)}</code></td>
                           <td><strong>${escapeHtml(ord.companyName)}</strong></td>
-                          <td><strong>₺${grand.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</strong></td>
-                          <td>₺${Number(ord.collectedAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
+                          <td><strong>${escapeHtml(billing.currency)} ${grand.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</strong></td>
+                          <td>${Number(ord.collectedAmount || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</td>
                           <td>
-                            <button type="button" class="btn btn-primary btn-sm quick-bill-order-btn"
-                              data-order-id="${escapeAttr(ord.id)}"
-                              data-order-no="${escapeAttr(ord.orderNo || '')}"
-                              data-company="${escapeAttr(ord.companyName || '')}"
-                              data-email="${escapeAttr(ord.customerEmail || '')}"
-                              data-subtotal="${escapeAttr(String(sub))}"
-                              data-collected="${escapeAttr(String(ord.collectedAmount || 0))}"
-                              data-items="${escapeAttr(ord.itemsSummary || '')}">
-                              ⚡ E-Fatura Oluştur
-                            </button>
+                            ${billing.ready ? `
+                              <button type="button" class="btn btn-primary btn-sm quick-bill-order-btn"
+                                data-order-id="${escapeAttr(ord.id)}"
+                                data-order-no="${escapeAttr(ord.orderNo || '')}"
+                                data-company="${escapeAttr(ord.companyName || '')}"
+                                data-email="${escapeAttr(ord.contactEmail || ord.customerEmail || '')}"
+                                data-net="${escapeAttr(String(billing.netExclVat))}"
+                                data-vat-rate="${escapeAttr(String(billing.vatRate))}"
+                                data-grand="${escapeAttr(String(billing.grandTotal))}"
+                                data-collected="${escapeAttr(String(ord.collectedAmount || 0))}"
+                                data-items="${escapeAttr(orderItemsSummary(ord))}">
+                                ⚡ E-Fatura Oluştur (KDV %${billing.vatRate})
+                              </button>
+                            ` : `
+                              <button type="button" class="btn btn-secondary btn-sm open-order-invoice-btn" data-order-id="${escapeAttr(ord.id)}">📝 Fatura Formunda Aç</button>
+                              <div style="font-size:0.74rem;color:#92400e;margin-top:0.25rem;max-width:260px;">${escapeHtml(billing.reason)}</div>
+                            `}
                           </td>
                         </tr>
                       `;
@@ -3437,24 +3576,32 @@ export function renderAdminPage(container, navigate) {
             </div>
             <div class="form-group">
               <label class="form-label">Fatura Numarası (GİB / Seri)</label>
-              <input type="text" name="invoiceNo" class="form-input" placeholder="Otomatik: EF${new Date().getFullYear()}..." />
+              <input type="text" name="invoiceNo" class="form-input" placeholder="Boş bırakın: ELF${new Date().getFullYear()}000000001 biçiminde otomatik atanır" maxlength="16" />
             </div>
             <div class="form-group">
               <label class="form-label">Bağlı Sipariş (Opsiyonel)</label>
               <select name="orderId" class="form-select" id="acc-inv-order-select">
                 <option value="">— Siparişten Bağımsız / Manuel —</option>
-                ${orders.map((o) => `
+                ${orders.map((o) => {
+                  const billing = deriveOrderBilling(o);
+                  return `
                   <option value="${escapeAttr(o.id)}"
                     data-order-no="${escapeAttr(o.orderNo || '')}"
                     data-company="${escapeAttr(o.companyName || '')}"
-                    data-email="${escapeAttr(o.customerEmail || '')}"
-                    data-grand="${escapeAttr(String(o.grandTotal || 0))}"
+                    data-email="${escapeAttr(o.contactEmail || o.customerEmail || '')}"
+                    data-currency="${escapeAttr(billing.currency)}"
+                    data-ready="${billing.ready ? '1' : ''}"
+                    data-net="${escapeAttr(String(billing.netExclVat))}"
+                    data-vat-rate="${billing.ready ? escapeAttr(String(billing.vatRate)) : ''}"
+                    data-reason="${escapeAttr(billing.reason)}"
                     data-collected="${escapeAttr(String(o.collectedAmount || 0))}"
-                    data-items="${escapeAttr(o.itemsSummary || '')}">
-                    ${escapeHtml(o.orderNo)} — ${escapeHtml(o.companyName)} (₺${Number(o.grandTotal || 0).toLocaleString('tr-TR')})
+                    data-items="${escapeAttr(orderItemsSummary(o))}">
+                    ${escapeHtml(o.orderNo)} — ${escapeHtml(o.companyName)} (${escapeHtml(billing.currency)} ${Number(o.grandTotal || 0).toLocaleString('tr-TR')})
                   </option>
-                `).join('')}
+                `;
+                }).join('')}
               </select>
+              <small id="acc-inv-order-hint" style="display:block;margin-top:0.25rem;color:#92400e;"></small>
             </div>
 
             <div class="form-group">
@@ -3514,7 +3661,19 @@ export function renderAdminPage(container, navigate) {
                 <option value="5/10">5/10 Tevkifat (Bakım / Onarım / Mühendislik)</option>
                 <option value="7/10">7/10 Tevkifat</option>
                 <option value="9/10">9/10 Tevkifat (İşgücü / Danışmanlık)</option>
+                <option value="10/10">10/10 Tam Tevkifat</option>
               </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tevkifat Kodu (tevkifat varsa zorunlu)</label>
+              <input type="text" name="withholdingCode" id="acc-inv-wcode" class="form-input" list="acc-wcode-list" inputmode="numeric" maxlength="3" placeholder="Örn: 603" />
+              <datalist id="acc-wcode-list">
+                ${Object.entries(KNOWN_WITHHOLDING_CODES).map(([code, info]) => `<option value="${escapeAttr(code)}">${escapeHtml(`${info.numerator}/10 — ${info.label}`)}</option>`).join('')}
+              </datalist>
+            </div>
+            <div class="form-group">
+              <label class="form-label">KDV İstisna Kodu (%0 KDV için zorunlu)</label>
+              <input type="text" name="vatExemptionCode" id="acc-inv-exemption" class="form-input" inputmode="numeric" maxlength="3" placeholder="Örn: 301" />
             </div>
             <div class="form-group">
               <label class="form-label">Fatura Tarihi</label>
@@ -3543,6 +3702,14 @@ export function renderAdminPage(container, navigate) {
             </div>
 
             <div class="form-group full-width">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+                <label class="form-label" style="margin:0;">Fatura Kalemleri <small style="font-weight:400;color:var(--text-secondary);">(isteğe bağlı — eklenirse tutarlar ve KDV kalemlerden hesaplanır)</small></label>
+                <button type="button" class="btn btn-secondary btn-sm" id="acc-inv-add-line">+ Kalem Ekle</button>
+              </div>
+              <div id="acc-inv-lines" style="display:grid;gap:0.5rem;margin-top:0.5rem;"></div>
+            </div>
+
+            <div class="form-group full-width">
               <div id="acc-inv-live-preview" style="padding:0.85rem 1.1rem;background:#0f172a;color:#f8fafc;border-radius:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:0.86rem;">
                 <span>Canlı Hesaplama: <strong>Net Matrah: 0,00</strong> | <strong>KDV: 0,00</strong> | <strong>Tevkifat: 0,00</strong></span>
                 <span style="color:#34d399;font-weight:800;font-size:0.95rem;">Genel Toplam: 0,00 (TL Karşılığı: ₺0,00)</span>
@@ -3558,7 +3725,8 @@ export function renderAdminPage(container, navigate) {
         <div class="card" style="padding:1.5rem;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
             <h3>Kayıtlı Resmi Faturalar (${filteredInvoices.length})</h3>
-            <div style="display:flex;gap:0.4rem;">
+            <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
+              <input type="search" id="acc-inv-search" class="form-input" style="width:220px;padding:0.35rem 0.6rem;" placeholder="Fatura no, firma, VKN ara..." value="${escapeAttr(accountingInvoiceSearch)}" />
               <button type="button" class="btn ${accountingInvoiceFilter === 'all' ? 'btn-primary' : 'btn-secondary'} btn-sm inv-filter-btn" data-filter="all">Tümü (${invoices.length})</button>
               <button type="button" class="btn ${accountingInvoiceFilter === 'SATIS' ? 'btn-primary' : 'btn-secondary'} btn-sm inv-filter-btn" data-filter="SATIS">Satış (${salesInvoices.length})</button>
               <button type="button" class="btn ${accountingInvoiceFilter === 'ALIS' ? 'btn-primary' : 'btn-secondary'} btn-sm inv-filter-btn" data-filter="ALIS">Alış (${purchaseInvoices.length})</button>
@@ -3586,6 +3754,8 @@ export function renderAdminPage(container, navigate) {
                   ${filteredInvoices.map((inv) => {
                     const isOverdue = Number(inv.remainingAmountTry || 0) > 0 && inv.dueDate && inv.dueDate < todayIso;
                     const sym = inv.currency === 'USD' ? '$' : inv.currency === 'EUR' ? '€' : '₺';
+                    const sync = describeSyncState(inv, syncStateById.get(inv.id));
+                    const integrationOn = store.settings?.accountingIntegration?.enabled === true;
                     return `
                       <tr>
                         <td>
@@ -3621,7 +3791,13 @@ export function renderAdminPage(container, navigate) {
                         <td>
                           <div style="display:flex;flex-direction:column;gap:0.35rem;align-items:flex-start;">
                             <span class="badge ${inv.paymentStatus === 'Ödendi' ? 'badge-teal' : 'badge-neutral'}">${escapeHtml(inv.paymentStatus)}</span>
-                            <button type="button" class="btn btn-secondary btn-sm print-invoice-row-btn" data-inv-id="${escapeAttr(inv.id)}">🖨️ A4 Yazdır</button>
+                            <span class="badge ${sync.badgeClass}" title="${escapeAttr(sync.detail || '')}">🔗 ${escapeHtml(sync.label)}</span>
+                            ${sync.code === 'error' && sync.detail ? `<small style="max-width:200px;color:#991b1b;">${escapeHtml(String(sync.detail).slice(0, 140))}</small>` : ''}
+                            ${integrationOn && inv.docCategory !== 'PROFORMA' && sync.code !== 'synced' ? `<button type="button" class="btn btn-secondary btn-sm push-invoice-btn" data-inv-id="${escapeAttr(inv.id)}">↗ Muhasebeye Gönder</button>` : ''}
+                            <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                              <button type="button" class="btn btn-secondary btn-sm print-invoice-row-btn" data-inv-id="${escapeAttr(inv.id)}">🖨️ A4 Yazdır</button>
+                              <button type="button" class="btn btn-secondary btn-sm export-ubl-invoice-row-btn" data-inv-id="${escapeAttr(inv.id)}" title="GİB UBL-TR 2.1 E-Fatura / E-Arşiv XML İndir">📥 UBL-TR XML</button>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -3689,7 +3865,7 @@ export function renderAdminPage(container, navigate) {
               <label class="form-label">Bağlı Fatura (Otomatik Bakiye Düşer)</label>
               <select name="invoiceId" id="acc-trx-invoice-select" class="form-select">
                 <option value="">— Faturadan Bağımsız Cari İşlem —</option>
-                ${invoices.filter((i) => Number(i.remainingAmountTry || 0) > 0).map((inv) => `
+                ${taxInvoices.filter((i) => Number(i.remainingAmountTry || 0) > 0).map((inv) => `
                   <option value="${escapeAttr(inv.id)}"
                     data-inv-no="${escapeAttr(inv.invoiceNo)}"
                     data-company="${escapeAttr(inv.companyName)}"
@@ -3976,10 +4152,50 @@ export function renderAdminPage(container, navigate) {
           `}
         </div>
       ` : ''}
+
+      ${accountingTab === 'integration' ? '<div id="accounting-integration-root"></div>' : ''}
     `;
 
     renderSafeHtml(box, html);
     bindFocusBanner(box, () => renderAccountingModule(box));
+
+    if (accountingTab === 'integration') {
+      renderIntegrationPanel(box.querySelector('#accounting-integration-root'), {
+        store,
+        profile: currentProfile,
+        onChanged: (only) => refreshStoreAndRender({ only })
+      });
+    }
+
+    // Fatura arama (imleç ve odak korunur)
+    const invSearchEl = box.querySelector('#acc-inv-search');
+    invSearchEl?.addEventListener('change', () => {
+      accountingInvoiceSearch = invSearchEl.value;
+      renderAccountingModule(box);
+    });
+
+    // Faturayı muhasebe programına gönder (başarı yalnızca sunucu doğrulayınca gösterilir)
+    box.querySelectorAll('.push-invoice-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const invId = btn.getAttribute('data-inv-id');
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Gönderiliyor...';
+        try {
+          const { runAccountingSync } = await import('../services/accounting-sync.js');
+          const result = await runAccountingSync('pushInvoice', { invoiceId: invId });
+          showNotification(`Fatura muhasebe programına iletildi (kayıt: ${result.externalId}).`, 'success');
+        } catch (err) {
+          showNotification(err.message || 'Fatura muhasebe programına gönderilemedi.', 'error');
+        } finally {
+          await refreshStoreAndRender({ only: ['accountingSyncStates'] });
+        }
+        if (btn.isConnected) {
+          btn.disabled = false;
+          btn.textContent = original;
+        }
+      });
+    });
 
     // Sekme değiştirme
     box.querySelectorAll('.acc-tab-btn').forEach((btn) => {
@@ -3997,6 +4213,20 @@ export function renderAdminPage(container, navigate) {
       });
     });
 
+    // Doğrulanmış KDV dağılımı olmayan siparişi fatura formunda aç (tutar tahmin edilmez)
+    box.querySelectorAll('.open-order-invoice-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const orderId = btn.getAttribute('data-order-id') || '';
+        accountingTab = 'invoices';
+        renderAccountingModule(box);
+        const sel = box.querySelector('#acc-inv-order-select');
+        if (!sel) return;
+        sel.value = orderId;
+        sel.dispatchEvent(new Event('change'));
+        sel.scrollIntoView({ block: 'center' });
+      });
+    });
+
     // Onaylı Siparişten Tek Tıkla E-Fatura Oluşturma (Finansal Kokpit sekmesinden)
     box.querySelectorAll('.quick-bill-order-btn').forEach((btn) => {
       btn.addEventListener('click', async () => {
@@ -4004,7 +4234,9 @@ export function renderAdminPage(container, navigate) {
         const orderNo = btn.getAttribute('data-order-no') || '';
         const companyName = btn.getAttribute('data-company') || '';
         const contactEmail = btn.getAttribute('data-email') || '';
-        const subtotal = Number(btn.getAttribute('data-subtotal') || 0);
+        const subtotal = Number(btn.getAttribute('data-net') || 0);
+        const vatRate = Number(btn.getAttribute('data-vat-rate') || 0);
+        const grand = Number(btn.getAttribute('data-grand') || 0);
         const collected = Number(btn.getAttribute('data-collected') || 0);
         const itemsSummary = btn.getAttribute('data-items') || '';
         try {
@@ -4021,20 +4253,20 @@ export function renderAdminPage(container, navigate) {
             exchangeRate: 1,
             subtotal,
             discountTotal: 0,
-            vatRate: 20,
+            vatRate,
             withholdingRate: 'Yok',
             paidAmount: collected,
-            paymentStatus: collected >= subtotal * 1.2 ? 'Ödendi' : collected > 0 ? 'Kısmi Ödeme' : 'Ödeme Bekliyor',
+            paymentStatus: collected >= grand ? 'Ödendi' : collected > 0 ? 'Kısmi Ödeme' : 'Ödeme Bekliyor',
             issueDate: todayIso,
             dueDate: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
             description: `${orderNo} Sipariş Faturası — ${itemsSummary}`
           }, currentProfile);
           showNotification(`${orderNo} siparişi için resmi E-Fatura oluşturuldu ve sipariş durumu güncellendi.`, 'success');
-          await refreshStoreAndRender();
+          await refreshStoreAndRender({ only: ACCOUNTING_REFRESH_KEYS });
         } catch (err) {
           showNotification(err.message || 'Siparişten fatura oluşturulamadı.', 'error');
           btn.disabled = false;
-          btn.textContent = '⚡ E-Fatura Oluştur';
+          btn.textContent = `⚡ E-Fatura Oluştur (KDV %${vatRate})`;
         }
       });
     });
@@ -4051,26 +4283,122 @@ export function renderAdminPage(container, navigate) {
       const rateInp = invForm.querySelector('#acc-inv-rate');
       const previewEl = invForm.querySelector('#acc-inv-live-preview');
 
+      const linesBox = invForm.querySelector('#acc-inv-lines');
+      const fmt = (n) => Number(n || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+
+      const collectLines = () => Array.from(linesBox?.querySelectorAll('[data-inv-line]') || []).map((row) => {
+        const read = (name) => row.querySelector(`[data-line-field="${name}"]`)?.value ?? '';
+        return {
+          description: read('description'),
+          quantity: read('quantity'),
+          unit: read('unit'),
+          unitPrice: read('unitPrice'),
+          discountPercent: read('discountPercent') || 0,
+          vatRate: read('vatRate')
+        };
+      });
+
       const updateLiveInvoicePreview = () => {
-        const sub = Math.max(Number(subInp?.value || 0), 0);
-        const disc = Math.max(Number(discInp?.value || 0), 0);
-        const net = Math.max(sub - disc, 0);
-        const vatRate = Number(vatSel?.value || 20);
-        const vatAmt = (net * vatRate) / 100;
-        const wStr = String(withSel?.value || 'Yok');
-        const wMap = { 'Yok': 0, '2/10': 0.2, '3/10': 0.3, '4/10': 0.4, '5/10': 0.5, '7/10': 0.7, '9/10': 0.9 };
-        const wAmt = vatAmt * (wMap[wStr] || 0);
-        const grand = net + (vatAmt - wAmt);
-        const rate = Math.max(Number(rateInp?.value || 1), 0.0001);
-        const grandTry = grand * (curSel?.value === 'TRY' ? 1 : rate);
+        const lines = collectLines();
+        const hasLines = lines.length > 0;
+        [subInp, discInp, vatSel].forEach((el) => { if (el) el.disabled = hasLines; });
         const sym = curSel?.value === 'USD' ? '$' : curSel?.value === 'EUR' ? '€' : '₺';
+        let totals;
+        try {
+          totals = computeInvoiceTotals({
+            lines,
+            subtotal: subInp?.value,
+            discountTotal: discInp?.value,
+            vatRate: vatSel?.value,
+            withholdingRate: withSel?.value,
+            currency: curSel?.value,
+            exchangeRate: rateInp?.value
+          });
+        } catch (calcError) {
+          if (previewEl) renderSafeHtml(previewEl, `<span style="color:#fbbf24;">${escapeHtml(calcError.message)}</span>`);
+          return;
+        }
         if (previewEl) {
           renderSafeHtml(previewEl, `
-            <span>Canlı Hesaplama: <strong>Net Matrah: ${sym}${net.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</strong> | <strong>KDV: ${sym}${vatAmt.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</strong> | <strong>Tevkifat: -${sym}${wAmt.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}</strong></span>
-            <span style="color:#34d399;font-weight:800;font-size:0.95rem;">Genel Toplam: ${sym}${grand.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} (TL Karşılığı: ₺${grandTry.toLocaleString('tr-TR', { minimumFractionDigits: 2 })})</span>
+            <span>Canlı Hesaplama: <strong>Net Matrah: ${sym}${fmt(totals.netExclVat)}</strong> | <strong>KDV${totals.vatMixed ? ' (karışık oran)' : ''}: ${sym}${fmt(totals.vatAmount)}</strong> | <strong>Tevkifat: -${sym}${fmt(totals.withholdingAmount)}</strong></span>
+            <span style="color:#34d399;font-weight:800;font-size:0.95rem;">Genel Toplam: ${sym}${fmt(totals.grandTotal)} (TL Karşılığı: ₺${fmt(totals.grandTotalTry)})</span>
           `);
         }
       };
+
+      const addLineRow = () => {
+        const row = document.createElement('div');
+        row.setAttribute('data-inv-line', '');
+        row.style.cssText = 'display:grid;grid-template-columns:minmax(160px,3fr) 70px 70px 100px 70px 80px auto;gap:0.4rem;align-items:center;';
+        const input = (name, type, placeholder, extra = {}) => {
+          const el = document.createElement('input');
+          el.type = type;
+          el.className = 'form-input';
+          el.setAttribute('data-line-field', name);
+          el.placeholder = placeholder;
+          el.setAttribute('aria-label', placeholder);
+          Object.entries(extra).forEach(([k, v]) => el.setAttribute(k, v));
+          el.addEventListener('input', updateLiveInvoicePreview);
+          return el;
+        };
+        const vat = document.createElement('select');
+        vat.className = 'form-select';
+        vat.setAttribute('data-line-field', 'vatRate');
+        vat.setAttribute('aria-label', 'KDV oranı');
+        [20, 10, 1, 0].forEach((rate) => {
+          const opt = document.createElement('option');
+          opt.value = String(rate);
+          opt.textContent = `%${rate}`;
+          vat.appendChild(opt);
+        });
+        vat.addEventListener('change', updateLiveInvoicePreview);
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'btn btn-secondary btn-sm';
+        remove.textContent = '✕';
+        remove.setAttribute('aria-label', 'Kalemi sil');
+        remove.addEventListener('click', () => {
+          row.remove();
+          updateLiveInvoicePreview();
+        });
+        const qty = input('quantity', 'number', 'Miktar', { min: '0', step: 'any' });
+        qty.value = '1';
+        const unit = input('unit', 'text', 'Birim', { maxlength: '20' });
+        unit.value = 'Adet';
+        const disc = input('discountPercent', 'number', 'İsk. %', { min: '0', max: '100', step: 'any' });
+        disc.value = '0';
+        row.append(
+          input('description', 'text', 'Kalem açıklaması', { maxlength: '300' }),
+          qty,
+          unit,
+          input('unitPrice', 'number', 'Birim fiyat', { min: '0', step: '0.01' }),
+          disc,
+          vat,
+          remove
+        );
+        linesBox.appendChild(row);
+        row.querySelector('[data-line-field="description"]')?.focus();
+        updateLiveInvoicePreview();
+      };
+      invForm.querySelector('#acc-inv-add-line')?.addEventListener('click', addLineRow);
+
+      // İhracat faturasında KDV %0'dır; bilinen tevkifat kodu seçilince oran otomatik gelir.
+      const categorySel = invForm.querySelector('select[name="docCategory"]');
+      categorySel?.addEventListener('change', () => {
+        if (categorySel.value === 'IHRACAT') {
+          if (vatSel) vatSel.value = '0';
+          Array.from(linesBox?.querySelectorAll('[data-line-field="vatRate"]') || []).forEach((el) => { el.value = '0'; });
+          updateLiveInvoicePreview();
+        }
+      });
+      invForm.querySelector('#acc-inv-wcode')?.addEventListener('change', (event) => {
+        const known = KNOWN_WITHHOLDING_CODES[String(event.target.value).trim()];
+        if (known && withSel) {
+          withSel.value = `${known.numerator}/10`;
+          updateLiveInvoicePreview();
+        }
+      });
+      updateLiveInvoicePreview();
 
       [subInp, discInp, vatSel, withSel, curSel, rateInp].forEach((el) => {
         el?.addEventListener('input', updateLiveInvoicePreview);
@@ -4079,13 +4407,16 @@ export function renderAdminPage(container, navigate) {
 
       ordSelect?.addEventListener('change', () => {
         const opt = ordSelect.options[ordSelect.selectedIndex];
+        const hintEl = invForm.querySelector('#acc-inv-order-hint');
+        if (hintEl) hintEl.textContent = '';
         if (!opt || !opt.value) return;
         const comp = opt.getAttribute('data-company') || '';
         const email = opt.getAttribute('data-email') || '';
-        const grand = Number(opt.getAttribute('data-grand') || 0);
         const coll = Number(opt.getAttribute('data-collected') || 0);
         const items = opt.getAttribute('data-items') || '';
         const ordNo = opt.getAttribute('data-order-no') || '';
+        const orderCurrency = opt.getAttribute('data-currency') || 'TRY';
+        const ready = opt.getAttribute('data-ready') === '1';
 
         const compEl = invForm.querySelector('#acc-inv-company');
         const emailEl = invForm.querySelector('#acc-inv-email');
@@ -4093,9 +4424,21 @@ export function renderAdminPage(container, navigate) {
         const descEl = invForm.querySelector('#acc-inv-desc');
         if (compEl) compEl.value = comp;
         if (emailEl) emailEl.value = email;
-        if (subInp) subInp.value = String(Math.round((grand / 1.2) * 100) / 100);
         if (paidEl) paidEl.value = String(coll);
         if (descEl) descEl.value = `${ordNo} Sipariş Faturası — ${items}`;
+        if (curSel && Array.from(curSel.options).some((o) => o.value === orderCurrency)) curSel.value = orderCurrency;
+
+        if (ready) {
+          // Yalnızca siparişte doğrulanmış matrah ve KDV oranı forma taşınır.
+          if (subInp) subInp.value = opt.getAttribute('data-net') || '';
+          if (vatSel) vatSel.value = opt.getAttribute('data-vat-rate') || '20';
+          if (rateInp) rateInp.value = '1';
+        } else {
+          // KDV dağılımı doğrulanamıyorsa tutar tahmin edilmez; kullanıcı girer.
+          if (subInp) subInp.value = '';
+          if (rateInp && orderCurrency !== 'TRY') rateInp.value = '';
+          if (hintEl) hintEl.textContent = opt.getAttribute('data-reason') || 'KDV hariç tutarı ve KDV oranını girin.';
+        }
         updateLiveInvoicePreview();
       });
 
@@ -4105,8 +4448,10 @@ export function renderAdminPage(container, navigate) {
         const selOrderId = String(fd.get('orderId') || '');
         const linkedOrd = orders.find((o) => o.id === selOrderId);
         try {
-          await saveAccountingInvoice({
+          const saved = await saveAccountingInvoice({
             invoiceNo: fd.get('invoiceNo'),
+            withholdingCode: fd.get('withholdingCode'),
+            vatExemptionCode: fd.get('vatExemptionCode'),
             invoiceType: fd.get('invoiceType'),
             docCategory: fd.get('docCategory'),
             orderId: selOrderId,
@@ -4117,6 +4462,7 @@ export function renderAdminPage(container, navigate) {
             contactEmail: fd.get('contactEmail'),
             currency: fd.get('currency'),
             exchangeRate: Number(fd.get('exchangeRate') || 1),
+            lines: collectLines(),
             subtotal: Number(fd.get('subtotal') || 0),
             discountTotal: Number(fd.get('discountTotal') || 0),
             vatRate: Number(fd.get('vatRate') || 20),
@@ -4127,20 +4473,35 @@ export function renderAdminPage(container, navigate) {
             dueDate: fd.get('dueDate'),
             description: fd.get('description')
           }, currentProfile);
-          showNotification('Resmi fatura sunucuya kaydedildi ve cari bakiyeye işlendi.', 'success');
-          await refreshStoreAndRender();
+          showNotification(`Resmi fatura sunucuya kaydedildi (${saved.invoiceNo}) ve cari bakiyeye işlendi.`, 'success');
+          (saved.complianceWarnings || []).forEach((warning) => showNotification(warning, 'info'));
+          await refreshStoreAndRender({ only: ACCOUNTING_REFRESH_KEYS });
         } catch (err) {
           showNotification(err.message || 'Fatura kaydedilemedi.', 'error');
         }
       });
     }
 
-    // A4 Fatura Yazdırma Butonları
+    // A4 Fatura Yazdırma & UBL-TR 2.1 XML İndirme Butonları
     box.querySelectorAll('.print-invoice-row-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const invId = btn.getAttribute('data-inv-id');
         const found = invoices.find((i) => i.id === invId);
         if (found) openInvoicePrintModal(found);
+      });
+    });
+    box.querySelectorAll('.export-ubl-invoice-row-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const invId = btn.getAttribute('data-inv-id');
+        const found = invoices.find((i) => i.id === invId);
+        if (found) {
+          try {
+            downloadUblTrInvoiceXml(found, store.settings?.general || {});
+            showNotification(`${found.invoiceNo} için GİB UBL-TR 2.1 XML dosyası indirildi.`, 'success');
+          } catch (err) {
+            showNotification(err.message || 'XML dosyası üretilemedi.', 'error');
+          }
+        }
       });
     });
 
@@ -4179,7 +4540,7 @@ export function renderAdminPage(container, navigate) {
             notes: fd.get('notes')
           }, currentProfile);
           showNotification('Kasa / Banka işlemi kaydedildi ve bağlı fatura bakiyesi güncellendi.', 'success');
-          await refreshStoreAndRender();
+          await refreshStoreAndRender({ only: ACCOUNTING_REFRESH_KEYS });
         } catch (err) {
           showNotification(err.message || 'Kasa/Banka hareketi kaydedilemedi.', 'error');
         }
@@ -4207,7 +4568,7 @@ export function renderAdminPage(container, navigate) {
           notes: fd.get('notes')
         }, currentProfile);
         showNotification('Çek / Senet evrakı portföye kaydedildi.', 'success');
-        await refreshStoreAndRender();
+        await refreshStoreAndRender({ only: ACCOUNTING_REFRESH_KEYS });
       } catch (err) {
         showNotification(err.message || 'Çek/Senet kaydedilemedi.', 'error');
       }
@@ -4219,7 +4580,7 @@ export function renderAdminPage(container, navigate) {
         try {
           await updateChequeOrNoteStatus(chqId, sel.value, '', currentProfile);
           showNotification('Evrak portföy durumu sunucuda güncellendi.', 'success');
-          await refreshStoreAndRender();
+          await refreshStoreAndRender({ only: ACCOUNTING_REFRESH_KEYS });
         } catch (err) {
           showNotification(err.message || 'Evrak durumu güncellenemedi.', 'error');
         }
@@ -4409,6 +4770,14 @@ export function renderAdminPage(container, navigate) {
               <label class="form-label">Merkez Adres</label>
               <input type="text" name="address" class="form-input" value="${escapeAttr(general.address || 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana')}" />
             </div>
+            <div class="form-group">
+              <label class="form-label">Vergi Dairesi (Fatura için zorunlu)</label>
+              <input type="text" name="taxOffice" class="form-input" value="${escapeAttr(general.taxOffice || '')}" placeholder="Firmanın bağlı olduğu vergi dairesi" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vergi Kimlik No (VKN, 10 hane — fatura için zorunlu)</label>
+              <input type="text" name="taxNumber" class="form-input" inputmode="numeric" maxlength="10" pattern="[0-9]{10}" value="${escapeAttr(general.taxNumber || '')}" placeholder="10 haneli VKN" />
+            </div>
             <div class="form-group full-width">
               <button type="submit" class="btn btn-primary btn-sm">Genel Ayarları Sunucuya Kaydet</button>
             </div>
@@ -4569,7 +4938,9 @@ export function renderAdminPage(container, navigate) {
           companyName: fd.get('companyName'),
           phone: fd.get('phone'),
           email: fd.get('email'),
-          address: fd.get('address')
+          address: fd.get('address'),
+          taxOffice: String(fd.get('taxOffice') || '').trim(),
+          taxNumber: String(fd.get('taxNumber') || '').replace(/\D/g, '')
         }, currentProfile);
         showNotification('Genel ayarlar sunucuya kaydedildi.', 'success');
         await refreshStoreAndRender();

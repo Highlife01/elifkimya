@@ -6,7 +6,15 @@
 
 import { faqItems, productCategories } from '../data/products.js';
 import { findPublicRoute } from '../pages/seo-landings.js';
-import { MEDIPURE_CATEGORIES, MEDIPURE_PRODUCT_COUNT } from '../data/medipure-catalog.js';
+import { MEDIPURE_CATEGORIES } from '../data/medipure-catalog.js';
+import { TURKEY_81_PROVINCES } from '../data/provinces-81.js';
+import {
+  LANGUAGES,
+  getLanguageFromPath,
+  stripLanguagePrefix,
+  localizePath,
+  translateText
+} from './translation-catalog.js';
 
 const RAW_KEYWORD_CLUSTERS = [
   {
@@ -349,291 +357,308 @@ export const ENGINEERING_360_TABS = {
   }
 };
 
-function upsertMetaTag(attrName, attrValue, content) {
-  if (!content) return;
-  let el = document.querySelector(`meta[${attrName}="${attrValue}"]`);
-  if (!el) {
-    el = document.createElement('meta');
-    el.setAttribute(attrName, attrValue);
-    document.head.appendChild(el);
-  }
-  el.setAttribute('content', content);
+const SITE = 'https://www.elifcevrekimya.com.tr';
+const INDEXABLE = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+const OG_LOCALES = {
+  tr: 'tr_TR', en: 'en_US', ar: 'ar_AR', de: 'de_DE', fr: 'fr_FR',
+  ru: 'ru_RU', es: 'es_ES', it: 'it_IT', zh: 'zh_CN', fa: 'fa_IR'
+};
+const BREADCRUMB_NAMES = {
+  '/': 'Ana Sayfa',
+  '/urunler': 'Endüstriyel Kimyasal Ürünler',
+  '/sistemler': 'Su Arıtma & Otomasyon Sistemleri',
+  '/sektorler': 'Sektörel Proses Çözümleri',
+  '/hizmet-bolgeleri': 'Hizmet Bölgeleri & OSB Lojistiği',
+  '/teknik-bilgi': 'Teknik Belge Merkezi (SDS/TDS/COA)',
+  '/teklif-al': 'Kurumsal Teklif & Su Analizi Talebi',
+  '/iletisim': 'İletişim & Merkez Depo'
+};
+
+function languageCode(code) {
+  return LANGUAGES.some((language) => language.code === code) ? code : 'tr';
 }
 
-/**
- * Her sayfa geçişinde SEO meta etiketlerini ve GEO (Yapay Zeka & Rich Snippet)
- * çok katmanlı JSON-LD (@graph) şemasını günceller.
- */
-export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
-  const isNoIndex = pathname.startsWith('/admin') || pathname.startsWith('/portal');
-  upsertMetaTag(
-    'name',
-    'robots',
-    isNoIndex
-      ? 'noindex, nofollow, noarchive'
-      : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
-  );
+export function languageAlternates(pathname) {
+  const basePath = stripLanguagePrefix(pathname);
+  return [
+    ...LANGUAGES.map(({ code }) => ({
+      hreflang: code,
+      href: SITE + localizePath(basePath, code)
+    })),
+    { hreflang: 'x-default', href: SITE + localizePath(basePath, 'tr') }
+  ];
+}
 
-  if (isNoIndex) {
-    document.title = pathname.startsWith('/admin')
-      ? 'Elif Çevre Kimya Yönetim Paneli | Kurumsal ERP, CRM & Muhasebe'
-      : 'Elif Çevre Kimya Müşteri Portalı | Teklif & Sipariş Takibi';
-    return;
+/** Shared by client navigation and the build so metadata cannot drift. */
+export function buildLocalizedPageSeo(pathname, customSeoSettings = null, code = getLanguageFromPath(pathname)) {
+  const lang = languageCode(code);
+  const basePath = stripLanguagePrefix(pathname);
+  const privatePage = /^\/(admin|portal)(?:\/|$)/.test(basePath);
+  const record = privatePage ? null : findPublicRoute(basePath);
+  const t = (value) => translateText(value, lang);
+  if (privatePage || !record) {
+    return {
+      lang,
+      dir: LANGUAGES.find((language) => language.code === lang)?.dir || 'ltr',
+      basePath,
+      path: localizePath(basePath, lang),
+      record: null,
+      title: t(privatePage
+        ? (basePath.startsWith('/admin')
+          ? 'Elif Çevre Kimya Yönetim Paneli | Kurumsal ERP, CRM & Muhasebe'
+          : 'Elif Çevre Kimya Müşteri Portalı | Teklif & Sipariş Takibi')
+        : 'Sayfa bulunamadı | Elif Çevre Kimya'),
+      description: t(privatePage ? 'Elif Çevre Kimya güvenli giriş sayfası.' : 'Bu adres Elif Çevre Kimya (www.elifcevrekimya.com.tr) sitesinde bulunamadı.'),
+      keywords: '',
+      canonical: '',
+      robots: 'noindex, nofollow, noarchive',
+      ogLocale: OG_LOCALES[lang],
+      alternates: []
+    };
   }
-
-  const record = findPublicRoute(pathname);
-  if (!record) {
-    document.title = 'Sayfa bulunamadı | Elif Çevre Kimya';
-    upsertMetaTag('name', 'description', 'Bu adres Elif Çevre Kimya (www.elifcevrekimya.com.tr) sitesinde bulunamadı.');
-    upsertMetaTag('name', 'robots', 'noindex, nofollow');
-    const staleCanonical = document.querySelector('link[rel="canonical"]');
-    staleCanonical?.remove();
-    return;
-  }
-
-  const baseSeo = {
-    title: record.title,
-    description: record.description,
-    canonical: record.canonical
+  const titleSource = basePath === '/' && customSeoSettings?.siteTitle ? customSeoSettings.siteTitle : record.title;
+  const descriptionSource = basePath === '/' && customSeoSettings?.metaDescription ? customSeoSettings.metaDescription : record.description;
+  const keywordsSource = customSeoSettings?.metaKeywords || keywordsForPath(basePath);
+  return {
+    lang,
+    dir: LANGUAGES.find((language) => language.code === lang)?.dir || 'ltr',
+    basePath,
+    path: localizePath(basePath, lang),
+    record,
+    title: t(titleSource),
+    description: t(descriptionSource),
+    keywords: keywordsSource.split(',').map((keyword) => t(keyword.trim())).filter(Boolean).join(', '),
+    canonical: SITE + localizePath(basePath, lang),
+    robots: INDEXABLE,
+    ogLocale: OG_LOCALES[lang],
+    alternates: languageAlternates(basePath)
   };
+}
 
-  const title = (pathname === '/' && customSeoSettings?.siteTitle)
-    ? customSeoSettings.siteTitle
-    : baseSeo.title;
-  const description = (pathname === '/' && customSeoSettings?.metaDescription)
-    ? customSeoSettings.metaDescription
-    : baseSeo.description;
-  const keywords = customSeoSettings?.metaKeywords || keywordsForPath(pathname);
-  const canonical = baseSeo.canonical || `https://www.elifcevrekimya.com.tr${pathname === '/' ? '/' : pathname}`;
+/** Only existing catalog facts are included; translations never add claims. */
+export function buildPageStructuredData(seo) {
+  if (!seo.record) return null;
+  const { record, canonical, title, description, lang, basePath } = seo;
+  const t = (value) => translateText(value, lang);
+  const homeUrl = SITE + localizePath('/', lang);
+  const organizationId = SITE + '/#organization';
+  const websiteId = homeUrl + '#website';
+  const breadcrumbItems = [{
+    '@type': 'ListItem',
+    position: 1,
+    name: t('Ana Sayfa'),
+    item: homeUrl
+  }];
+  if (basePath !== '/') {
+    if (record.kind !== 'hub') {
+      const parentPath = '/' + basePath.split('/').filter(Boolean)[0];
+      breadcrumbItems.push({
+        '@type': 'ListItem',
+        position: 2,
+        name: t(BREADCRUMB_NAMES[parentPath] || 'Elif Çevre Kimya'),
+        item: SITE + localizePath(parentPath, lang)
+      });
+    }
+    breadcrumbItems.push({
+      '@type': 'ListItem',
+      position: breadcrumbItems.length + 1,
+      name: t(BREADCRUMB_NAMES[basePath] || record.h1),
+      item: canonical
+    });
+  }
 
-  document.title = title;
-  upsertMetaTag('name', 'description', description);
-  upsertMetaTag('name', 'keywords', keywords);
+  const graph = [
+    {
+      '@type': ['Organization', 'LocalBusiness'],
+      '@id': organizationId,
+      name: 'Elif Çevre Kimya',
+      alternateName: ['Elif Kimya', 'Elif Çevre ve Endüstriyel Kimya'],
+      legalName: 'Elif Çevre Kimya Sanayi ve Ticaret',
+      url: SITE + '/',
+      sameAs: [SITE, 'https://elifkimya.web.app'],
+      logo: SITE + '/logo.svg',
+      image: SITE + '/assets/hero-chemical.jpg',
+      description,
+      telephone: '+905464992342',
+      email: 'info@elifcevrekimya.com.tr',
+      contactPoint: [{
+        '@type': 'ContactPoint',
+        telephone: '+905464992342',
+        email: 'satis@elifcevrekimya.com.tr',
+        contactType: 'sales',
+        areaServed: 'TR',
+        availableLanguage: ['Turkish', 'English']
+      }],
+      hasMap: 'https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Ova Mah. Şakirpaşa Cd. No:269',
+        addressLocality: 'Seyhan',
+        addressRegion: 'Adana',
+        postalCode: '01080',
+        addressCountry: 'TR'
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: 36.9854, longitude: 35.2658 },
+      areaServed: TURKEY_81_PROVINCES
+        .map(({ name }) => ({ '@type': 'City', name }))
+        .concat([{ '@type': 'Country', name: 'Türkiye' }]),
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: t('Endüstriyel kimyasal ve su arıtma kataloğu'),
+        itemListElement: productCategories.map((category, index) => ({
+          '@type': 'OfferCatalog',
+          position: index + 1,
+          name: t(category.title),
+          description: t(category.shortDesc)
+        }))
+      }
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': canonical + '#breadcrumb',
+      itemListElement: breadcrumbItems
+    },
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      url: homeUrl,
+      name: 'Elif Çevre Kimya',
+      inLanguage: lang,
+      publisher: { '@id': organizationId }
+    },
+    {
+      '@type': 'WebPage',
+      '@id': canonical + '#webpage',
+      url: canonical,
+      name: title,
+      description,
+      inLanguage: lang,
+      isPartOf: { '@id': websiteId },
+      about: { '@id': organizationId },
+      breadcrumb: { '@id': canonical + '#breadcrumb' }
+    }
+  ];
+  if (record.kind !== 'hub') {
+    graph.push({
+      '@type': record.kind === 'blog' ? 'Article' : 'Service',
+      '@id': canonical + (record.kind === 'blog' ? '#article' : '#service'),
+      name: t(record.h1),
+      ...(record.kind === 'blog' ? { headline: t(record.h1), inLanguage: lang } : {}),
+      description,
+      url: canonical,
+      ...(record.kind === 'blog'
+        ? { publisher: { '@id': organizationId } }
+        : { provider: { '@id': organizationId }, areaServed: { '@type': 'Country', name: 'Türkiye' } })
+    });
+  }
+  if (basePath === '/' || basePath.startsWith('/sistemler')) {
+    graph.push({
+      '@type': 'ItemList',
+      '@id': SITE + localizePath('/sistemler', lang) + '#medipure-katalog',
+      name: t('Medipure Saf Su Cihazları'),
+      numberOfItems: MEDIPURE_CATEGORIES.length,
+      itemListElement: MEDIPURE_CATEGORIES.map((category, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: t(category.title),
+        description: t(category.summary)
+      }))
+    });
+  }
+  if (basePath === '/') {
+    graph.push({
+      '@type': 'FAQPage',
+      '@id': homeUrl + '#faq',
+      inLanguage: lang,
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: t(item.question),
+        acceptedAnswer: { '@type': 'Answer', text: t(item.answer) }
+      }))
+    });
+  }
+  return { '@context': 'https://schema.org', '@graph': graph };
+}
 
-  // Bölgesel GEO Meta Etiketleri (Seyhan / Adana, Çukurova Merkez)
+function upsertMetaTag(attrName, attrValue, content) {
+  let element = document.querySelector('meta[' + attrName + '="' + attrValue + '"]');
+  if (!content) {
+    element?.remove();
+    return;
+  }
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute(attrName, attrValue);
+    document.head.appendChild(element);
+  }
+  element.setAttribute('content', content);
+}
+
+/** Update all tags together, including removal of stale public-page metadata. */
+export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null, code) {
+  const effectiveCode = code || getLanguageFromPath(
+    typeof window !== 'undefined' ? window.location.pathname : pathname
+  );
+  const seo = buildLocalizedPageSeo(pathname, customSeoSettings, effectiveCode);
+  document.documentElement.setAttribute('lang', seo.lang);
+  document.documentElement.setAttribute('dir', seo.dir);
+  document.title = seo.title;
+  upsertMetaTag('name', 'robots', seo.robots);
+  upsertMetaTag('name', 'description', seo.description);
+  upsertMetaTag('name', 'keywords', seo.keywords);
   upsertMetaTag('name', 'geo.region', 'TR-01');
   upsertMetaTag('name', 'geo.placename', 'Seyhan, Adana, Çukurova, Türkiye');
   upsertMetaTag('name', 'geo.position', '36.9854;35.2658');
   upsertMetaTag('name', 'ICBM', '36.9854, 35.2658');
-
-  // OpenGraph & Twitter
   upsertMetaTag('property', 'og:site_name', 'Elif Çevre Kimya');
-  upsertMetaTag('property', 'og:title', title);
-  upsertMetaTag('property', 'og:description', description);
-  upsertMetaTag('property', 'og:url', canonical);
-  upsertMetaTag('property', 'og:locale', 'tr_TR');
-  upsertMetaTag('name', 'twitter:title', title);
-  upsertMetaTag('name', 'twitter:description', description);
+  upsertMetaTag('property', 'og:title', seo.title);
+  upsertMetaTag('property', 'og:description', seo.description);
+  upsertMetaTag('property', 'og:url', seo.canonical);
+  upsertMetaTag('property', 'og:locale', seo.ogLocale);
+  upsertMetaTag('name', 'twitter:title', seo.title);
+  upsertMetaTag('name', 'twitter:description', seo.description);
+  upsertMetaTag('name', 'twitter:url', seo.canonical);
 
-  let canonicalLink = document.querySelector('link[rel="canonical"]');
-  if (!canonicalLink) {
-    canonicalLink = document.createElement('link');
-    canonicalLink.setAttribute('rel', 'canonical');
-    document.head.appendChild(canonicalLink);
+  document.querySelectorAll('link[rel="alternate"][hreflang], meta[property="og:locale:alternate"]').forEach((element) => element.remove());
+  seo.alternates.forEach((alternate) => {
+    const element = document.createElement('link');
+    element.setAttribute('rel', 'alternate');
+    element.setAttribute('hreflang', alternate.hreflang);
+    element.setAttribute('href', alternate.href);
+    document.head.appendChild(element);
+  });
+  if (seo.record) {
+    LANGUAGES.filter(({ code: otherCode }) => otherCode !== seo.lang).forEach(({ code: otherCode }) => {
+      const element = document.createElement('meta');
+      element.setAttribute('property', 'og:locale:alternate');
+      element.setAttribute('content', OG_LOCALES[otherCode]);
+      document.head.appendChild(element);
+    });
   }
-  canonicalLink.setAttribute('href', canonical);
 
-  // Dinamik JSON-LD @graph Oluşturma (Google Rich Results + AI Overviews / GEO)
-  const breadcrumbNames = {
-    '/': 'Ana Sayfa',
-    '/urunler': 'Endüstriyel Kimyasal Ürünler',
-    '/sistemler': 'Su Arıtma & Otomasyon Sistemleri',
-    '/sektorler': 'Sektörel Proses Çözümleri',
-    '/hizmet-bolgeleri': 'Hizmet Bölgeleri & OSB Lojistiği',
-    '/teknik-bilgi': 'Teknik Belge Merkezi (SDS/TDS/COA)',
-    '/teklif-al': 'Kurumsal Teklif & Su Analizi Talebi',
-    '/iletisim': 'İletişim & Merkez Depo'
-  };
-
-  const breadcrumbItems = [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Elif Çevre Kimya',
-      item: 'https://www.elifcevrekimya.com.tr/'
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (seo.canonical) {
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
     }
-  ];
-  if (pathname !== '/' && breadcrumbNames[pathname]) {
-    breadcrumbItems.push({
-      '@type': 'ListItem',
-      position: 2,
-      name: breadcrumbNames[pathname],
-      item: canonical
-    });
-  } else if (pathname !== '/' && record.kind !== 'hub') {
-    const parentPath = `/${pathname.split('/').filter(Boolean)[0]}`;
-    breadcrumbItems.push({
-      '@type': 'ListItem',
-      position: 2,
-      name: breadcrumbNames[parentPath] || 'Elif Çevre Kimya',
-      item: `https://www.elifcevrekimya.com.tr${parentPath}`
-    });
-    breadcrumbItems.push({
-      '@type': 'ListItem',
-      position: 3,
-      name: record.h1,
-      item: canonical
-    });
+    canonical.setAttribute('href', seo.canonical);
+  } else {
+    canonical?.remove();
   }
 
-  const graphSchema = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': ['Organization', 'LocalBusiness'],
-        '@id': 'https://www.elifcevrekimya.com.tr/#organization',
-        name: 'Elif Çevre Kimya',
-        alternateName: ['Elif Kimya', 'Elif Çevre ve Endüstriyel Kimya'],
-        legalName: 'Elif Çevre Kimya Sanayi ve Ticaret',
-        url: 'https://www.elifcevrekimya.com.tr/',
-        sameAs: [
-          'https://www.elifcevrekimya.com.tr',
-          'https://elifkimya.web.app'
-        ],
-        logo: 'https://www.elifcevrekimya.com.tr/logo.svg',
-        image: 'https://www.elifcevrekimya.com.tr/assets/hero-chemical.jpg',
-        description,
-        telephone: '+905464992342',
-        email: 'info@elifkimya.com.tr',
-        contactPoint: [
-          {
-            '@type': 'ContactPoint',
-            telephone: '+905464992342',
-            email: 'satis@elifkimya.com.tr',
-            contactType: 'sales',
-            areaServed: 'TR',
-            availableLanguage: ['Turkish', 'English']
-          },
-          {
-            '@type': 'ContactPoint',
-            telephone: '+905464992342',
-            email: 'info@elifkimya.com.tr',
-            contactType: 'customer support',
-            areaServed: 'TR',
-            availableLanguage: ['Turkish']
-          }
-        ],
-        hasMap: 'https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111',
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: 'Ova Mah. Şakirpaşa Cd. No:269',
-          addressLocality: 'Seyhan',
-          addressRegion: 'Adana',
-          postalCode: '01080',
-          addressCountry: 'TR'
-        },
-        geo: {
-          '@type': 'GeoCoordinates',
-          latitude: 36.9854,
-          longitude: 35.2658
-        },
-        areaServed: [
-          { '@type': 'City', name: 'Adana' },
-          { '@type': 'City', name: 'Mersin' },
-          { '@type': 'City', name: 'Hatay' },
-          { '@type': 'City', name: 'Osmaniye' },
-          { '@type': 'City', name: 'Gaziantep' },
-          { '@type': 'City', name: 'Kayseri' },
-          { '@type': 'City', name: 'Niğde' },
-          { '@type': 'City', name: 'Kahramanmaraş' },
-          { '@type': 'City', name: 'Denizli' },
-          { '@type': 'City', name: 'Aydın' },
-          { '@type': 'City', name: 'Manisa' },
-          { '@type': 'City', name: 'Afyonkarahisar' },
-          { '@type': 'Country', name: 'Türkiye' }
-        ],
-        knowsAbout: [
-          'Çevre Kimyası ve Endüstriyel Atık Su Arıtma Kimyasalları',
-          'Polialüminyum Klorür (PAC %17 Sıvı / %30 Toz), Demir III Klorür ve Polielektrolitler',
-          'Endüstriyel Su Şartlandırma Kimyasalları',
-          'Soğutma Kulesi ve Buhar Kazanı Kimyasalları',
-          'Jeotermal Kireç, Silika ve Korozyon Şartlandırması',
-          'Ters Osmoz (RO) Antiskalant ve Membran CIP Kimyasalları',
-          'Endüstriyel Su Arıtma Sistemleri (RO, EDI, UF, Su Yumuşatma)',
-          'Medipure Laboratuvar ve Endüstriyel Saf Su Cihazları (15 Kategori, 163 Model)',
-          'Sodyum Hipoklorit, Kostik Soda, Hidroklorik ve Sülfürik Asit Tedariki',
-          'PLC / SCADA Su Arıtma Otomasyonu ve Dozaj Panoları'
-        ],
-        hasOfferCatalog: {
-          '@type': 'OfferCatalog',
-          name: 'Elif Çevre Kimya Endüstriyel Kimyasal, Çevre Kimyası ve Su Arıtma Kataloğu',
-          itemListElement: productCategories.map((cat, idx) => ({
-            '@type': 'OfferCatalog',
-            position: idx + 1,
-            name: cat.title,
-            description: cat.shortDesc
-          }))
-        }
-      },
-      {
-        '@type': 'BreadcrumbList',
-        '@id': `${canonical}#breadcrumb`,
-        itemListElement: breadcrumbItems
-      },
-      {
-        '@type': 'WebSite',
-        '@id': 'https://www.elifcevrekimya.com.tr/#website',
-        url: 'https://www.elifcevrekimya.com.tr/',
-        name: 'Elif Çevre Kimya',
-        inLanguage: 'tr-TR',
-        publisher: { '@id': 'https://www.elifcevrekimya.com.tr/#organization' }
-      },
-      {
-        '@type': 'WebPage',
-        '@id': `${canonical}#webpage`,
-        url: canonical,
-        name: title,
-        description,
-        inLanguage: 'tr-TR',
-        isPartOf: { '@id': 'https://www.elifcevrekimya.com.tr/#website' },
-        about: { '@id': 'https://www.elifcevrekimya.com.tr/#organization' }
-      },
-      ...(record.kind === 'hub' ? [] : [{
-        '@type': 'Service',
-        '@id': `${canonical}#service`,
-        name: record.h1,
-        description: record.description,
-        serviceType: record.kind,
-        url: canonical,
-        provider: { '@id': 'https://www.elifcevrekimya.com.tr/#organization' },
-        areaServed: { '@type': 'Country', name: 'Türkiye' }
-      }]),
-      {
-        '@type': 'ItemList',
-        '@id': 'https://www.elifcevrekimya.com.tr/sistemler#medipure-katalog',
-        name: `Medipure saf su cihaz kataloğu (${MEDIPURE_PRODUCT_COUNT} model)`,
-        numberOfItems: MEDIPURE_CATEGORIES.length,
-        itemListElement: MEDIPURE_CATEGORIES.map((category, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          name: category.title,
-          description: `${category.products.length} model. ${category.summary}`
-        }))
-      }
-    ]
-  };
-
-  if (pathname === '/') {
-    graphSchema['@graph'].push({
-      '@type': 'FAQPage',
-      '@id': 'https://www.elifcevrekimya.com.tr/#faq',
-      mainEntity: faqItems.map((item) => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: item.answer
-        }
-      }))
-    });
+  let schema = document.getElementById('dynamic-seo-geo-schema');
+  const graph = buildPageStructuredData(seo);
+  if (!graph) {
+    schema?.remove();
+    return;
   }
-
-  let schemaScript = document.getElementById('dynamic-seo-geo-schema');
-  if (!schemaScript) {
-    schemaScript = document.createElement('script');
-    schemaScript.id = 'dynamic-seo-geo-schema';
-    schemaScript.type = 'application/ld+json';
-    document.head.appendChild(schemaScript);
+  if (!schema) {
+    schema = document.createElement('script');
+    schema.id = 'dynamic-seo-geo-schema';
+    schema.type = 'application/ld+json';
+    document.head.appendChild(schema);
   }
-  schemaScript.textContent = JSON.stringify(graphSchema);
+  schema.textContent = JSON.stringify(graph);
 }
