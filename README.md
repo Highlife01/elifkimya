@@ -69,7 +69,25 @@
 6. **Maliyetlendirme ve A4 PDF Teklif (`proposals`):** Çoklu kalem, birim maliyet, satış fiyatı, iskonto, nakliye, montaj, devreye alma, KDV, döviz kuru/tarihi kaydı, brüt kâr ve kâr marjı (%) hesabı, **müşteri maliyet gizlemeli A4 PDF yazdırma** ve tek tıkla Müşteri Portalı paylaşım linki üretimi.
 7. **Sipariş, Stok ve Tedarikçi (`orders`):** Onaylanan tekliften sipariş oluşturma, ödeme/tahsilat takibi, depo stok kartları, değiştirilemez (*immutable*) stok hareket defteri (`runTransaction` ile *Giriş, Çıkış, Satış, Numune, İade, Sayım Düzeltmesi*) ve tedarikçi kayıtları.
 8. **Servis, Bakım ve Saha Takibi (`service`):** Periyodik bakım, membran CIP yıkama, reçine/kuvars değişimi, kalibrasyon ve arıza kayıtları, saha ölçüm değerleri (giriş/çıkış iletkenlik, pH, basınç) ve sonraki bakım tarihi takibi.
-9. **Sistem, SEO, Bildirim ve Rol Yönetimi (`settings`):** İletişim/kategori/SEO ayarları, bildirim günlükleri, değiştirilemez denetim günlüğü (`auditLogs`) ve 6 seviyeli RBAC rol ataması (`superadmin`, `sales`, `technical`, `warehouse`, `viewer`, `customer`).
+9. **Sistem, SEO, Bildirim ve Rol Yönetimi (`settings`):** İletişim/kategori/SEO ayarları (satıcı vergi dairesi ve VKN dahil), bildirim günlükleri, değiştirilemez denetim günlüğü (`auditLogs`) ve 6 seviyeli RBAC rol ataması (`superadmin`, `sales`, `technical`, `warehouse`, `viewer`, `customer`).
+
+### 4.1. Dashboard (Genel Bakış) geliştirmeleri
+
+- **Tahsilat yaşlandırma:** Açık satış faturaları vadesi gelmemiş / 1–30 / 31–60 / 60+ gün / vadesiz dilimlerinde ve en riskli cariler listesiyle gösterilir. Proforma ve kapalı faturalar dahil edilmez (`src/utils/dashboard-insights.js`).
+- **Önceki dönemle karşılaştırma:** 7/30/90/365 gün filtresinde talep, onaylı sipariş hacmi, satış faturası ve tahsilat son N gün ile önceki N gün karşılaştırılır; önceki dönemde kayıt yoksa oran uydurulmaz.
+- **Rol bazlı görünüm:** Muhasebe yetkisi olmayan roller (ör. depo, teknik) nakit akışı, mutabakat, yaşlandırma, CSV ve A4 finans raporunu görmez; yetkisiz koleksiyonlar hiç sorgulanmaz.
+- **Performans:** Admin yüklemesi role göre koleksiyon çeker, kayıt sonrası yalnızca ilgili koleksiyonları yeniler; ağır dashboard hesapları store dizileri değişmedikçe önbellekten gelir; canlı gelen kutusu güncellemeleri birleştirilir ve sekme gizliyken çizim ertelenir.
+- **Veri tamlığı:** Koleksiyonlardan en yeni 1000 kayıt (denetim günlüğü ve stok hareketlerinde 250) alınır; sınır aşılırsa kenar çubuğunda uyarı görünür.
+- Diğer bileşenler: CRM SLA sayacı, 30 günlük nakit akışı vade takvimi, sipariş → e-fatura mutabakat radarı, iş kolu ve 81 il dağılımı, global arama (`Ctrl+K`), CSV özeti ve A4 yönetici raporu (`src/utils/dashboard-analytics.js`).
+
+### 4.2. Muhasebe, fatura ve mevzuat uyumu
+
+- **Fatura kalemleri:** Miktar, birim fiyat, iskonto ve kalem başına KDV; karışık oranlar kalem bazında hesaplanır (`src/utils/invoice-calc.js`). Kalem girilmezse eski tek tutarlı fatura çalışır.
+- **Mevzuat kuralları** (`src/utils/tax-rules.js`, son gözden geçirme 2026-10-19): KDV oranları %20/%10/%1/%0 (10.07.2023 öncesi %18/%8), %0 KDV için istisna kodu, tevkifat için 3 haneli tevkifat kodu ve oran-kod uyumu, 12.000 TL (2026) fatura düzenleme sınırı uyarısı, GİB biçiminde ardışık fatura numarası (`ELF2026000000001`), alış faturasında tedarikçi numarası zorunluluğu. Proforma vergi belgesi sayılmaz; ciro, KDV ve cariye girmez. Alışlardaki tevkifat sorumlu KDV olarak net KDV'ye eklenir.
+  > Oran ve sınırlar yıllık değişebilir; uygulamadan önce GİB duyuruları ve mali müşavirle doğrulanmalıdır. XML çıktısı GİB şemasına/portalına karşı doğrulanmamıştır.
+- **Siparişten fatura:** KDV dağılımı yalnızca siparişte doğrulanabiliyorsa (matrah + KDV = toplam, standart oran, TRY) tek tıkla faturalanır; aksi halde tutar tahmin edilmez, fatura formunda girilir (`src/utils/order-billing.js`).
+- **GİB UBL-TR 2.1 XML:** Satıcı VKN ve vergi dairesi ayarlardan zorunludur, sahte değer üretilmez; tevkifat/istisna kodları ve oran bazında KDV alt toplamları yazılır.
+- **Muhasebe programı API köprüsü** (`functions/`, [functions/README.md](functions/README.md)): Cloud Functions üzerinden sağlayıcıdan bağımsız iki yönlü senkron (fatura gönder, fatura/ödeme durumu/cari çek). API anahtarı yalnızca sunucuda (Secret Manager) tutulur; panelde **Muhasebe → 6. Muhasebe API Entegrasyonu** sekmesinden ayarlanır. Henüz bir muhasebe programına bağlı değildir.
 
 ---
 
@@ -82,12 +100,18 @@ npm install
 # 2. Geliştirme sunucusunu başlatın
 npm run dev
 
-# 3. Üretim paketini (dist/) derleyin
+# 3. Testleri çalıştırın (kök testler + functions/test)
+npm test
+
+# 4. Üretim paketini (dist/) derleyin
 npm run build
 
-# 4. Firestore güvenlik kurallarını ve indekslerini dağıtın (elifkimya veritabanı)
+# 5. Firestore güvenlik kurallarını ve indekslerini dağıtın (elifkimya veritabanı)
 firebase deploy --only firestore --project advera-c8dd0
 
-# 5. Firebase Hosting (elifkimya sitesi) dağıtımını yapın
+# 6. Firebase Hosting (elifkimya sitesi) dağıtımını yapın
 firebase deploy --only hosting:elifkimya --project advera-c8dd0
+
+# 7. (Muhasebe API entegrasyonu hazır olunca) Cloud Functions: önce `firebase functions:secrets:set ACCOUNTING_API_KEY`
+firebase deploy --only functions --project advera-c8dd0
 ```

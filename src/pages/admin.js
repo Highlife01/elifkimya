@@ -51,10 +51,22 @@ import { renderIntegrationPanel } from './admin-accounting-integration.js';
 import { describeSyncState, indexSyncStates } from '../utils/sync-status.js';
 import { computeInvoiceTotals } from '../utils/invoice-calc.js';
 import { deriveOrderBilling, vatAmountFromGross } from '../utils/order-billing.js';
+import { computePeriodComparison, computeReceivablesAging, createRenderScheduler, memoizeByRefs } from '../utils/dashboard-insights.js';
 import { KNOWN_WITHHOLDING_CODES, TAX_RULES_REVIEWED_AT, INVOICE_ISSUANCE_LIMITS } from '../utils/tax-rules.js';
 import { downloadUblTrInvoiceXml } from '../utils/ubl-tr-invoice.js';
+import {
+  classifyInboundRequest,
+  computeSlaBadge,
+  searchGlobalAdminStore,
+  computeCashFlowCalendar,
+  computeOrderInvoiceReconciliation,
+  computeCategoryAndCityAnalytics,
+  computeInventoryAndComplianceHealth,
+  downloadDashboardExecutiveCsv
+} from '../utils/dashboard-analytics.js';
 
 const ACCOUNTING_REFRESH_KEYS = ['accountingInvoices', 'accountingTransactions', 'chequesAndNotes', 'orders'];
+const EMPTY_LIST = Object.freeze([]);
 
 // Proforma vergi belgesi değildir: ciro, KDV, cari ve tahsilat hesaplarına girmez.
 const isTaxDocument = (invoice) => String(invoice?.docCategory || invoice?.eDocumentType || '').toUpperCase() !== 'PROFORMA';
@@ -129,8 +141,9 @@ export function renderAdminPage(container, navigate) {
   let activeModule = 'dashboard';
   let store = null;
   let dashboardDateDays = 0; // 0 = Tümü
-  let dashboardInboxTab = 'all'; // 'all' | 'orders_quotes' | 'contacts' | 'unread'
+  let dashboardInboxTab = 'all'; // 'all' | 'medipure' | 'chemical' | 'orders_quotes' | 'contacts' | 'unread'
   let dashboardInboxSearch = '';
+  let dashboardGlobalQuery = '';
   let lastSyncedTimeStr = '';
   let isSyncingStore = false;
   let lastInboxSignature = '';
@@ -148,9 +161,29 @@ export function renderAdminPage(container, navigate) {
   let crmSearchQuery = '';
   let crmChannelFilter = 'all';
   let pendingProposalSeed = null;
+  let pendingInvoiceSeed = null;
   let accountingTab = 'overview'; // 'overview' | 'invoices' | 'cashbank' | 'cheques' | 'ledger' | 'integration'
   let accountingInvoiceFilter = 'all'; // 'all' | 'SATIS' | 'ALIS' | 'OVERDUE'
   let accountingInvoiceSearch = '';
+
+  // Ağır dashboard hesapları: girdi dizileri (store referansları) değişmedikçe yeniden hesaplanmaz.
+  const memoCashFlow = memoizeByRefs((invoices, transactions, chequesAndNotes, todayIso) => computeCashFlowCalendar({ invoices, transactions, chequesAndNotes, todayIso }));
+  const memoSyncIndex = memoizeByRefs((states) => indexSyncStates(states));
+  const memoReconciliation = memoizeByRefs((orders, invoices, syncStatesByInvoiceId) => computeOrderInvoiceReconciliation({ orders, invoices, syncStatesByInvoiceId }));
+  const memoAging = memoizeByRefs((invoices, todayIso) => computeReceivablesAging({ invoices, todayIso }));
+  const memoCompliance = memoizeByRefs((products, inventoryItems, documents) => computeInventoryAndComplianceHealth({ products, inventoryItems, documents }));
+
+  // Canlı gelen kutusu güncellemeleri birleştirilir; sekme gizliyken çizim ertelenir, form yazılırken bozulmaz.
+  const liveRenderScheduler = createRenderScheduler(() => {
+    if (!document.body.contains(container) || (activeModule !== 'dashboard' && activeModule !== 'crm')) return;
+    const activeEl = document.activeElement;
+    const isEditingFormField = activeEl && container.contains(activeEl) && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName);
+    if (!isEditingFormField) renderShell();
+  }, {
+    delayMs: 500,
+    isHidden: () => document.hidden,
+    onVisible: (callback) => document.addEventListener('visibilitychange', callback)
+  });
 
   function computeCrmSignature(list) {
     if (!Array.isArray(list)) return '';
@@ -216,29 +249,7 @@ export function renderAdminPage(container, navigate) {
   }
 
   function getInboundChannelMeta(req) {
-    const ch = String(req?.formChannel || '').toLowerCase();
-    const rt = String(req?.requestType || '').toLowerCase();
-    const src = String(req?.source || '').toLowerCase();
-    const subj = String(req?.subject || req?.relatedProductOrSystem || '').toUpperCase();
-    if (ch === 'order_form' || rt === 'order_request' || rt.includes('siparis') || rt.includes('sipariş')) {
-      if (subj.includes('MEDIPURE')) {
-        return { code: 'order', label: '🛒 MEDIPURE CİHAZ SİPARİŞİ', badgeClass: 'badge-teal', isOrderOrQuote: true };
-      }
-      if (subj.includes('KİMYASAL') || subj.includes('KIMYASAL')) {
-        return { code: 'order', label: '🧪 KİMYASAL SİPARİŞİ', badgeClass: 'badge-teal', isOrderOrQuote: true };
-      }
-      return { code: 'order', label: '🛒 SİPARİŞ FORMU', badgeClass: 'badge-teal', isOrderOrQuote: true };
-    }
-    if (ch === 'quote_form' || src === 'website_rfq' || rt.includes('quote') || rt === 'water_project' || rt === 'technical_visit' || rt === 'periodic_supply') {
-      return { code: 'quote', label: '📋 TEKLİF & PROJE FORMU', badgeClass: 'badge-teal', isOrderOrQuote: true };
-    }
-    if (ch === 'callback_form' || rt === 'callback_30min' || src === 'website_callback') {
-      return { code: 'callback', label: '📞 30 DK GERİ ARAMA', badgeClass: 'badge-amber', isOrderOrQuote: false };
-    }
-    if (ch === 'contact_form' || rt === 'general_contact' || src === 'website_contact') {
-      return { code: 'contact', label: '📩 İLETİŞİM FORMU MESAJI', badgeClass: 'badge-amber', isOrderOrQuote: false };
-    }
-    return { code: 'crm', label: '📌 CRM / TİCARİ TALEP', badgeClass: 'badge-neutral', isOrderOrQuote: true };
+    return classifyInboundRequest(req);
   }
 
   function renderAuthScreen() {
@@ -504,6 +515,7 @@ export function renderAdminPage(container, navigate) {
     serviceListFocus = 'all';
     if (dashPreset?.accountingTab) accountingTab = 'overview';
     if (dashPreset?.accountingInvoiceFilter) accountingInvoiceFilter = 'all';
+    if (dashPreset && Object.prototype.hasOwnProperty.call(dashPreset, 'accountingInvoiceSearch')) accountingInvoiceSearch = '';
     dashPreset = null;
   }
 
@@ -522,6 +534,7 @@ export function renderAdminPage(container, navigate) {
     if (preset.serviceListFocus) serviceListFocus = preset.serviceListFocus;
     if (preset.accountingTab) accountingTab = preset.accountingTab;
     if (preset.accountingInvoiceFilter) accountingInvoiceFilter = preset.accountingInvoiceFilter;
+    if (Object.prototype.hasOwnProperty.call(preset, 'accountingInvoiceSearch')) accountingInvoiceSearch = preset.accountingInvoiceSearch;
     dashScrollOnce = Boolean(preset.anchor);
     activeModule = preset.module;
     renderShell();
@@ -545,11 +558,160 @@ export function renderAdminPage(container, navigate) {
   }
 
   /* ========================================================================
-     MODÜL 1: GENEL BAKIŞ (DASHBOARD)
+     MODÜL 1: GENEL BAKIŞ (DASHBOARD — 7 KATMANDA GELİŞTİRİLMİŞ KOMUTA MERKEZİ)
      ======================================================================== */
+  function openDashboardExecutivePrintModal({
+    periodLabel,
+    kpis,
+    cashFlow,
+    categories,
+    topCities,
+    unbilledOrders,
+    recentRequests
+  }) {
+    const existing = document.getElementById('admin-dash-exec-print-modal');
+    if (existing) existing.remove();
+
+    const general = store.settings?.general || {};
+    const modal = document.createElement('div');
+    modal.id = 'admin-dash-exec-print-modal';
+    modal.className = 'modal-backdrop';
+    const todayStr = new Date().toLocaleDateString('tr-TR');
+
+    const modalHtml = `
+      <div class="modal-card a4-modal-card" style="max-width:880px;width:95%;">
+        <div class="modal-header no-print" style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid var(--border-color);background:#0f172a;color:#fff;">
+          <div>
+            <strong style="font-size:1rem;">A4 Yönetici & Finans Özet Raporu (${escapeHtml(periodLabel)})</strong>
+          </div>
+          <div style="display:flex;gap:0.5rem;">
+            <button type="button" class="btn btn-primary btn-sm" id="print-dash-exec-btn">🖨️ A4 Yazdır / PDF Kaydet</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="close-dash-exec-btn">Kapat</button>
+          </div>
+        </div>
+        <div class="a4-sheet" style="padding:2rem;background:#fff;color:#0f172a;font-size:0.86rem;line-height:1.5;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #059669;padding-bottom:1rem;margin-bottom:1.25rem;">
+            <div>
+              <h2 style="margin:0;color:#0f172a;font-size:1.3rem;font-weight:900;">${escapeHtml(general.companyName || 'ELİF ÇEVRE KİMYA SANAYİ VE TİCARET')}</h2>
+              <p style="margin:0.2rem 0 0;color:#475569;font-size:0.8rem;">Kurumsal ERP Yönetim, Nakit Akışı ve Operasyon Özeti • İç Maliyet Sızdırmaz Resmi Özet</p>
+            </div>
+            <div style="text-align:right;font-size:0.8rem;">
+              <div><strong>Rapor Tarihi:</strong> ${escapeHtml(todayStr)}</div>
+              <div><strong>Dönem Filtresi:</strong> ${escapeHtml(periodLabel)}</div>
+              <div><strong>Veritabanı:</strong> <code>${escapeHtml(DATABASE_ID)}</code></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.25rem;">
+            <div style="padding:0.75rem;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
+              <div style="font-size:0.72rem;color:#475569;text-transform:uppercase;font-weight:700;">Onaylı Sipariş Hacmi</div>
+              <strong style="font-size:1.05rem;color:#0f172a;">${tryMoney(kpis.totalApprovedOrdersTry)}</strong>
+              <div style="font-size:0.75rem;color:#64748b;">${kpis.confirmedOrdersCount} onaylı sipariş</div>
+            </div>
+            <div style="padding:0.75rem;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
+              <div style="font-size:0.72rem;color:#475569;text-transform:uppercase;font-weight:700;">Satış Faturaları</div>
+              <strong style="font-size:1.05rem;color:#059669;">${tryMoney(kpis.salesInvoicesTry)}</strong>
+              <div style="font-size:0.75rem;color:#64748b;">Alış: ${tryMoney(kpis.purchaseInvoicesTry)}</div>
+            </div>
+            <div style="padding:0.75rem;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
+              <div style="font-size:0.72rem;color:#475569;text-transform:uppercase;font-weight:700;">Net Kasa & Banka</div>
+              <strong style="font-size:1.05rem;color:${cashFlow.currentLiquidTry >= 0 ? '#059669' : '#dc2626'};">${tryMoney(cashFlow.currentLiquidTry)}</strong>
+              <div style="font-size:0.75rem;color:#64748b;">Vadesi Geçen Alacak: ${tryMoney(cashFlow.overdueReceivablesTry)}</div>
+            </div>
+            <div style="padding:0.75rem;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;">
+              <div style="font-size:0.72rem;color:#475569;text-transform:uppercase;font-weight:700;">30 Gün Sonu Tahmini Nakit</div>
+              <strong style="font-size:1.05rem;color:${cashFlow.projected30DayNetTry >= 0 ? '#059669' : '#dc2626'};">${tryMoney(cashFlow.projected30DayNetTry)}</strong>
+              <div style="font-size:0.75rem;color:#64748b;">+Giriş: ${tryMoney(cashFlow.in30DaysTry)} / -Çıkış: ${tryMoney(cashFlow.out30DaysTry)}</div>
+            </div>
+          </div>
+
+          <h4 style="margin:0 0 0.5rem;color:#0f172a;">1. İş Kolu Dağılımı (Kimyasal • Medipure Saf Su • Su Arıtma Projeleri • Servis)</h4>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:1.25rem;font-size:0.8rem;">
+            <thead>
+              <tr style="background:#0f172a;color:#fff;">
+                <th style="padding:0.5rem;text-align:left;">İş Kolu / Ürün Grubu</th>
+                <th style="padding:0.5rem;text-align:right;">Gelen Talep (CRM)</th>
+                <th style="padding:0.5rem;text-align:right;">Onaylı Sipariş</th>
+                <th style="padding:0.5rem;text-align:right;">Sipariş Hacmi (TL)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${categories.map((c) => `
+                <tr style="border-bottom:1px solid #cbd5e1;">
+                  <td style="padding:0.5rem;font-weight:700;">${escapeHtml(c.label)}</td>
+                  <td style="padding:0.5rem;text-align:right;">${c.crmCount}</td>
+                  <td style="padding:0.5rem;text-align:right;">${c.orderCount}</td>
+                  <td style="padding:0.5rem;text-align:right;font-weight:700;">${tryMoney(c.orderVolumeTry)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <h4 style="margin:0 0 0.5rem;color:#0f172a;">2. Faturası Kesilmemiş Onaylı Siparişler (${unbilledOrders.length})</h4>
+          <table style="width:100%;border-collapse:collapse;margin-bottom:1.25rem;font-size:0.8rem;">
+            <thead>
+              <tr style="background:#0f172a;color:#fff;">
+                <th style="padding:0.5rem;text-align:left;">Sipariş No</th>
+                <th style="padding:0.5rem;text-align:left;">Müşteri Firma</th>
+                <th style="padding:0.5rem;text-align:left;">Durum</th>
+                <th style="padding:0.5rem;text-align:right;">Tutar (KDV Dahil)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${unbilledOrders.length === 0 ? `
+                <tr><td colspan="4" style="padding:0.6rem;text-align:center;">Tüm onaylı siparişler faturalandırılmıştır.</td></tr>
+              ` : unbilledOrders.slice(0, 12).map(({ order }) => `
+                <tr style="border-bottom:1px solid #cbd5e1;">
+                  <td style="padding:0.5rem;"><code>${escapeHtml(order.orderNo || '-')}</code></td>
+                  <td style="padding:0.5rem;font-weight:700;">${escapeHtml(order.companyName || '-')}</td>
+                  <td style="padding:0.5rem;">${escapeHtml(order.status || '-')}</td>
+                  <td style="padding:0.5rem;text-align:right;font-weight:700;">${tryMoney(order.grandTotal)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <h4 style="margin:0 0 0.5rem;color:#0f172a;">3. En Çok Talep Gelen İller (${topCities.length}) & Son Gelen Talepler</h4>
+          <div style="font-size:0.8rem;margin-bottom:0.75rem;">
+            <strong>Öne Çıkan İller:</strong> ${topCities.length === 0 ? 'Henüz şehir verisi yok' : topCities.map((c) => `${escapeHtml(c.label)} (${c.crmCount} talep)`).join(' • ')}
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+            <thead>
+              <tr style="background:#0f172a;color:#fff;">
+                <th style="padding:0.45rem;text-align:left;">Tarih</th>
+                <th style="padding:0.45rem;text-align:left;">Firma & Yetkili</th>
+                <th style="padding:0.45rem;text-align:left;">Ürün / Sistem</th>
+                <th style="padding:0.45rem;text-align:left;">Aşama</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${recentRequests.slice(0, 10).map((r) => `
+                <tr style="border-bottom:1px solid #cbd5e1;">
+                  <td style="padding:0.45rem;">${escapeHtml((r.createdAtIso || '').slice(0, 16))}</td>
+                  <td style="padding:0.45rem;"><strong>${escapeHtml(r.companyName || '-')}</strong> (${escapeHtml(r.contactName || '-')})</td>
+                  <td style="padding:0.45rem;">${escapeHtml(r.relatedProductOrSystem || r.subject || r.requestType || '-')}</td>
+                  <td style="padding:0.45rem;">${escapeHtml(r.stage || '-')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    renderSafeHtml(modal, modalHtml);
+    document.body.appendChild(modal);
+    modal.querySelector('#close-dash-exec-btn')?.addEventListener('click', () => modal.remove());
+    modal.querySelector('#print-dash-exec-btn')?.addEventListener('click', () => window.print());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+  }
+
   function renderDashboardModule(box) {
     const nowMs = Date.now();
     const cutoffMs = dashboardDateDays > 0 ? nowMs - dashboardDateDays * 86400000 : 0;
+    const periodLabel = dashboardDateDays === 0 ? 'Tüm Zamanlar' : `Son ${dashboardDateDays} Gün`;
 
     const crmSplit = splitDated(store.crmRequests, cutoffMs);
     const propSplit = splitDated(store.proposals, cutoffMs);
@@ -595,7 +757,33 @@ export function renderAdminPage(container, navigate) {
     const overdueSales = (store.accountingInvoices || []).filter((i) => isTaxDocument(i) && i.invoiceType === 'SATIS' && Number(i.remainingAmountTry || 0) > 0 && i.dueDate && i.dueDate < todayIso);
     const overdueTry = overdueSales.reduce((sum, i) => sum + Number(i.remainingAmountTry || 0), 0);
 
-    // Gelen Kutusu (Sipariş Formu vs İletişim Formu ayrımı)
+    // Yeni Analitik Çekirdek Hesaplamaları (Gerçek Verilerden; store dizileri değişmedikçe önbellekten gelir)
+    const canSeeFinance = hasPermission(currentProfile.role, 'view_accounting');
+    const cashFlow = memoCashFlow(store.accountingInvoices || EMPTY_LIST, store.accountingTransactions || EMPTY_LIST, store.chequesAndNotes || EMPTY_LIST, todayIso);
+    const syncStatesByInvoiceId = memoSyncIndex(store.accountingSyncStates || EMPTY_LIST);
+    const reconciliation = memoReconciliation(store.orders || EMPTY_LIST, store.accountingInvoices || EMPTY_LIST, syncStatesByInvoiceId);
+    const aging = canSeeFinance ? memoAging(store.accountingInvoices || EMPTY_LIST, todayIso) : null;
+    const { categories, topCities } = computeCategoryAndCityAnalytics({
+      crmRequests: crmList,
+      orders: ordList,
+      customers: store.customers || []
+    });
+    const compliance = memoCompliance(store.products || EMPTY_LIST, store.inventoryItems || EMPTY_LIST, store.documents || EMPTY_LIST);
+
+    // Önceki dönemle karşılaştırma (yalnızca 7/30/90/365 gün filtrelerinde)
+    const compareDays = dashboardDateDays;
+    const compareChips = compareDays > 0 ? [
+      { label: 'Gelen talep', ...computePeriodComparison({ items: store.crmRequests, dateOf: recordIso, days: compareDays, nowMs }), format: (n) => String(n) },
+      { label: 'Onaylı sipariş hacmi', ...computePeriodComparison({ items: store.orders.filter((o) => o.status !== 'İptal'), dateOf: recordIso, getValue: (o) => o.grandTotal, days: compareDays, nowMs }), format: tryMoney },
+      ...(canSeeFinance ? [
+        { label: 'Satış faturası', ...computePeriodComparison({ items: (store.accountingInvoices || []).filter((i) => isTaxDocument(i) && i.invoiceType === 'SATIS'), dateOf: (i) => i.issueDate || recordIso(i), getValue: (i) => i.grandTotalTry, days: compareDays, nowMs }), format: tryMoney },
+        { label: 'Tahsilat', ...computePeriodComparison({ items: (store.accountingTransactions || []).filter((t) => t.direction === 'TAHSILAT'), dateOf: (t) => t.transactionDate || recordIso(t), getValue: (t) => t.amountTry, days: compareDays, nowMs }), format: tryMoney }
+      ] : [])
+    ] : [];
+
+    // Gelen Kutusu (Medipure Siparişleri vs Kimyasal Siparişleri vs İletişim Formu ayrımı)
+    const medipureInbox = crmList.filter((r) => getInboundChannelMeta(r).isMedipureOrder);
+    const chemicalInbox = crmList.filter((r) => getInboundChannelMeta(r).isChemicalOrder);
     const orderAndQuoteInbox = crmList.filter((r) => getInboundChannelMeta(r).isOrderOrQuote);
     const contactAndCallbackInbox = crmList.filter((r) => !getInboundChannelMeta(r).isOrderOrQuote);
     const unreadInbox = crmList.filter((r) => (r.resolutionStatus || 'active') === 'active' && r.stage === 'Yeni Talep');
@@ -603,8 +791,11 @@ export function renderAdminPage(container, navigate) {
     function getFilteredDashboardInboxItems() {
       const q = String(dashboardInboxSearch || '').trim().toLowerCase();
       return crmList.filter((r) => {
-        if (dashboardInboxTab === 'orders_quotes' && !getInboundChannelMeta(r).isOrderOrQuote) return false;
-        if (dashboardInboxTab === 'contacts' && getInboundChannelMeta(r).isOrderOrQuote) return false;
+        const meta = getInboundChannelMeta(r);
+        if (dashboardInboxTab === 'medipure' && !meta.isMedipureOrder) return false;
+        if (dashboardInboxTab === 'chemical' && !meta.isChemicalOrder) return false;
+        if (dashboardInboxTab === 'orders_quotes' && !meta.isOrderOrQuote) return false;
+        if (dashboardInboxTab === 'contacts' && meta.isOrderOrQuote) return false;
         if (dashboardInboxTab === 'unread' && !((r.resolutionStatus || 'active') === 'active' && r.stage === 'Yeni Talep')) return false;
         if (q) {
           const hay = `${r.companyName || ''} ${r.contactName || ''} ${r.phone || ''} ${r.email || ''} ${r.cityCountry || ''} ${r.relatedProductOrSystem || ''} ${r.subject || ''} ${r.description || ''} ${r.message || ''} ${r.requestedAmount || ''}`.toLowerCase();
@@ -645,13 +836,16 @@ export function renderAdminPage(container, navigate) {
     const html = `
       <div class="admin-module-header">
         <div>
-          <h2>1. Genel Bakış: Canlı Sipariş & İletişim Gelen Kutusu ve Operasyon Özeti</h2>
-          <p>Web sitesindeki <strong>Sipariş & Teklif Formu (<code>/teklif-al</code>)</strong>, <strong>İletişim Formu (<code>/iletisim</code>)</strong> ve <strong>Sizi Arayalım</strong> formlarından gelen tüm mesajlar anlık olarak bu ekrana düşer.${cutoffMs && undatedCount ? ` Tarih filtresi, tarihi olmayan <strong>${undatedCount}</strong> kaydı dışarıda bırakır.` : ''}</p>
+          <h2>1. Genel Bakış: Canlı Sipariş & İletişim Gelen Kutusu, Nakit Akışı ve Operasyon Komuta Merkezi</h2>
+          <p>Web sitesindeki <strong>Medipure Cihaz Siparişleri</strong>, <strong>Kimyasal Sipariş & Teklif Formu (<code>/teklif-al</code>)</strong> ve <strong>İletişim Formu (<code>/iletisim</code>)</strong> anlık olarak bu ekrana düşer.${cutoffMs && undatedCount ? ` Tarih filtresi, tarihi olmayan <strong>${undatedCount}</strong> kaydı dışarıda bırakır.` : ''}</p>
         </div>
         <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-          <button type="button" class="btn btn-secondary btn-sm" id="dash-go-crm-btn">📥 2. Tüm CRM & Talepler (${crmList.length})</button>
-          <button type="button" class="btn btn-primary btn-sm" id="dash-go-accounting-btn">📊 8. Gelişmiş Muhasebe & Finans'ı Aç</button>
-          <label style="font-size:0.85rem;font-weight:600;">Tarih Filtresi:</label>
+          ${canSeeFinance ? `
+          <button type="button" class="btn btn-secondary btn-sm" id="dash-export-csv-btn" title="Seçili dönem özetini Excel (CSV) olarak indir">📥 Excel / CSV Özeti İndir</button>
+          <button type="button" class="btn btn-secondary btn-sm" id="dash-print-exec-btn" title="A4 Yönetici & Finans Özet Raporu Yazdır">🖨️ A4 Yönetici Raporu</button>` : ''}
+          <button type="button" class="btn btn-secondary btn-sm" id="dash-go-crm-btn">📥 2. Tüm CRM (${crmList.length})</button>
+          ${canSeeFinance ? '<button type="button" class="btn btn-primary btn-sm" id="dash-go-accounting-btn">📊 8. Muhasebe & E-Fatura</button>' : ''}
+          <label style="font-size:0.85rem;font-weight:600;">Dönem:</label>
           <select id="dash-date-filter" class="form-select" style="width:auto;">
             <option value="0" ${dashboardDateDays === 0 ? 'selected' : ''}>Tüm Zamanlar</option>
             <option value="7" ${dashboardDateDays === 7 ? 'selected' : ''}>Son 7 Gün</option>
@@ -662,12 +856,53 @@ export function renderAdminPage(container, navigate) {
         </div>
       </div>
 
+      <!-- GELİŞTİRME 2: HIZLI İŞLEM MERKEZİ (QUICK ACTIONS) & GLOBAL ARAMA (CTRL+K) -->
+      <div class="card" style="padding:1.15rem 1.35rem;margin-bottom:1.25rem;background:linear-gradient(135deg, rgba(15,23,42,0.03), rgba(5,150,105,0.06));border:1px solid var(--border-color);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <div style="display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center;">
+            <span style="font-size:0.78rem;font-weight:800;text-transform:uppercase;color:var(--accent-teal);margin-right:0.25rem;">⚡ Hızlı İşlem:</span>
+            <button type="button" class="btn btn-primary btn-sm" data-jump="${jump({ module: 'accounting', label: 'Yeni E-Fatura / E-Arşiv Oluştur', accountingTab: 'invoices', anchor: '#accounting-invoices-anchor' })}">🧾 + E-Fatura Kes</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-jump="${jump({ module: 'proposals', label: 'Yeni Maliyet & A4 PDF Teklif Hazırla', anchor: '#proposal-builder' })}">📄 + PDF Teklif Hazırla</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-jump="${jump({ module: 'accounting', label: 'Kasa / Banka Tahsilat veya Tediye Kaydı', accountingTab: 'cashbank', anchor: '#accounting-cash-anchor' })}">🏦 + Tahsilat / Tediye</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-jump="${jump({ module: 'orders', label: 'Depo Gerçek Stok Giriş / Çıkış İşlemi', anchor: '#admin-stock-move-form' })}">📦 + Stok Giriş / Çıkış</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-jump="${jump({ module: 'projects', label: 'Yeni Su Arıtma Keşif & Proje Kaydı', anchor: '#admin-project-form' })}">💧 + Su Arıtma Projesi</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-jump="${jump({ module: 'crm', label: 'Manuel CRM & Müşteri Talebi Ekle', anchor: '#admin-crm-form' })}">📥 + CRM Talebi</button>
+          </div>
+          <div style="position:relative;min-width:290px;flex:1;max-width:440px;">
+            <input
+              type="search"
+              id="dash-global-search-input"
+              class="form-input"
+              value="${escapeAttr(dashboardGlobalQuery)}"
+              placeholder="🔍 Tüm ERP’de ara (Firma, Fatura No, Sipariş, Medipure, SKU)... [Ctrl+K]"
+              style="width:100%;padding-right:2.2rem;"
+            />
+            <div id="dash-global-search-results" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:80;max-height:360px;overflow-y:auto;background:var(--bg-card, #fff);border:2px solid var(--accent-teal);border-radius:10px;box-shadow:0 14px 32px rgba(15,23,42,0.18);padding:0.5rem;"></div>
+          </div>
+        </div>
+      </div>
+
+      ${compareChips.length ? `
+      <!-- ÖNCEKİ DÖNEMLE KARŞILAŞTIRMA -->
+      <div class="card" style="padding:0.85rem 1.1rem;margin-bottom:1rem;display:flex;gap:1.25rem;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:0.78rem;font-weight:800;text-transform:uppercase;color:var(--text-muted);">Önceki ${compareDays} güne göre</span>
+        ${compareChips.map((chip) => `
+          <div style="min-width:150px;">
+            <div style="font-size:0.74rem;color:var(--text-muted);">${escapeHtml(chip.label)}</div>
+            <strong>${escapeHtml(chip.format(chip.current))}</strong>
+            ${chip.changePct === null
+              ? `<span class="kpi-sub" style="margin-left:0.35rem;">${chip.hasPrevious ? 'karşılaştırılamaz' : 'önceki dönemde kayıt yok'}</span>`
+              : `<span style="margin-left:0.35rem;font-size:0.8rem;font-weight:700;color:${chip.changePct >= 0 ? '#059669' : '#dc2626'};">${chip.changePct >= 0 ? '▲' : '▼'} %${Math.abs(chip.changePct).toLocaleString('tr-TR')}</span>`}
+          </div>
+        `).join('')}
+      </div>` : ''}
+
       <!-- 8 Operasyonel KPI Kartı -->
       <div class="admin-kpi-grid">
         <button type="button" class="admin-kpi-card ${unreadInbox.length > 0 ? 'kpi-alert' : ''}" data-inbox-jump="orders_quotes">
           <span class="kpi-title">Gelen Sipariş & Teklif Formları</span>
           <strong class="kpi-num">${orderAndQuoteInbox.length}</strong>
-          <span class="kpi-sub">${unreadInbox.length > 0 ? `🔴 ${unreadInbox.length} yeni yanıt bekliyor` : `${newPendingRequests.length} açık ön görüşmede`}${periodNote(crmSplit.undated)}</span>
+          <span class="kpi-sub">💧 ${medipureInbox.length} Medipure · 🧪 ${chemicalInbox.length} Kimyasal · ${unreadInbox.length > 0 ? `🔴 ${unreadInbox.length} yeni` : `${newPendingRequests.length} açık`}${periodNote(crmSplit.undated)}</span>
         </button>
         <button type="button" class="admin-kpi-card" data-inbox-jump="contacts">
           <span class="kpi-title">Gelen İletişim & Geri Arama Mesajları</span>
@@ -682,7 +917,7 @@ export function renderAdminPage(container, navigate) {
         <button type="button" class="admin-kpi-card" data-jump="${jump({ module: 'orders', label: 'Onaylanan siparişler (iptal hariç)', ordersListFocus: 'confirmed', anchor: '#orders-table-anchor' })}">
           <span class="kpi-title">Onaylanan Kesin Siparişler</span>
           <strong class="kpi-num">${confirmedOrders.length}</strong>
-          <span class="kpi-sub">Yalnızca onaylı sipariş kayıtları${periodNote(ordSplit.undated)}</span>
+          <span class="kpi-sub">${reconciliation.unbilledOrders.length > 0 ? `⚠️ ${reconciliation.unbilledOrders.length} sipariş fatura bekliyor` : 'Tüm siparişler faturalandı'}${periodNote(ordSplit.undated)}</span>
         </button>
         <button type="button" class="admin-kpi-card" data-jump="${jump({ module: 'projects', label: 'Devam eden su arıtma projeleri', projectListFocus: 'ongoing', anchor: '#projects-table-anchor' })}">
           <span class="kpi-title">Devam Eden Su Arıtma Projeleri</span>
@@ -697,16 +932,16 @@ export function renderAdminPage(container, navigate) {
         <button type="button" class="admin-kpi-card" data-jump="${jump({ module: 'products', label: '' })}">
           <span class="kpi-title">Yayımlanmış Aktif Ürünler</span>
           <strong class="kpi-num">${activeProductsCount}</strong>
-          <span class="kpi-sub">Toplam ${store.products.length} ürün kartı · tarih filtresinden bağımsız</span>
+          <span class="kpi-sub">SDS/TDS Tamlık: ${compliance.documentedCount}/${compliance.publishedCount} ürün</span>
         </button>
         <button type="button" class="admin-kpi-card ${criticalStockItems.length > 0 ? 'kpi-warn' : ''}" data-jump="${jump({ module: 'orders', label: 'Sayımı girilmiş ve eşiğin altındaki stok', ordersListFocus: 'critical', anchor: '#inventory-table-anchor' })}">
           <span class="kpi-title">Kritik Stok Uyarıları</span>
           <strong class="kpi-num">${initializedInventory.length === 0 ? '—' : criticalStockItems.length}</strong>
-          <span class="kpi-sub">${initializedInventory.length === 0 ? 'Stok sayımı henüz girilmedi' : `${initializedInventory.length} stok kalemi izleniyor`} · tarih filtresinden bağımsız</span>
+          <span class="kpi-sub">${initializedInventory.length === 0 ? 'Stok sayımı henüz girilmedi' : `${initializedInventory.length} stok kalemi izleniyor`}</span>
         </button>
       </div>
 
-      <!-- CANLI GELEN KUTUSU: SİPARİŞ FORMLARI & İLETİŞİM MESAJLARI -->
+      <!-- GELİŞTİRME 1: CANLI GELEN KUTUSU (MEDIPURE & KİMYASAL SİPARİŞ SEKMELERİ + SLA SAYACI + FATURA KISAYOLU) -->
       <div class="card" id="dash-inbox" style="margin-top:1.5rem;padding:1.5rem;border:2px solid var(--accent-teal);">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1rem;">
           <div>
@@ -715,20 +950,26 @@ export function renderAdminPage(container, navigate) {
               <span style="font-size:0.8rem;color:var(--text-muted);">DB: <code>${escapeHtml(DATABASE_ID)}/crmRequests</code></span>
               ${lastSyncedTimeStr ? `<span style="font-size:0.78rem;color:var(--text-muted);">• Son senkron: ${escapeHtml(lastSyncedTimeStr)}</span>` : ''}
             </div>
-            <h3 style="margin:0;">📥 Web Sitesi Gelen Kutusu: Sipariş Formları & İletişim Mesajları</h3>
+            <h3 style="margin:0;">📥 Web Sitesi Gelen Kutusu: Medipure Cihaz Siparişleri, Kimyasal Siparişleri & İletişim</h3>
             <p style="font-size:0.86rem;color:var(--text-secondary);margin-top:0.2rem;">
-              İletişim formu, 30 dakikada geri arama formu ve sipariş/teklif formlarından gönderilen tüm mesajların tam metni, miktarı ve iletişim bilgileri aşağıdadır.
+              Medipure cihaz modelleri, kimyasal ürün kartları, teklif formu ve 30 dk geri arama formlarından gelen tüm talepler SLA yanıt süresiyle birlikte aşağıda listelenir.
             </p>
           </div>
-          <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
             <button type="button" class="btn ${dashboardInboxTab === 'all' ? 'btn-primary' : 'btn-secondary'} btn-sm dash-inbox-tab" data-tab="all">
               Tümü (${crmList.length})
             </button>
+            <button type="button" class="btn ${dashboardInboxTab === 'medipure' ? 'btn-primary' : 'btn-secondary'} btn-sm dash-inbox-tab" data-tab="medipure">
+              💧 Medipure Cihaz Siparişleri (${medipureInbox.length})
+            </button>
+            <button type="button" class="btn ${dashboardInboxTab === 'chemical' ? 'btn-primary' : 'btn-secondary'} btn-sm dash-inbox-tab" data-tab="chemical">
+              🧪 Kimyasal Siparişleri (${chemicalInbox.length})
+            </button>
             <button type="button" class="btn ${dashboardInboxTab === 'orders_quotes' ? 'btn-primary' : 'btn-secondary'} btn-sm dash-inbox-tab" data-tab="orders_quotes">
-              🛒 Sipariş & Teklif Formları (${orderAndQuoteInbox.length})
+              🛒 Tüm Sipariş & Teklifler (${orderAndQuoteInbox.length})
             </button>
             <button type="button" class="btn ${dashboardInboxTab === 'contacts' ? 'btn-primary' : 'btn-secondary'} btn-sm dash-inbox-tab" data-tab="contacts">
-              📩 İletişim & Geri Arama Mesajları (${contactAndCallbackInbox.length})
+              📩 İletişim & Geri Arama (${contactAndCallbackInbox.length})
             </button>
             <button type="button" class="btn ${dashboardInboxTab === 'unread' ? 'btn-primary' : 'btn-secondary'} btn-sm dash-inbox-tab" data-tab="unread">
               🔴 Yeni / Yanıt Bekleyen (${unreadInbox.length})
@@ -743,7 +984,7 @@ export function renderAdminPage(container, navigate) {
             class="form-input"
             style="max-width:380px;flex:1;"
             value="${escapeAttr(dashboardInboxSearch)}"
-            placeholder="Gelen kutusunda firma, yetkili, telefon, ürün veya mesaj ara..."
+            placeholder="Gelen kutusunda firma, yetkili, telefon, Medipure modeli veya kimyasal ara..."
           />
           <button type="button" class="btn btn-secondary btn-sm" id="dash-inbox-clear-search" style="${dashboardInboxSearch ? '' : 'display:none;'}">
             Aramayı Temizle
@@ -793,7 +1034,282 @@ export function renderAdminPage(container, navigate) {
         </div>
       </div>
 
-      <div class="dash-work-grid">
+      ${canSeeFinance ? `
+      <!-- GELİŞTİRME 3 & 4: 30 GÜNLÜK NAKİT AKIŞI VADE TAKVİMİ & SİPARİŞ-FATURA MUTABAKAT RADARI -->
+      <div class="admin-two-col" style="margin-top:1.5rem;">
+        <!-- 30 Günlük Finansal Nakit Akışı & Vade Takvimi -->
+        <div class="card" style="padding:1.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.85rem;">
+            <div>
+              <h3 style="margin:0;">📅 30 Günlük Nakit Akışı & Vade Takvimi</h3>
+              <p class="kpi-sub" style="margin-top:0.2rem;">Açık faturalar ve portföydeki çek/senet vadelerinden gerçek zamanlı hesaplanır.</p>
+            </div>
+            <span class="badge ${cashFlow.projected30DayNetTry >= 0 ? 'badge-teal' : 'badge-error'}">
+              30 Gün Sonu Tahmini Net: ${tryMoney(cashFlow.projected30DayNetTry)}
+            </span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.65rem;margin-bottom:1rem;">
+            <div style="padding:0.75rem;background:var(--bg-surface);border-radius:8px;border-left:3px solid #059669;">
+              <div style="font-size:0.75rem;color:var(--text-secondary);font-weight:700;">7 / 30 GÜN BEKLENEN TAHSİLAT (+)</div>
+              <div style="font-size:0.95rem;font-weight:800;color:#059669;margin-top:0.2rem;">7G: ${tryMoney(cashFlow.in7DaysTry)} · 30G: ${tryMoney(cashFlow.in30DaysTry)}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem;">Vadesi Geçmiş Alacak: <strong style="color:#dc2626;">${tryMoney(cashFlow.overdueReceivablesTry)}</strong> (${cashFlow.overdueReceivablesCount})</div>
+            </div>
+            <div style="padding:0.75rem;background:var(--bg-surface);border-radius:8px;border-left:3px solid #d97706;">
+              <div style="font-size:0.75rem;color:var(--text-secondary);font-weight:700;">7 / 30 GÜN BEKLENEN ÖDEME (-)</div>
+              <div style="font-size:0.95rem;font-weight:800;color:#d97706;margin-top:0.2rem;">7G: ${tryMoney(cashFlow.out7DaysTry)} · 30G: ${tryMoney(cashFlow.out30DaysTry)}</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.15rem;">Vadesi Geçmiş Borç: <strong>${tryMoney(cashFlow.overduePayablesTry)}</strong> (${cashFlow.overduePayablesCount})</div>
+            </div>
+          </div>
+
+          ${cashFlow.upcomingEvents.length === 0 ? `
+            <div class="empty-state-box">
+              <p>Önümüzdeki 30 gün içinde vadesi gelen veya vadesi geçmiş açık fatura / çek-senet kaydı bulunmuyor.</p>
+            </div>
+          ` : `
+            <div class="recent-activity-list">
+              ${cashFlow.upcomingEvents.map((ev) => `
+                <button type="button" class="recent-activity-item" data-jump="${jump({
+                  module: 'accounting',
+                  label: `${ev.kindLabel}: ${ev.refNo}`,
+                  accountingTab: ev.accountingTab,
+                  accountingInvoiceFilter: ev.accountingInvoiceFilter,
+                  anchor: ev.anchor
+                })}">
+                  <div>
+                    <span class="badge ${ev.isOverdue ? 'badge-error' : ev.direction === 'IN' ? 'badge-teal' : 'badge-amber'}" style="margin-right:0.35rem;">
+                      ${ev.isOverdue ? '⚠️ GECİKTİ' : ev.direction === 'IN' ? '⬇️ TAHSİLAT' : '⬆️ ÖDEME'}
+                    </span>
+                    <strong>${escapeHtml(ev.companyName)}</strong> — <code style="font-size:0.78rem;">${escapeHtml(ev.refNo)}</code>
+                    <div style="font-size:0.76rem;color:var(--text-muted);margin-top:0.15rem;">${escapeHtml(ev.kindLabel)} · Vade: <strong>${escapeHtml(ev.dateIso)}</strong></div>
+                  </div>
+                  <strong style="color:${ev.direction === 'IN' ? '#059669' : '#dc2626'};">${ev.direction === 'IN' ? '+' : '-'}${tryMoney(ev.amountTry)}</strong>
+                </button>
+              `).join('')}
+            </div>
+          `}
+        </div>
+
+        <!-- Sipariş → Sevkiyat → E-Fatura Mutabakat & Senkron Radarı -->
+        <div class="card" style="padding:1.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.85rem;">
+            <div>
+              <h3 style="margin:0;">🔗 Sipariş → E-Fatura Mutabakat Radarı</h3>
+              <p class="kpi-sub" style="margin-top:0.2rem;">Onaylanan siparişlerin faturalanma ve dış muhasebe senkron durumu.</p>
+            </div>
+            <span class="badge ${reconciliation.unbilledOrders.length > 0 ? 'badge-amber' : 'badge-teal'}">
+              ${reconciliation.unbilledOrders.length > 0 ? `${reconciliation.unbilledOrders.length} Sipariş Fatura Bekliyor (${tryMoney(reconciliation.unbilledTotalTry)})` : 'Tüm Siparişler Faturalandı'}
+            </span>
+          </div>
+
+          ${reconciliation.unbilledOrders.length === 0 ? `
+            <div class="empty-state-box" style="margin-bottom:0.85rem;">
+              <p>✅ Faturası kesilmemiş onaylı sipariş bulunmuyor.</p>
+            </div>
+          ` : `
+            <div class="recent-activity-list" style="margin-bottom:1rem;">
+              ${reconciliation.unbilledOrders.slice(0, 6).map(({ order, billing }) => `
+                <div class="dash-work-item" style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+                  <div>
+                    <strong><code>${escapeHtml(order.orderNo || 'Sipariş')}</code> — ${escapeHtml(order.companyName || '-')}</strong>
+                    <div class="kpi-sub">
+                      Durum: ${escapeHtml(order.status || '-')} · Tutar: <strong>${tryMoney(order.grandTotal)}</strong>
+                      ${billing.ready ? ` · KDV %${billing.vatRate} hazır` : ' · KDV oranı faturada seçilecek'}
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-xs dash-bill-order-btn" data-order-id="${escapeAttr(order.id)}">
+                    🧾 Fatura Kes
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          `}
+
+          <div style="padding:0.85rem;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+            <div>
+              <strong style="font-size:0.86rem;">Muhasebe API & GİB UBL-TR 2.1 Senkron Durumu</strong>
+              <div class="kpi-sub">
+                Senkron bekleyen vergi belgesi: <strong>${reconciliation.unsyncedInvoices.length}</strong>
+                ${reconciliation.erroredSyncInvoices.length > 0 ? ` · <span style="color:#dc2626;font-weight:700;">Hatalı: ${reconciliation.erroredSyncInvoices.length}</span>` : ''}
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-xs" data-jump="${jump({ module: 'accounting', label: 'E-Fatura & UBL-TR 2.1 XML Listesi', accountingTab: 'invoices', anchor: '#accounting-invoices-anchor' })}">
+              Faturaları Yönet →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAHSİLAT YAŞLANDIRMA: açık satış faturalarının vade gecikmesine göre dağılımı -->
+      <div class="card" style="padding:1.5rem;margin-top:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.85rem;">
+          <div>
+            <h3 style="margin:0;">💰 Tahsilat Yaşlandırma</h3>
+            <p class="kpi-sub" style="margin-top:0.2rem;">Açık satış faturaları vade gecikmesine göre; proforma ve kapalı faturalar dahil değildir.</p>
+          </div>
+          <span class="badge ${aging.overdueTry > 0 ? 'badge-error' : 'badge-teal'}">
+            Toplam açık: ${tryMoney(aging.totalOpenTry)} · Vadesi geçen: ${tryMoney(aging.overdueTry)}
+          </span>
+        </div>
+        ${aging.totalOpenTry === 0 ? `
+          <div class="empty-state-box"><p>✅ Açık satış faturası bulunmuyor.</p></div>
+        ` : `
+          <div class="admin-two-col">
+            <div class="real-bar-chart">
+              ${aging.buckets.map((bucket) => {
+                const pct = Math.round((bucket.amountTry / aging.totalOpenTry) * 100);
+                return `
+                  <div style="margin-bottom:0.7rem;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.83rem;margin-bottom:0.25rem;">
+                      <strong>${escapeHtml(bucket.label)}</strong>
+                      <span>${tryMoney(bucket.amountTry)} · ${bucket.count} fatura</span>
+                    </div>
+                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width:${pct}%;${bucket.key === 'd61_plus' ? 'background:#dc2626;' : bucket.key === 'd31_60' ? 'background:#d97706;' : ''}"></div></div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+            <div>
+              <h4 style="margin:0 0 0.5rem;">En riskli cariler (vadesi geçen tutar)</h4>
+              ${aging.topRiskCustomers.length === 0 ? `
+                <div class="empty-state-box"><p>Vadesi geçmiş alacak bulunmuyor.</p></div>
+              ` : aging.topRiskCustomers.map((c) => `
+                <button type="button" class="dash-work-item" style="width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:0.5rem;" data-jump="${jump({ module: 'accounting', label: `${c.companyName} — vadesi geçen faturalar`, accountingTab: 'invoices', accountingInvoiceFilter: 'OVERDUE', accountingInvoiceSearch: c.companyName, anchor: '#accounting-invoices-anchor' })}">
+                  <span><strong>${escapeHtml(c.companyName)}</strong><span class="kpi-sub" style="display:block;">${c.invoiceCount} fatura · en eski ${c.oldestDays} gün gecikmiş</span></span>
+                  <strong style="color:#dc2626;">${tryMoney(c.overdueTry)}</strong>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `}
+      </div>` : ''}
+
+      <!-- GELİŞTİRME 5: İŞ KOLU DAĞILIMI (MEDIPURE / KİMYASAL / PROJE) & 81 İL DÖNÜŞÜM ANALİTİĞİ -->
+      <div class="admin-two-col" style="margin-top:1.5rem;">
+        <div class="card" style="padding:1.5rem;">
+          <h3 style="margin-bottom:0.35rem;">🧪 İş Kolu & Ürün Grubu Dağılımı (Gerçek Kayıtlar)</h3>
+          <p class="kpi-sub" style="margin-bottom:0.85rem;">Gelen taleplerin ve onaylı siparişlerin Medipure, Kimyasal, Su Arıtma Projesi ve Servis kırılımı.</p>
+          <div class="real-bar-chart">
+            ${categories.map((cat) => {
+              const maxCat = Math.max(...categories.map((c) => c.crmCount + c.orderCount), 1);
+              const pct = Math.round(((cat.crmCount + cat.orderCount) / maxCat) * 100);
+              return `
+                <div style="margin-bottom:0.75rem;">
+                  <div style="display:flex;justify-content:space-between;font-size:0.83rem;margin-bottom:0.25rem;">
+                    <strong>${escapeHtml(cat.label)}</strong>
+                    <span><strong>${cat.crmCount}</strong> talep · <strong>${cat.orderCount}</strong> sipariş (${tryMoney(cat.orderVolumeTry)})</span>
+                  </div>
+                  <div class="bar-chart-track">
+                    <div class="bar-chart-fill" style="width:${pct}%;"></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="card" style="padding:1.5rem;">
+          <h3 style="margin-bottom:0.35rem;">🗺️ 81 İl & Bölge Dönüşüm Dağılımı (SEO/GEO Radarı)</h3>
+          <p class="kpi-sub" style="margin-bottom:0.85rem;">Hangi illerden talep ve müşteri geldiğini gösterir; ile tıklayarak o ilin CRM kayıtlarını filtreleyebilirsiniz.</p>
+          ${topCities.length === 0 ? `
+            <div class="empty-state-box">
+              <p>Henüz il/şehir bilgisi içeren talep veya müşteri kaydı bulunmuyor.</p>
+            </div>
+          ` : `
+            <div class="real-bar-chart">
+              ${topCities.map((city) => {
+                const maxCity = Math.max(...topCities.map((c) => c.crmCount + c.customerCount), 1);
+                const pct = Math.round(((city.crmCount + city.customerCount) / maxCity) * 100);
+                return `
+                  <button type="button" class="bar-chart-row" data-jump="${jump({
+                    module: 'crm',
+                    label: `${city.label} iline ait talepler`,
+                    crmFilterStage: 'all',
+                    crmFilterRes: 'all',
+                    crmViewMode: 'table',
+                    crmSearchQuery: city.searchKeyword,
+                    crmChannelFilter: 'all',
+                    anchor: '#crm-view-container'
+                  })}">
+                    <span class="bar-chart-label">${escapeHtml(city.label)} <small style="color:var(--text-muted);">(${escapeHtml(city.region)})</small></span>
+                    <div class="bar-chart-track">
+                      <div class="bar-chart-fill" style="width:${pct}%;"></div>
+                    </div>
+                    <strong class="bar-chart-val">${city.crmCount} talep${city.customerCount ? ` · ${city.customerCount} cari` : ''}</strong>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </div>
+      </div>
+
+      <!-- GELİŞTİRME 6: DEPO STOK İLERLEME ÇUBUKLARI & SDS/TDS TEKNİK BELGE TAMLIK DENETİMİ -->
+      <div class="admin-two-col" style="margin-top:1.5rem;">
+        <div class="card" style="padding:1.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+            <div>
+              <h3 style="margin:0;">🛢️ Depo Stok Seviyesi & Kritik Eşik Çubukları</h3>
+              <p class="kpi-sub">Başlangıç sayımı (<code>INITIAL_COUNT</code>) yapılmış gerçek stok kalemleri.</p>
+            </div>
+            <button type="button" class="btn btn-secondary btn-xs" data-jump="${jump({ module: 'orders', label: 'Depo stok hareketleri', anchor: '#inventory-table-anchor' })}">Tüm Stok →</button>
+          </div>
+          ${compliance.initializedItems.length === 0 ? `
+            <div class="empty-state-box">
+              <p>Henüz başlangıç sayımı girilmiş stok kartı bulunmuyor. Sipariş & Stok modülünden gerçek sayım girebilirsiniz.</p>
+            </div>
+          ` : `
+            <div class="real-bar-chart">
+              ${compliance.initializedItems.slice(0, 8).map((stk) => `
+                <button type="button" class="bar-chart-row" data-jump="${jump({ module: 'orders', label: `Stok kartı: ${stk.sku}`, ordersListFocus: stk.isCritical ? 'critical' : 'all', anchor: '#inventory-table-anchor' })}">
+                  <span class="bar-chart-label">
+                    <strong>${escapeHtml(stk.sku)}</strong> — ${escapeHtml(stk.name)}
+                  </span>
+                  <div class="bar-chart-track">
+                    <div class="bar-chart-fill" style="width:${Math.min(100, stk.ratioPct)}%;background:${stk.isCritical ? '#dc2626' : '#059669'};"></div>
+                  </div>
+                  <strong class="bar-chart-val" style="color:${stk.isCritical ? '#dc2626' : 'var(--text-primary)'};">
+                    ${stk.current} / ${stk.minThreshold} ${escapeHtml(stk.unit || '')}
+                  </strong>
+                </button>
+              `).join('')}
+            </div>
+          `}
+        </div>
+
+        <div class="card" style="padding:1.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+            <div>
+              <h3 style="margin:0;">📑 SDS / GBF & TDS Teknik Belge Tamlık Denetimi</h3>
+              <p class="kpi-sub">Yayındaki ürünlerin (<code>${compliance.publishedCount}</code>) teknik doküman eşleşme durumu.</p>
+            </div>
+            <span class="badge ${compliance.productsMissingDocs.length === 0 ? 'badge-teal' : 'badge-amber'}">
+              ${compliance.documentedCount} / ${compliance.publishedCount} Belgeli
+            </span>
+          </div>
+          ${compliance.publishedCount === 0 ? `
+            <div class="empty-state-box">
+              <p>Henüz yayımlanmış ürün kartı bulunmuyor.</p>
+            </div>
+          ` : compliance.productsMissingDocs.length === 0 ? `
+            <div class="empty-state-box">
+              <p>✅ Yayındaki tüm ürünlerin SDS/GBF veya TDS teknik belgesi sistemde kayıtlıdır.</p>
+            </div>
+          ` : `
+            <p class="kpi-sub" style="margin-bottom:0.6rem;">Aşağıdaki yayındaki ürünler için henüz SDS/GBF veya TDS belgesi eşleştirilmemiştir:</p>
+            <div class="recent-activity-list">
+              ${compliance.productsMissingDocs.map((prd) => `
+                <button type="button" class="dash-work-item" data-jump="${jump({ module: 'documents', label: `${prd.name} için SDS/TDS Belgesi Yükle` })}">
+                  <span><strong>${escapeHtml(prd.name)}</strong><br/><span class="kpi-sub">${escapeHtml(prd.category || '')} ${prd.casNumber ? `· CAS: ${escapeHtml(prd.casNumber)}` : ''}</span></span>
+                  <span class="badge badge-amber">+ Belge Yükle</span>
+                </button>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      </div>
+
+      <div class="dash-work-grid" style="margin-top:1.5rem;">
         ${showSalesWork ? `
           <div class="card" style="padding:1.25rem;">
             <h3>Bugünkü iş — Satış</h3>
@@ -927,7 +1443,7 @@ export function renderAdminPage(container, navigate) {
         renderSafeHtml(regionEl, `
           <div class="empty-state-box">
             <h4>${dashboardInboxSearch ? 'Arama Kriterine Uygun Mesaj veya Talep Bulunamadı' : 'Bu Sekmede Kayıtlı Form Mesajı veya Sipariş Talebi Yok'}</h4>
-            <p>Ziyaretçiler <code>/iletisim</code> veya <code>/teklif-al</code> sayfalarından form gönderdiğinde sayfa yenilenmesine gerek kalmadan anında burada listelenir.</p>
+            <p>Ziyaretçiler Medipure cihaz kataloğundan, kimyasal ürün kartlarından, <code>/iletisim</code> veya <code>/teklif-al</code> sayfalarından form gönderdiğinde sayfa yenilenmesine gerek kalmadan anında burada listelenir.</p>
           </div>
         `);
         return;
@@ -937,6 +1453,7 @@ export function renderAdminPage(container, navigate) {
         <div class="dash-inbox-grid">
           ${visibleInboxItems.slice(0, 24).map((req) => {
             const chMeta = getInboundChannelMeta(req);
+            const sla = computeSlaBadge(req, nowMs);
             const dateStr = (req.createdAtIso || '').replace('T', ' ').slice(0, 16) || 'Tarih belirtilmedi';
             const cleanPhoneDigits = String(req.phone || '').replace(/\D/g, '');
             const waPhone = cleanPhoneDigits.length >= 10
@@ -947,9 +1464,12 @@ export function renderAdminPage(container, navigate) {
             return `
               <div class="card dash-inbox-card">
                 <div>
-                  <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.55rem;">
-                    <span class="badge ${escapeAttr(chMeta.badgeClass)}">${escapeHtml(chMeta.label)}</span>
-                    <span style="font-size:0.78rem;color:var(--text-muted);font-weight:600;">🕒 ${escapeHtml(dateStr)}</span>
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.55rem;">
+                    <div style="display:flex;gap:0.35rem;flex-wrap:wrap;align-items:center;">
+                      <span class="badge ${escapeAttr(chMeta.badgeClass)}">${escapeHtml(chMeta.label)}</span>
+                      <span class="badge ${escapeAttr(sla.badgeClass)}">${escapeHtml(sla.label)}</span>
+                    </div>
+                    <span style="font-size:0.76rem;color:var(--text-muted);font-weight:600;">🕒 ${escapeHtml(dateStr)}</span>
                   </div>
 
                   <div style="margin-bottom:0.45rem;">
@@ -985,6 +1505,11 @@ export function renderAdminPage(container, navigate) {
                     </select>
                   </div>
                   <div style="display:flex;gap:0.35rem;flex-wrap:wrap;">
+                    ${cleanPhoneDigits.length >= 10 ? `
+                      <a href="tel:${escapeAttr(cleanPhoneDigits)}" class="btn btn-secondary btn-xs" title="Hemen Telefonla Ara">
+                        📞 Ara
+                      </a>
+                    ` : ''}
                     ${waPhone ? `
                       <a href="https://wa.me/${escapeAttr(waPhone)}?text=${encodeURIComponent(`Merhaba ${req.contactName || req.companyName || ''}, Elif Çevre Kimya web sitemiz üzerinden ilettiğiniz "${req.relatedProductOrSystem || 'talebiniz'}" hakkında dönüş yapıyoruz.`)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs">
                         💬 WhatsApp
@@ -995,6 +1520,9 @@ export function renderAdminPage(container, navigate) {
                     </button>
                     <button type="button" class="btn btn-secondary btn-xs dash-prepare-proposal-btn" data-req-id="${escapeAttr(req.id)}">
                       📄 Teklif Hazırla
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-xs dash-draft-invoice-btn" data-req-id="${escapeAttr(req.id)}" title="Bu talebin cari bilgileriyle E-Fatura taslağı aç">
+                      🧾 Fatura Taslağı
                     </button>
                     ${req.stage !== 'Onaylandı' ? `
                       <button type="button" class="btn btn-primary btn-xs dash-convert-order-btn" data-req-id="${escapeAttr(req.id)}">
@@ -1031,7 +1559,7 @@ export function renderAdminPage(container, navigate) {
         });
       });
 
-      // Canlı Gelen Kutusu Aşama Güncelleyici (In-Place Store Güncelleme — 19 koleksiyonu tekrar çekmez)
+      // Canlı Gelen Kutusu Aşama Güncelleyici
       regionEl.querySelectorAll('.dash-inbox-stage').forEach((sel) => {
         sel.addEventListener('change', async () => {
           const reqId = sel.getAttribute('data-req-id');
@@ -1100,6 +1628,30 @@ export function renderAdminPage(container, navigate) {
         });
       });
 
+      // E-Fatura Taslağına Aktar Butonu
+      regionEl.querySelectorAll('.dash-draft-invoice-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const req = store.crmRequests.find((r) => r.id === btn.getAttribute('data-req-id'));
+          if (!req) return;
+          clearDashPreset();
+          pendingInvoiceSeed = {
+            companyName: req.companyName || '',
+            contactEmail: req.email && req.email !== '-' ? req.email : '',
+            description: `${req.relatedProductOrSystem || req.subject || 'Sipariş'} ${req.requestedAmount ? `(${req.requestedAmount})` : ''}`.trim()
+          };
+          accountingTab = 'invoices';
+          dashPreset = {
+            module: 'accounting',
+            label: `${req.companyName || 'Talep'} için E-Fatura taslağı`,
+            accountingTab: 'invoices',
+            anchor: '#accounting-invoices-anchor'
+          };
+          dashScrollOnce = true;
+          activeModule = 'accounting';
+          renderShell();
+        });
+      });
+
       // Tek Tıkla Onaylı Siparişe Aktar Butonu
       regionEl.querySelectorAll('.dash-convert-order-btn').forEach((btn) => {
         btn.addEventListener('click', async () => {
@@ -1137,6 +1689,104 @@ export function renderAdminPage(container, navigate) {
 
     renderSafeHtml(box, html);
     renderInboxRegion();
+
+    // Global Komut & Arama Çubuğu (Ctrl+K)
+    const globalSearchInp = box.querySelector('#dash-global-search-input');
+    const globalSearchRes = box.querySelector('#dash-global-search-results');
+    function renderGlobalSearchResults() {
+      if (!globalSearchRes) return;
+      const q = String(dashboardGlobalQuery || '').trim();
+      if (q.length < 2) {
+        globalSearchRes.style.display = 'none';
+        renderSafeHtml(globalSearchRes, '');
+        return;
+      }
+      const hits = searchGlobalAdminStore(store, q, 16);
+      globalSearchRes.style.display = 'block';
+      if (hits.length === 0) {
+        renderSafeHtml(globalSearchRes, `<div style="padding:0.65rem;font-size:0.84rem;color:var(--text-secondary);">"${escapeHtml(q)}" için kayıt bulunamadı.</div>`);
+        return;
+      }
+      renderSafeHtml(globalSearchRes, hits.map((hit, idx) => `
+        <button type="button" class="dash-work-item" data-global-hit="${idx}" style="width:100%;text-align:left;margin-bottom:0.25rem;">
+          <div>
+            <span class="badge ${escapeAttr(hit.badgeClass)}" style="margin-right:0.35rem;">${escapeHtml(hit.type)}</span>
+            <strong>${escapeHtml(hit.title)}</strong>
+            <div class="kpi-sub">${escapeHtml(hit.subtitle)}</div>
+          </div>
+          <span style="font-size:0.78rem;color:var(--accent-teal);font-weight:700;">Aç →</span>
+        </button>
+      `).join(''));
+      globalSearchRes.querySelectorAll('[data-global-hit]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const hit = hits[Number(btn.getAttribute('data-global-hit'))];
+          if (hit?.preset) {
+            dashboardGlobalQuery = '';
+            applyDashPreset(hit.preset);
+          }
+        });
+      });
+    }
+
+    globalSearchInp?.addEventListener('input', (e) => {
+      dashboardGlobalQuery = e.target.value;
+      renderGlobalSearchResults();
+    });
+    globalSearchInp?.addEventListener('focus', () => {
+      if (String(dashboardGlobalQuery || '').trim().length >= 2) renderGlobalSearchResults();
+    });
+    if (String(dashboardGlobalQuery || '').trim().length >= 2) {
+      renderGlobalSearchResults();
+    }
+
+    // Faturası Kesilmemiş Siparişten Tek Tıkla Fatura Formuna Geçiş
+    box.querySelectorAll('.dash-bill-order-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const orderId = btn.getAttribute('data-order-id');
+        if (!orderId) return;
+        clearDashPreset();
+        pendingInvoiceSeed = { orderId };
+        accountingTab = 'invoices';
+        dashPreset = {
+          module: 'accounting',
+          label: 'Seçilen sipariş için E-Fatura oluştur',
+          accountingTab: 'invoices',
+          anchor: '#accounting-invoices-anchor'
+        };
+        dashScrollOnce = true;
+        activeModule = 'accounting';
+        renderShell();
+      });
+    });
+
+    // Excel/CSV ve A4 Yönetici Özeti Butonları
+    const execPayload = () => ({
+      periodLabel,
+      kpis: {
+        orderAndQuoteCount: orderAndQuoteInbox.length,
+        contactCount: contactAndCallbackInbox.length,
+        activeProposalsCount: activeProposals.length,
+        confirmedOrdersCount: confirmedOrders.length,
+        totalQuoteVolumeTry,
+        totalApprovedOrdersTry,
+        salesInvoicesTry,
+        purchaseInvoicesTry
+      },
+      cashFlow,
+      categories,
+      topCities,
+      unbilledOrders: reconciliation.unbilledOrders,
+      recentRequests: crmList
+    });
+
+    box.querySelector('#dash-export-csv-btn')?.addEventListener('click', () => {
+      downloadDashboardExecutiveCsv(execPayload());
+      showNotification(`Dashboard dönem özeti (${periodLabel}) CSV/Excel olarak indirildi.`, 'success');
+    });
+
+    box.querySelector('#dash-print-exec-btn')?.addEventListener('click', () => {
+      openDashboardExecutivePrintModal(execPayload());
+    });
 
     box.querySelectorAll('[data-jump]').forEach((el) => {
       el.addEventListener('click', () => {
@@ -4442,6 +5092,23 @@ export function renderAdminPage(container, navigate) {
         updateLiveInvoicePreview();
       });
 
+      if (pendingInvoiceSeed) {
+        const seed = pendingInvoiceSeed;
+        pendingInvoiceSeed = null;
+        if (seed.orderId && ordSelect) {
+          ordSelect.value = seed.orderId;
+          ordSelect.dispatchEvent(new Event('change'));
+        } else {
+          const compEl = invForm.querySelector('#acc-inv-company');
+          const emailEl = invForm.querySelector('#acc-inv-email');
+          const descEl = invForm.querySelector('#acc-inv-desc');
+          if (compEl && seed.companyName) compEl.value = seed.companyName;
+          if (emailEl && seed.contactEmail) emailEl.value = seed.contactEmail;
+          if (descEl && seed.description) descEl.value = seed.description;
+          updateLiveInvoicePreview();
+        }
+      }
+
       invForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const fd = new FormData(invForm);
@@ -5011,6 +5678,7 @@ export function renderAdminPage(container, navigate) {
       unsubscribeInbox();
       unsubscribeInbox = null;
     }
+    liveRenderScheduler.cancel();
     if (user && profile) {
       await refreshStoreAndRender();
       let knownCount = Array.isArray(store?.crmRequests) ? store.crmRequests.length : 0;
@@ -5044,16 +5712,28 @@ export function renderAdminPage(container, navigate) {
           );
         }
         knownCount = store.crmRequests.length;
-        if (activeModule === 'dashboard' || activeModule === 'crm') {
-          const activeEl = document.activeElement;
-          const isEditingFormField = activeEl && container.contains(activeEl) && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeEl.tagName);
-          if (!isEditingFormField) {
-            renderShell();
-          }
-        }
+        liveRenderScheduler.schedule();
       });
     } else {
       renderAuthScreen();
+    }
+  });
+
+  // Global Komut & Arama Kısayolu (Ctrl+K / Cmd+K)
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && String(e.key || '').toLowerCase() === 'k') {
+      if (!document.body.contains(container) || !currentUser || !store) return;
+      e.preventDefault();
+      if (activeModule !== 'dashboard') {
+        clearDashPreset();
+        activeModule = 'dashboard';
+        renderShell();
+      }
+      const inp = container.querySelector('#dash-global-search-input');
+      if (inp) {
+        inp.focus();
+        inp.select();
+      }
     }
   });
 }
