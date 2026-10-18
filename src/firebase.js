@@ -386,16 +386,16 @@ export async function createOrUpdateCrmRequest(requestData, actor) {
     }
 
     const updates = {
-      companyName: String(requestData.companyName || prev.companyName).trim(),
-      contactName: String(requestData.contactName || prev.contactName).trim(),
-      phone: String(requestData.phone || prev.phone).trim(),
-      email: String(requestData.email || prev.email).trim(),
-      cityCountry: String(requestData.cityCountry ?? prev.cityCountry).trim(),
-      requestType: String(requestData.requestType || prev.requestType),
-      relatedProductOrSystem: String(requestData.relatedProductOrSystem ?? prev.relatedProductOrSystem).trim(),
-      description: String(requestData.description ?? prev.description).trim(),
-      assignedStaff: String(requestData.assignedStaff ?? prev.assignedStaff).trim(),
-      followUpDate: String(requestData.followUpDate ?? prev.followUpDate).trim(),
+      companyName: String(requestData.companyName || prev.companyName || '').trim(),
+      contactName: optStr(requestData.contactName ?? prev.contactName),
+      phone: optStr(requestData.phone ?? prev.phone),
+      email: optStr(requestData.email ?? prev.email),
+      cityCountry: optStr(requestData.cityCountry ?? prev.cityCountry) || 'Adana / Türkiye',
+      requestType: String(requestData.requestType || prev.requestType || 'product_quote'),
+      relatedProductOrSystem: optStr(requestData.relatedProductOrSystem ?? prev.relatedProductOrSystem),
+      description: optStr(requestData.description ?? prev.description),
+      assignedStaff: optStr(requestData.assignedStaff ?? prev.assignedStaff),
+      followUpDate: optStr(requestData.followUpDate ?? prev.followUpDate),
       stage: newStage,
       resolutionStatus: newRes,
       stageHistory: history,
@@ -407,18 +407,20 @@ export async function createOrUpdateCrmRequest(requestData, actor) {
     await writeAuditLog('UPDATE_CRM_REQUEST', 'crmRequests', requestData.id, { stage: newStage, resolutionStatus: newRes }, actor);
     return { id: requestData.id, ...prev, ...updates };
   } else {
+    const companyName = String(requestData.companyName || '').trim();
+    if (!companyName) throw new Error('Firma adı zorunludur.');
     const stage = requestData.stage || 'Yeni Talep';
     const payload = {
-      companyName: String(requestData.companyName || '').trim(),
-      contactName: String(requestData.contactName || '').trim(),
-      phone: String(requestData.phone || '').trim(),
-      email: String(requestData.email || '').trim(),
-      cityCountry: String(requestData.cityCountry || 'Adana').trim(),
+      companyName,
+      contactName: optStr(requestData.contactName) || companyName,
+      phone: optStr(requestData.phone),
+      email: optStr(requestData.email),
+      cityCountry: optStr(requestData.cityCountry) || 'Adana / Türkiye',
       requestType: String(requestData.requestType || 'product_quote'),
-      relatedProductOrSystem: String(requestData.relatedProductOrSystem || '').trim(),
-      description: String(requestData.description || '').trim(),
-      assignedStaff: String(requestData.assignedStaff || actor.displayName || actor.email || '').trim(),
-      followUpDate: String(requestData.followUpDate || '').trim(),
+      relatedProductOrSystem: optStr(requestData.relatedProductOrSystem),
+      description: optStr(requestData.description),
+      assignedStaff: optStr(requestData.assignedStaff || actor.displayName || actor.email),
+      followUpDate: optStr(requestData.followUpDate),
       stage,
       resolutionStatus: requestData.resolutionStatus || 'active',
       kvkkConsent: true,
