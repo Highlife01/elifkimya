@@ -187,6 +187,9 @@ function bindEvents() {
 
   // 10. Hero Çoklu Görsel Seçici (5 Farklı Premium Görsel)
   setupHeroVisualSwitcher();
+
+  // 11. Sektörel Çözümler Kategori Filtresi
+  setupSectorsFilter();
 }
 
 /**
@@ -411,12 +414,36 @@ function setupProductCatalog() {
       const q = e.target.value.toLowerCase().trim();
       itemCards.forEach(card => {
         const name = card.getAttribute('data-product-name') || '';
+        const chem = card.getAttribute('data-active-chem') || '';
         const text = card.textContent.toLowerCase();
-        const match = !q || name.includes(q) || text.includes(q);
+        const match = !q || name.includes(q) || chem.includes(q) || text.includes(q);
         card.style.display = match ? 'flex' : 'none';
       });
     });
   }
+}
+
+/**
+ * Sektörel Çözümler Kategori Filtresi
+ */
+function setupSectorsFilter() {
+  const tabs = document.querySelectorAll('.sector-filter-tab');
+  const cards = document.querySelectorAll('.sector-full-card');
+  if (!tabs.length || !cards.length) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const targetCat = tab.getAttribute('data-sector-cat');
+
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-sector-category');
+        const show = targetCat === 'all' || cardCat === targetCat;
+        card.style.display = show ? 'grid' : 'none';
+      });
+    });
+  });
 }
 
 /**

@@ -1,6 +1,6 @@
 /**
  * Elif Kimya - Ürün ve Hizmet Mimarisi
- * 6 Temel Endüstriyel Kategori ve Teknik Detaylar
+ * 6 Temel Endüstriyel Kategori, Spesifik Fabrika Kimyasalları & Etken Maddeler
  */
 
 export const productCategories = [
@@ -14,38 +14,66 @@ export const productCategories = [
     icon: 'droplets',
     subcategories: [
       {
-        name: 'Korozyon İnhibitörleri',
+        name: 'Korozyon İnhibitörleri (Organik & İnorganik)',
         slug: 'korozyon-inhibitorleri',
-        desc: 'Çelik, bakır ve pirinç alaşımlarında film tabakası oluşturarak metal kaybını ve delinmeleri engelleyen organik/inorganik inhibitörler.',
-        specs: ['pH Çalışma Aralığı: 6.8 - 8.5', 'Dozaj: 30 - 80 ppm', 'Ambalaj: 30 kg Bidon, 1000 kg IBC'],
+        activeChemical: 'HEDP, Toliltriazol (TTA), Benzotriazol (BTA), Çinko Fosfonat',
+        desc: 'Karbon çelik, bakır, pirinç ve paslanmaz alaşımlarda moleküler pasif film tabakası oluşturarak metal kaybını ve delinmeleri engelleyen korozyon inhibitörleri.',
+        specs: [
+          'pH Çalışma Aralığı: 6.8 - 9.0',
+          'Etken Madde: Organik Fosfonat & Azol Karışımı',
+          'Dozaj: 30 - 80 ppm sürekli kontrol',
+          'Ambalaj: 30 kg Bidon, 1000 kg IBC, Dökme Tanker'
+        ],
         tdsReady: true
       },
       {
         name: 'Kireç ve Kışır Önleyiciler (Antiskalantlar)',
         slug: 'kirec-ve-kisir-onleyiciler',
-        desc: 'Kalsiyum karbonat, kalsiyum sülfat ve silika çökmelerini kristal yapısını bozarak engelleyen polimerik formülasyonlar.',
-        specs: ['Etken Madde: Polikarboksilat & Fosfonat', 'Termal Kararlılık: 95°C', 'Ambalaj: 25 kg Bidon, 1000 kg IBC'],
+        activeChemical: 'PBTC (2-Fosfonobütan-1,2,4-trikarboksilik asit), Polikarboksilat, AA/AMPS',
+        desc: 'Kalsiyum karbonat, kalsiyum sülfat ve yüksek silika çökmelerini kristal distorsiyonu mekanizmasıyla engelleyen yüksek termal stabiliteye sahip antiskalantlar.',
+        specs: [
+          'Termal Kararlılık: 110°C reaktör ceket uyumlu',
+          'Silika Toleransı: 250 ppm seviyesine kadar',
+          'Konsantrasyon Döngüsü (COC): 4 - 7 kat artış',
+          'Ambalaj: 30 kg Bidon, 1000 kg IBC'
+        ],
         tdsReady: true
       },
       {
-        name: 'Biyositler ve Dezenfektanlar',
+        name: 'Biyositler ve Mikrobiyolojik Kontrol',
         slug: 'biyositler-ve-dezenfektanlar',
-        desc: 'Legionella pneumophila, yosun, mantar ve biyofilm oluşumuna karşı oksitleyici (klor/brom bazlı) ve oksitleyici olmayan geniş spektrumlu biyositler.',
-        specs: ['Biyofilm Penetrasyonu: Yüksek', 'Şok & Sürekli Dozaj Uyumlu', 'Biyolojik Parçalanabilirlik: Uygun'],
+        activeChemical: 'DBNPA (%20), İzotiyazolin (CMIT/MIT %1.5-3), Glutaraldehit, Stabilize Brom',
+        desc: 'Legionella pneumophila, yosun, mantar, anaerobik kükürt bakterileri ve biyofilm oluşumuna karşı hızlı penetrasyon sağlayan oksitleyici ve oksitleyici olmayan biyositler.',
+        specs: [
+          'DBNPA Hızlı Şok Dozajı: 30-50 ppm (2-4 saatte %99.9 eliminasyon)',
+          'CMIT/MIT Sürekli Koruma: 15-25 ppm',
+          'Biyofilm Dağıtıcı Yüzey Aktifler Entegre',
+          'Biyolojik Parçalanabilirlik: Tam uyumlu'
+        ],
         tdsReady: true
       },
       {
-        name: 'Dispersantlar & Çamur Dağıtıcılar',
+        name: 'Dispersantlar & Biyolojik Çamur Dağıtıcılar',
         slug: 'dispersantlar',
-        desc: 'Sistemde biriken silt, kil ve inorganik tortuları askıda tutarak blöf hattı üzerinden sistemden uzaklaştıran yüzey aktif maddeler.',
-        specs: ['Yüksek Anyonik Yük', 'Askıda Katı Kontrolü', 'Ambalaj: 30 kg Bidon'],
+        activeChemical: 'Yüksek Anyonik Poliakrilat, Non-iyonik Yüzey Aktifler',
+        desc: 'Sistemde biriken silt, kil, demir oksit ve ölü biyokütleyi askıda tutarak blöf hattı üzerinden sistemden uzaklaştıran çamur dağıtıcılar.',
+        specs: [
+          'Askıda Katı Kontrolü: 1000+ ppm tolerans',
+          'Depozit Dağıtma Verimi: %95+',
+          'Ambalaj: 30 kg Bidon, 1000 kg IBC'
+        ],
         tdsReady: true
       },
       {
-        name: 'pH Düzenleyiciler',
+        name: 'pH Düzenleyiciler & Alkalinite Dengeleyiciler',
         slug: 'ph-duzenleyiciler',
-        desc: 'Soğutma suyu Langelier (LSI) ve Ryznar doymuşluk indekslerini optimum aralıkta tutmak için asidik ve bazik dengeleyiciler.',
-        specs: ['Hassas Dozaj Pompası Uyumu', 'Konsantre Formül', 'Güvenli Sevkiyat Sertifikalı'],
+        activeChemical: 'Teknik Dereceli Sülfürik Asit (%98), Sodyum Hidroksit (%48)',
+        desc: 'Soğutma suyu Langelier (LSI) ve Ryznar doymuşluk indekslerini korozyonsuz ve kışırsız nötr aralıkta tutmak için asidik ve bazik dengeleyiciler.',
+        specs: [
+          'Otomatik Dozaj Pompaları ve pH Probları Uyumlu',
+          'Konsantre Formül, Düşük Tüketim',
+          'ADR Sertifikalı Güvenli Sevkiyat'
+        ],
         tdsReady: true
       }
     ]
@@ -62,36 +90,62 @@ export const productCategories = [
       {
         name: 'Reverse Osmosis (RO) Sistemleri',
         slug: 'reverse-osmosis',
+        activeChemical: 'TFC Poliamid Membran, PLC Otomasyon, CIP Ünitesi',
         desc: 'Kuyu suyu, şebeke ve acı suları %99.5 tuz giderme verimiyle yüksek saflıkta proses suyuna dönüştüren endüstriyel ters ozmoz üniteleri.',
-        specs: ['Kapasite: 1 - 100 m³/saat', 'PLC & Dokunmatik Ekran Kontrol', 'CIP Yıkama Entegre'],
+        specs: [
+          'Kapasite: 1 - 250 m³/saat modüler dizayn',
+          'Enerji Geri Kazanım Cihazları (ERD) Entegre',
+          'Otomatik CIP Kimyasal Yıkama İstasyonu',
+          'PLC Dokunmatik Ekran & SCADA Bağlantısı'
+        ],
         tdsReady: true
       },
       {
         name: 'Kum ve Aktif Karbon Filtrasyonu',
         slug: 'kum-ve-aktif-karbon-filtrasyonu',
-        desc: 'Askıda katı maddeleri, bulanıklığı, kloru ve organik kokuyu gidererek membran ve yumuşatma sistemlerini koruyan çok katmanlı filtreler.',
-        specs: ['FRP veya Epoksi Kaplı Karbon Çelik Gövde', 'Otomatik Ters Yıkama Valfleri'],
+        activeChemical: 'Kuvars Kumu, Antrasit, Yüksek İyotlu Hindistan Cevizi Aktif Karbon',
+        desc: 'Askıda katı maddeleri, bulanıklığı, serbest kloru ve organik kokuyu gidererek RO membranlarını ve yumuşatma reçinelerini koruyan çok katmanlı filtreler.',
+        specs: [
+          'FRP veya Epoksi Kaplı Paslanmaz Karbon Çelik Gövde',
+          'Otomatik Pnömatik/Elektrik Aktüatörlü Valfler',
+          'SDI < 3.0 Çıkış Güvencesi'
+        ],
         tdsReady: true
       },
       {
-        name: 'Su Yumuşatma Sistemleri',
+        name: 'Endüstriyel Su Yumuşatma Sistemleri',
         slug: 'su-yumusatma-sistemleri',
-        desc: 'Kalsiyum ve magnezyum iyonlarını sodyum ile yer değiştirerek sıfır sertlikte kazan ve proses suyu sağlayan tandem (kesintisiz) sistemler.',
-        specs: ['Gıda Tipi Katyonik Reçine', 'Zaman veya Debi Kontrollü Otomasyon', 'Tuz Tankı Dahil'],
+        activeChemical: 'Gıda Derecesi Kuvvetli Asidik Katyonik Jel Reçine',
+        desc: 'Kalsiyum ve magnezyum iyonlarını sodyum ile yer değiştirerek sıfır sertlikte (0°dH) kazan besi ve proses suyu sağlayan tandem (kesintisiz) sistemler.',
+        specs: [
+          'Kesintisiz Tandem (Dubleks) Çalışma Prensibi',
+          'Debi veya Sertlik Sensör Kontrollü Otomatik Rejenerasyon',
+          'PE Çözelti Tuz Tankı ve Emiş Düzeneği Dahil'
+        ],
         tdsReady: true
       },
       {
-        name: 'Ultrafiltrasyon (UF)',
+        name: 'Ultrafiltrasyon (UF) Sistemleri',
         slug: 'ultrafiltrasyon',
-        desc: '0.02 mikron gözenek çapıyla bakteri, virüs ve askıda katı maddeleri kimyasalsız ayıran ileri ön arıtma teknolojisi.',
-        specs: ['SDI < 2.5 Çıkış Değeri', 'Yüksek Akı Kararlılığı', 'Modüler Dizayn'],
+        activeChemical: 'PVDF İçi Boş Elyaf (Hollow Fiber) Membran (0.02 µm)',
+        desc: 'Askıda katı maddeleri, kolloidal silikayı, bakteri ve virüsleri kimyasalsız ayıran ileri ön arıtma teknolojisi.',
+        specs: [
+          'SDI < 2.0 Çıkış Değeri (RO Membran Ömrünü 2 Kat Artırır)',
+          'Ters Yıkama ve CEB (Kimyasal Destekli Yıkama) Otomasyonu',
+          'Kompakt Paslanmaz Çelik Şase'
+        ],
         tdsReady: true
       },
       {
-        name: 'Deiyonizasyon Sistemleri',
+        name: 'Deiyonizasyon (Demineralizasyon) Kolonları',
         slug: 'deiyonizasyon-sistemleri',
-        desc: 'Katyonik ve anyonik reçine kolonları üzerinden iletkenliği < 1 µS/cm seviyesine düşüren klasik kimyasal rejenerasyonlu sistemler.',
-        specs: ['Asit/Kostik Rejenerasyon İstasyonu', 'Dijital İletkenlik Monitörü'],
+        activeChemical: 'Kuvvetli Asidik Katyonik & Kuvvetli Bazik Anyonik Reçine',
+        desc: 'Katyonik ve anyonik reçine kolonları üzerinden iletkenliği < 1 µS/cm seviyesine düşüren klasik asit/kostik rejenerasyonlu sistemler.',
+        specs: [
+          'Asit (HCl) ve Kostik (NaOH) Dozaj İstasyonu Entegre',
+          'Dijital İletkenlik Monitörü & Otomatik Yıkama Valfi',
+          'Dayanıklı Lastik/Kauçuk Kaplı Çelik Kolonlar'
+        ],
         tdsReady: true
       }
     ]
@@ -106,38 +160,50 @@ export const productCategories = [
     icon: 'activity',
     subcategories: [
       {
-        name: 'Laboratuvar Saf Su Sistemleri',
+        name: 'Laboratuvar Saf Su Sistemleri (Tip I, II, III)',
         slug: 'laboratuvar-saf-su-sistemleri',
-        desc: 'HPLC, GC-MS, ICP-MS ve hücre kültürü çalışmaları için Tip I, Tip II ve Tip III saflık standartlarını sağlayan kompakt tezgah üstü cihazlar.',
-        specs: ['Direnç: 18.2 MΩ·cm @ 25°C', 'TOC < 2 ppb', 'Endotoksin: < 0.001 EU/ml'],
+        activeChemical: '185/254 nm Çift Dalga Boylu UV, 0.05 µm Ultrafiltre, Nükleer Reçine',
+        desc: 'HPLC, GC-MS, ICP-MS ve hücre kültürü çalışmaları için Tip I (Ultra Saf), Tip II (Analitik) ve Tip III saflık standartlarını sağlayan tezgah üstü cihazlar.',
+        specs: [
+          'Direnç: 18.2 MΩ·cm @ 25°C',
+          'TOC (Toplam Organik Karbon): < 2 ppb',
+          'Endotoksin: < 0.001 EU/ml, Bakteri: < 0.01 CFU/ml'
+        ],
         tdsReady: true
       },
       {
-        name: 'Endüstriyel Saf Su Üretimi',
-        slug: 'endustriyel-saf-su-uretimi',
-        desc: 'Elektronik, solar panel, cam yıkama ve akü üretimi için saatte onlarca ton yüksek saflıkta su üreten merkezi tesisler.',
-        specs: ['Sürekli Online Kalite Takibi', 'Paslanmaz Çelik 316L Borulama Opsiyonu'],
-        tdsReady: true
-      },
-      {
-        name: 'Tip I, II ve III Saf Su Çözümleri',
-        slug: 'tip-1-2-3-saf-su',
-        desc: 'ASTM D1193, ISO 3696 ve CLSI standartlarına uygun kademelendirilmiş saflık modülleri ve dağıtım döngüleri.',
-        specs: ['Tip I (Ultra Saf), Tip II (Analitik), Tip III (Genel Laboratuvar/Otoklav)'],
-        tdsReady: true
-      },
-      {
-        name: 'EDI (Elektro-deiyonizasyon) Sistemleri',
+        name: 'Endüstriyel EDI (Elektro-deiyonizasyon) Sistemleri',
         slug: 'edi-sistemleri',
-        desc: 'Kimyasal rejenerasyona ihtiyaç duymadan, elektrik akımı ve iyon seçici membranlarla sürekli saf su üreten çevre dostu teknoloji.',
-        specs: ['İletkenlik: < 0.1 µS/cm', 'Sıfır Asit/Kostik Atığı', 'Kesintisiz Çalışma'],
+        activeChemical: 'İyon Değiştirici Membran Paketleri, DC Elektrik Alanı',
+        desc: 'Kimyasal rejenerasyona ihtiyaç duymadan, elektrik akımıyla sürekli saf su üreten, sıfır asit/kostik atıklı çevre dostu teknoloji.',
+        specs: [
+          'Çıkış İletkenliği: < 0.06 - 0.1 µS/cm',
+          'Silika Giderimi: > %99.5',
+          'Rejenerasyon Kimyasalı Sıfır — Kesintisiz 7/24 Üretim'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Endüstriyel Saf Su Üretim Tesisleri',
+        slug: 'endustriyel-saf-su-uretimi',
+        activeChemical: 'Çift Geçişli RO (Double Pass) + EDI + Degazör',
+        desc: 'Cam yıkama, solar panel, akü ve kimyasal sentez tesisleri için saatte onlarca ton yüksek saflıkta su üreten merkezi tesisler.',
+        specs: [
+          'Kapasite: 5 - 100 m³/saat',
+          'Hijyenik 316L Paslanmaz Çelik Borulama & Orbital Kaynak',
+          'Sürekli Online TOC ve İletkenlik Doğrulaması'
+        ],
         tdsReady: true
       },
       {
         name: 'Saf Su Cihazları ve Sarf Malzemeleri',
         slug: 'saf-su-sarf-malzemeleri',
-        desc: 'Nükleer kalite karışık yatak (mixed-bed) reçineleri, UV lambalar (185/254 nm), ultrafiltrasyon filtreleri ve kalibrasyon solüsyonları.',
-        specs: ['Orijinal Yedek Parça', 'Hızlı Kargo & Teknik Değişim Desteği'],
+        activeChemical: 'Nükleer Sınıf Mixed-Bed Reçine, DOW/DuPont Membranlar',
+        desc: 'Karışık yatak reçineleri, UV lambalar, 0.2 mikron steril kapsül filtreler ve NIST izlenebilir kalibrasyon solüsyonları.',
+        specs: [
+          'Orijinal Yedek Parça Garantisi',
+          'Hızlı Kargo & Yerinde Teknik Servis Desteği'
+        ],
         tdsReady: true
       }
     ]
@@ -152,31 +218,50 @@ export const productCategories = [
     icon: 'flame',
     subcategories: [
       {
-        name: 'Oksijen Tutucular',
+        name: 'Oksijen Tutucular (Uçucu & İnorganik)',
         slug: 'oksijen-tutucular',
-        desc: 'Kazan besi suyundaki çözünmüş oksijeni bağlayarak çukurlaşma (pitting) korozyonunu önleyen DEHA, karbonhidrazid ve katalizli sülfit çözümleri.',
-        specs: ['Yüksek Sıcaklık Reaksiyon Hızı', 'Uçucu veya Uçucu Olmayan Formüller', 'Gıda Uygunluk Seçenekleri'],
+        activeChemical: 'DEHA (Dietilhidroksilamin), Karbonhidrazid, Katalizli Sodyum Sülfit',
+        desc: 'Kazan besi suyundaki çözünmüş oksijeni bağlayarak çukurlaşma (pitting) korozyonunu önleyen, magnetit koruyucu tabaka oluşturan oksijen tutucular.',
+        specs: [
+          'Tepkime Süresi: Anlık oksijen eliminasyonu (< 5 ppb kalıntı)',
+          'DEHA: Katı madde bırakmaz, buharla taşınarak kondensi korur',
+          'FDA / USDA Gıda Uygunluk Seçenekleri'
+        ],
         tdsReady: true
       },
       {
-        name: 'Korozyon ve Tortu Önleyiciler',
+        name: 'Korozyon ve Kışır Önleyiciler (All-in-One)',
         slug: 'korozyon-ve-tortu-onleyiciler',
-        desc: 'Kazan boruları üzerinde ısı transferini engelleyen kireç tabakasını önleyen polimerik ve fosfat bazlı all-in-one şartlandırıcılar.',
-        specs: ['Isı İletim Verimi Artışı: %5-12 Yakıt Tasarrufu', 'Blöf Sıklığını Optimize Eder'],
+        activeChemical: 'Polikarboksilat, Organik Fosfonat, Sodyum Polifosfat',
+        desc: 'Kazan boruları üzerinde ısı transferini engelleyen kireç tabakasını önleyen, 1 mm kışırın yarattığı %8-12 yakıt kaybını ortadan kaldıran şartlandırıcılar.',
+        specs: [
+          'Basınç Aralığı: 1 - 65 bar buhar kazanları',
+          'Blöf Sıklığını %30-40 Azaltarak Enerji ve Su Tasarrufu',
+          'TS EN 12952 / 12953 Standartlarına Tam Uyum'
+        ],
         tdsReady: true
       },
       {
         name: 'Kondens Hattı Koruma Kimyasalları',
         slug: 'kondens-hatti-koruma',
-        desc: 'Kondens hatlarındaki karbonik asit korozyonunu engelleyen nötralize edici ve film yapıcı uçucu amin karışımları.',
-        specs: ['Buharla Birlikte Taşınır', 'Kondens Dönüş Suyunun Demir Oranını Düşürür'],
+        activeChemical: 'Nötralize Edici Uçucu Aminler (Morfolin, Sikloheksilamin), Film Yapıcı Oktadesilamin',
+        desc: 'Kondens hatlarındaki karbonik asit korozyonunu engelleyen, dönüş suyunun demir oranını düşürerek kazana çamur taşınmasını önleyen amin karışımları.',
+        specs: [
+          'Buharla Birlikte Taşınır, Tüm Kondens Şebekesini Korur',
+          'Kondens pH Seviyesi: 8.5 - 9.2 aralığında sabit tutulur',
+          'Boru Delinmelerini ve Hat Yenileme Maliyetlerini Sıfırlar'
+        ],
         tdsReady: true
       },
       {
-        name: 'Kazan Suyu Şartlandırma Ürünleri',
+        name: 'Kazan Suyu Köpük Önleyiciler & Çamur Şartlandırıcılar',
         slug: 'kazan-sartlandirma-urunleri',
-        desc: 'Alkalinite düzenleyiciler, çamur şartlandırıcılar ve ani köpüklenmeyi önleyen antifoam katkıları.',
-        specs: ['Düşük ve Yüksek Basınçlı Kazan Uyumlu', 'TS EN 12952 / 12953 Standartlarına Uygun'],
+        activeChemical: 'Polieter Bazlı Antifoam, Sentetik Polimerik Çamur Dispersantı',
+        desc: 'Kazan suyunun aniden köpürüp buhar hattına su taşımasını (priming/carryover) engelleyen ve çamuru akışkan tutarak blöfle atılmasını sağlayan formüller.',
+        specs: [
+          'Buhar Saflığını Korur, Türbin ve Vana Aşınmasını Önler',
+          'Gıda Kodeksine Uygun Konsantre Formül'
+        ],
         tdsReady: true
       }
     ]
@@ -193,36 +278,60 @@ export const productCategories = [
       {
         name: 'Koagülantlar (İnorganik & Organik)',
         slug: 'koagulantlar',
-        desc: 'Poli Alüminyum Klorür (PAC), Demir III Klorür, Alüminyum Sülfat ve organik koagülantlarla hızlı flok oluşumu ve askıda katı çöktürme.',
-        specs: ['Geniş pH Aralığında Yüksek Verim', 'Hızlı Çökme Hızı', 'Düşük Çamur Hacmi'],
+        activeChemical: 'Poli Alüminyum Klorür (PAC %30), Demir III Klorür (%40), Alüminyum Sülfat',
+        desc: 'Atık sudaki askıda katı maddeleri (AKM) ve kolloidleri nötralize ederek hızlı mikro-flok oluşumu sağlayan yüksek konsantrasyonlu koagülantlar.',
+        specs: [
+          'PAC: Geniş pH toleransı (5.5 - 9.0), düşük çamur üretimi',
+          'Demir III Klorür: Fosfat ve H2S koku gideriminde maksimum verim',
+          'Ambalaj: 30 kg Bidon, 1000 kg IBC, 25 Ton Dökme Tanker'
+        ],
         tdsReady: true
       },
       {
-        name: 'Anyonik ve Katyonik Polimerler',
-        slug: 'anyonik-ve-katyonik-polimerler',
-        desc: 'Yüksek molekül ağırlıklı toz ve emülsiyon tipi polielektrolitler; flokülasyonu hızlandırır ve filtre pres verimini maksimize eder.',
-        specs: ['Katyonik & Anyonik Çeşitler', 'Ultra Yüksek Zincir Uzunluğu', 'Düşük Tüketim Oranı'],
+        name: 'Anyonik Polielektrolitler (A-PAM)',
+        slug: 'anyonik-polimerler',
+        activeChemical: 'Anyonik Poliakrilamid (MW: 16 - 24 Milyon Dalton, İntrinsik Viskozite > 16 dl/g)',
+        desc: 'Maden, demir-çelik haddehane tufal çukurları, kum yıkama ve kimyasal arıtma lamelli çökelticilerinde anında dev flok oluşturan toz ve emülsiyon polimerler.',
+        specs: [
+          'Molekül Ağırlığı: Ultra yüksek 24M Dalton',
+          'Çökme Hızı: < 30 saniye içinde berrak faz ayrımı',
+          'Tüketim: 0.8 - 2.5 ppm ultra düşük dozaj'
+        ],
         tdsReady: true
       },
       {
-        name: 'Flokülantlar & Çöktürücüler',
-        slug: 'flokulantlar',
-        desc: 'Biyolojik ve kimyasal arıtma çıkışlarında askıda katı maddelerin lamelli çökelticilerde hızlı çökmesini sağlayan özel formüller.',
-        specs: ['Berrak Deşarj Suyu Eldesi', 'KOİ ve AKM İndirgeme'],
+        name: 'Katyonik Polielektrolitler (C-PAM)',
+        slug: 'katyonik-polimerler',
+        activeChemical: 'Katyonik Poliakrilamid (Yük Yoğunluğu: %20 - %80, Toz ve Emülsiyon)',
+        desc: 'Filtre pres, belt pres ve dekantör santrifüjlerde biyolojik ve kimyasal çamurların susuzlaştırılmasını sağlayan yüksek katyonik yüklü polimerler.',
+        specs: [
+          'Kek Kuruluğu Artışı: %25 - 38 kuru madde oranı',
+          'Çamur Bertaraf Maliyetinde %40 Tasarruf',
+          'Berrak Süzüntü (Filtrat) Kalitesi'
+        ],
         tdsReady: true
       },
       {
-        name: 'Renk ve Ağır Metal Giderim Ürünleri',
+        name: 'Renk Giderici Polimerler & Ağır Metal Çöktürücüler',
         slug: 'renk-ve-agir-metal-giderimi',
-        desc: 'Tekstil boyahane atık sularında inatçı azo boyaları ve kaplama banyolarındaki ağır metalleri (Cr, Ni, Zn, Cu) bağlayıp çöktüren polimerik bağlayıcılar.',
-        specs: ['%98+ Renk Giderme Verimi', 'Kompleks Ağır Metalleri Bağlama'],
+        activeChemical: 'Dicyandiamide-Formaldehit Reçinesi, Sodyum Dimetilditiyokarbamat (DTC)',
+        desc: 'Tekstil boyahane atık sularında reaktif ve dispers azo boyalarını parçalayan; kaplama sularındaki serbest ve kompleks ağır metalleri (Cr, Ni, Zn, Cu) bağlayıp çöktüren ürünler.',
+        specs: [
+          'Renk Giderme Verimi: %98+ (Pt-Co standartlarında berraklık)',
+          'Ağır Metal Sınırı: < 0.1 mg/L deşarj garantisi',
+          'Şelatlı Metallere Karşı Üstün Bağlama Kapasitesi'
+        ],
         tdsReady: true
       },
       {
-        name: 'Çamur Susuzlaştırma Kimyasalları',
-        slug: 'camur-susuzlastirma',
-        desc: 'Filtre pres, belt pres ve santrifüj dekanterlerde çamur kek kuruluğunu (% kuru madde oranını) artıran kondisyoner kimyasallar.',
-        specs: ['Kek Kuruluğu Artışı', 'Daha Düşük Bertaraf Maliyeti'],
+        name: 'Koku Gidericiler & Biyolojik Arıtma Besinleri',
+        slug: 'koku-ve-besin-kimyasallari',
+        activeChemical: 'Kalsiyum Nitrat Çözeltisi, Üre, Diamonyum Fosfat (DAP), Enzimler',
+        desc: 'Atık su terfi merkezleri ve çamur havuzlarında H2S koku kontrolü sağlayan nitrat bazlı ürünler ile biyolojik arıtmada KOİ/N/P dengesini kuran besin çözeltileri.',
+        specs: [
+          'H2S Gazını Kaynağında Yok Eder, Korozyonu Önler',
+          'Bakteri Popülasyonunu Canlandırır, Çamur İndeksini Düşürür'
+        ],
         tdsReady: true
       }
     ]
@@ -231,44 +340,110 @@ export const productCategories = [
     id: 'fabrika-ve-proses-kimyasallari',
     code: '06',
     title: 'Fabrika ve Proses Kimyasalları',
-    shortDesc: 'Üretim hatlarının hijyeni, membran temizliği (CIP), yüzey hazırlama ve tesise özel formüle edilen teknik kimyasal tedariki.',
-    tag: 'Proses & Üretim Hijyeni',
-    badge: 'Tesis Spesifik',
+    shortDesc: 'Ağır sanayi, kağıt fabrikaları, deterjan sülfonasyon hatları, Şişecam cam hatları, haddaneler ve kalsit mikronizasyon tesislerine özel proses kimyasalları.',
+    tag: 'Proses & Ağır Sanayi Formülasyonları',
+    badge: 'Tesis & Sektör Spesifik',
     icon: 'shield-check',
     subcategories: [
       {
-        name: 'Endüstriyel Temizlik Kimyasalları',
-        slug: 'endustriyel-temizlik-kimyasallari',
-        desc: 'Ağır sanayi, makine ve zeminler için solvent bazlı veya su bazlı ağır yağ sökücüler, alkali ve asidik endüstriyel yıkayıcılar.',
-        specs: ['Yüksek Yağ Çözme Gücü', 'Metal Yüzeylere Zarar Vermeyen Korozyon İnhibitörlü Yapı'],
+        name: 'Kağıt Fabrikası Proses Kimyasalları',
+        slug: 'kagit-fabrikasi-proses-kimyasallari',
+        activeChemical: 'C-PAM Retansiyon Ajanı, Silikonsuz Yağ Alkolü (C16-C22), PAE Reçinesi, DBNPA',
+        desc: 'Oluklu mukavva, ambalaj kağıdı ve temizlik kağıdı üretiminde su tutma ve drenajı hızlandıran C-PAM, kağıtta leke bırakmayan silikonsuz köpük kesici, keçe temizleyici ve PAE yaş mukavemet kimyasalları.',
+        specs: [
+          'Retansiyon & Drenaj: C-PAM (MW 8-12M Da) ile beyaz su elyaf kaybı <%0.08',
+          'Köpük Kontrolü: Yağ alkolü bazlı silikonsuz antifoam, vakum düşüşünü engeller',
+          'Slime Kontrolü: DBNPA şok biyositiyle levha kopmalarına son',
+          'Mukavemet: Poliamidoamin-epiklorohidrin (PAE) ile neme dayanıklı karton eldesi'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Deterjan & Sülfonasyon Tesisi Kimyasalları',
+        slug: 'deterjan-ve-sulfonasyon-kimyasallari',
+        activeChemical: 'PBTC + HEDP Fosfonat Karışımı, Sodyum Poliakrilat (MW 4500), Akrilik/Maleik Kopolimer',
+        desc: 'LABSA sülfonasyon reaktörlerinin yüksek ekzotermik ceket soğutma sularında termal kışır önleme, sprey kurutma kulesi gaz yıkama (scrubber) köpük kesicileri ve deterjan bulamacı dispersantları.',
+        specs: [
+          'Reaktör Ceket Şartlandırma: 120°C termal kararlı PBTC kireç/korozyon önleyici',
+          'Scrubber Köpük Kesici: Yüksek sıcaklık ve basınca dayanıklı silikonsuz emülsiyon',
+          'Dispersant: Sodyum Poliakrilat ile zeolit ve inorganik tuzların homojen dağılımı',
+          'CIP Hat Temizliği: EDTA/GLDA takviyeli konsantre kostik yıkayıcılar'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Cam Sanayi & Şişecam Özel Çözümleri',
+        slug: 'cam-sanayi-ve-sisecam-cozumleri',
+        activeChemical: 'Nitritsiz Sodyum Molibdat (Na2MoO4), Sentetik Rodaj Sıvısı, RO Son Durulama Ajanı',
+        desc: 'Float cam kalay banyosu elektrot ceketlerinde ultra düşük iletkenlikli korozyon önleyici, CNC cam rodaj/delme soğutma sıvıları, cam yıkama hatlarında leke ve film bırakmayan RO durulama kimyasalları ve kalıp ayırıcılar.',
+        specs: [
+          'Kalay Banyosu Elektrot Koruması: <0.1 µS/cm saf su uyumlu nitritsiz molibdat inhibitörü',
+          'Cam Rodaj Sıvısı: Cam tozunu hızla çöktüren, taş ömrünü %35 artıran sentetik lubrikant',
+          'Cam Yıkama Durulaması: Buharlaşma lekesi bırakmayan non-iyonik yüzey aktif formül',
+          'Kalıp Ayırıcı: Yüksek sıcaklığa dayanıklı sentetik grafit/ester emülsiyonu'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Demir-Çelik Haddehane & Pickling Kimyasalları',
+        slug: 'haddehane-ve-pickling-kimyasallari',
+        activeChemical: 'Mannich Bazı + Propargil Alkol, Ultra Yüksek Anyonik PAM (24M Da), AA/AMPS Terpolimer',
+        desc: 'Sıcak hadde çeliklerinin %15-20 HCl asitleme (pickling) hatlarında metali koruyup asit sarfiyatını %25 azaltan korozyon inhibitörleri, tufal çukuru (scale pit) ultra flokülantları ve sürekli döküm kalıp koruyucuları.',
+        specs: [
+          'Pickling Korozyon İnhibitörü: %20 HCl banyosunda %98 metal koruma verimi',
+          'Tufal Çukuru Flokülantı: A-PAM 24M Da ile demir tufalını 30 saniyede çöktürme',
+          'Sürekli Döküm Koruma: AA/AMPS polimer ile bakır kalıp kristalizatör soğutması',
+          'Hadde Yağı Ayırıcı: Soğutma suyundaki kaçak yağları ayıran de-emülgatör'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Mikronize Kalsit & Maden Zenginleştirme Dispersantları',
+        slug: 'kalsit-ve-maden-dispersantlari',
+        activeChemical: 'Ultra Saf Sodyum Poliakrilat Homopolimeri (MW: 3.500 - 4.500 Da)',
+        desc: 'Bilyalı değirmenlerde kalsit yaş öğütme viskozitesini düşürerek katı madde oranını %75\'e çıkaran, değirmen elektrik tüketimini %20+ düşüren dispersantlar ve filtre pres maden flokülantları.',
+        specs: [
+          'Katı Madde Yüklemesi: %65\'ten %75\'e viskozite artışı olmaksızın çıkış',
+          'Değirmen Enerji Tasarrufu: %18 - 25 kW/ton azalma',
+          'Sedimentasyon Önleme: Depolama tanklarında 6 ay çökmeyen tiksotropik kararlılık',
+          'Maden Filtre Pres Flokülantı: Berrak süzüntü ve yüksek kuru kek verimi'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Metal Yüzey İşlem & Boya Kabini Kimyasalları',
+        slug: 'metal-yuzey-islem-ve-boya-kabini',
+        activeChemical: 'Demir & Çinko Fosfatlama, Boya Çürütücü (Detackifier) Koagülant, Pasivasyon Ajanları',
+        desc: 'Elektrostatik toz boya öncesi yağ alma, demir/çinko fosfatlama banyoları ile sulu boya kabinlerinde aşırı püsküren boya partiküllerini yapışkansızlaştırıp yüzdüren kimyasal ikilisi.',
+        specs: [
+          'Korozyon Direnci: 500+ saat tuz sisi testi dayanımı',
+          'Boya Çürütücü: Kabin suyundaki solventli/su bazlı boyayı yüzdürüp temiz su döngüsü sağlar',
+          'Alkali ve Asidik Daldırma/Püskürtme Ağır Yağ Sökücüler'
+        ],
         tdsReady: true
       },
       {
         name: 'Membran Temizleme Kimyasalları (CIP)',
         slug: 'membran-temizleme-kimyasallari-cip',
-        desc: 'Ters ozmoz (RO) ve UF membranlarında oluşan inorganik kireç, demir ve organik biyofilm tabakalarını membran ömrünü koruyarak söken asidik ve alkali CIP ürünleri.',
-        specs: ['pH 2 (Asidik) ve pH 11 (Alkali) Formülasyonlar', 'Membran Akısını İlk Günkü Seviyeye Yaklaştırır'],
+        activeChemical: 'Asidik CIP (pH 2 - Fosfonik/Sitrik), Alkali CIP (pH 11 - EDTA/Biyosürfaktan/Enzim)',
+        desc: 'Ters ozmoz (RO) ve ultrafiltrasyon membranlarında biriken inorganik kireç, demir, silika ve biyolojik slime tabakalarını membran yapısını bozmadan çözen temizleyiciler.',
+        specs: [
+          'pH 2 Asidik CIP: Kalsiyum karbonat, demir ve metal oksitleri tamamen temizler',
+          'pH 11 Alkali CIP: Organik biyofilm, yağ ve kolloidal silt tabakasını söker',
+          'Membran Akısını (Flux) İlk Günkü Performansa Döndürür'
+        ],
         tdsReady: true
       },
       {
-        name: 'Proses Yardımcı Kimyasalları',
-        slug: 'proses-yardimci-kimyasallari',
-        desc: 'Gıda, tekstil ve boya sanayinde köpük kontrolü sağlayan silikonlu/silikonsuz antifoam ürünleri, ıslatıcılar ve emülgatörler.',
-        specs: ['Hızlı Köpük Söndürme', 'Uzun Süreli Kalıcılık', 'Gıda Derecesi Seçenekleri'],
-        tdsReady: true
-      },
-      {
-        name: 'Yüzey Temizleme ve Bakım Ürünleri',
-        slug: 'yuzey-temizleme-ve-bakim',
-        desc: 'Pas sökücüler, tufal çözücüler, kaynak sonrası pasivasyon kimyasalları ve elektrostatik toz boya öncesi fosfatlama banyoları.',
-        specs: ['Demir Fosfat & Çinko Fosfat Banyoları', 'Pasivasyon Koruyucular'],
-        tdsReady: true
-      },
-      {
-        name: 'Fabrikaya Özel Kimyasal Tedariki',
-        slug: 'fabrikaya-ozel-kimyasal-tedariki',
-        desc: 'Fabrikanızın sahadaki su analizine ve proses ihtiyaçlarına göre laboratuvarımızda AR-GE edilip üretilen özel kimyasal reçeteleri.',
-        specs: ['Teknik Analiz Raporlu', 'Fason veya Sözleşmeli Düzenli Tedarik'],
+        name: 'Özel Kimyasal Sentez & Fason Formülasyon',
+        slug: 'ozel-kimyasal-sentez-ve-tedarik',
+        activeChemical: 'Tesise Özel AR-GE Reçeteleri, Fason Üretim, Konsinye Tedarik',
+        desc: 'Fabrikanızın sahadaki su analizine, proses sıcaklığına ve metalurjisine göre AR-GE laboratuvarımızda formüle edilen, teknik analiz raporu ve güvenlik bilgi formuyla teslim edilen özel ürünler.',
+        specs: [
+          'Jar-Test ve Korozyon Kuponu Testleriyle Doğrulanmış Reçeteler',
+          'Konsinye Stok ve IoT Seviye Takip Opsiyonu',
+          'ISO 9001 / 14001 / 45001 Belgeli Üretim Güvencesi'
+        ],
         tdsReady: true
       }
     ]

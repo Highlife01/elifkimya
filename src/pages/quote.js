@@ -86,17 +86,23 @@ export function renderQuotePage(params = {}, currentLang = 'tr') {
                 </div>
 
                 <div class="form-group full-width">
-                  <label for="rfqPurpose">Kullanım Amacı & Tesis Alanı <span class="req">*</span></label>
+                  <label for="rfqPurpose">Kullanım Amacı & Tesis / Proses Alanı <span class="req">*</span></label>
                   <select id="rfqPurpose" name="purpose" required>
-                    <option value="">Kullanım noktasını seçiniz...</option>
-                    <option value="Açık Soğutma Kulesi Şartlandırması">Açık Evaporatif Soğutma Kulesi</option>
-                    <option value="Kapalı Devre Chiller / Isıtma">Kapalı Devre Chiller / Isıtma Soğutma</option>
-                    <option value="Buhar Kazanı & Kızgın Su Kazanı">Buhar Kazanı & Kondens Hattı</option>
-                    <option value="Ters Ozmoz (RO) Girişi & Membran">Ters Ozmoz (RO) Besleme ve Koruma</option>
-                    <option value="Laboratuvar / Analitik Saf Su">Laboratuvar / Analitik Tip I-II-III Saf Su</option>
-                    <option value="Endüstriyel Atık Su Deşarjı">Endüstriyel Atık Su Arıtma & Deşarj</option>
-                    <option value="CIP & Fabrika Hijyeni">Membran CIP & Tesis Hijyeni</option>
-                    <option value="Genel Üretim / Hammadde Tedariki">Genel Üretim & Fabrikaya Özel Tedarik</option>
+                    <option value="">Kullanım noktasını / tesis alanını seçiniz...</option>
+                    <option value="Kağıt Fabrikası (Retansiyon C-PAM, Yağ Alkolü Köpük Kesici, Biyosit)">Kağıt Fabrikası (Retansiyon C-PAM, Köpük Kesici, Biyosit)</option>
+                    <option value="Deterjan & Sülfonasyon (LABSA Ceket Soğutma, Dispersant, Scrubber)">Deterjan & Sülfonasyon (LABSA Soğutma, Dispersant, Scrubber)</option>
+                    <option value="Cam Sanayi & Şişecam (Molibdat Elektrot Koruması, Rodaj Sıvısı)">Cam Sanayi & Şişecam (Molibdat Koruması, Rodaj Sıvısı, RO Durulama)</option>
+                    <option value="Demir-Çelik Haddane (Pickling HCl İnhibitörü, Tufal Flokülantı 24M)">Demir-Çelik Haddane (Pickling HCl İnhibitörü, Tufal Flokülantı)</option>
+                    <option value="Kalsit Mikronizasyon & Maden (Sodyum Poliakrilat Islak Öğütme)">Kalsit Mikronizasyon & Maden (Sodyum Poliakrilat Islak Öğütme)</option>
+                    <option value="Metal Yüzey İşlem (Demir/Çinko Fosfatlama, Boya Kabini Çürütücü)">Metal Yüzey İşlem (Demir/Çinko Fosfatlama, Boya Çürütücü)</option>
+                    <option value="Açık Soğutma Kulesi Şartlandırması (Korozyon, Kireç, Biyosit)">Açık Evaporatif Soğutma Kulesi (Korozyon, Kireç, Biyosit)</option>
+                    <option value="Kapalı Devre Chiller / Isıtma Devresi">Kapalı Devre Chiller / Isıtma Devresi</option>
+                    <option value="Buhar Kazanı & Kondens Hattı (DEHA, Amin, All-in-One)">Buhar Kazanı & Kondens Hattı (DEHA, Amin, All-in-One)</option>
+                    <option value="Ters Ozmoz (RO) Girişi & Membran Koruma">Ters Ozmoz (RO) Girişi & Membran Koruma (Antiskalant)</option>
+                    <option value="Laboratuvar / Analitik Saf Su & EDI">Laboratuvar / Analitik Saf Su (Tip I-II-III) & EDI</option>
+                    <option value="Endüstriyel Atık Su Deşarjı & Çamur Susuzlaştırma (PAC, A-PAM, C-PAM)">Endüstriyel Atık Su Deşarjı & Çamur Susuzlaştırma (PAC, PAM)</option>
+                    <option value="Membran CIP & Fabrika Hijyeni (pH 2 Asidik, pH 11 Alkali)">Membran CIP & Fabrika Hijyeni (pH 2 Asidik, pH 11 Alkali)</option>
+                    <option value="Fabrikaya Özel Kimyasal Formülasyonu / AR-GE">Fabrikaya Özel Kimyasal Formülasyonu / AR-GE Sentez</option>
                   </select>
                 </div>
               </div>

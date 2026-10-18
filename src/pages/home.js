@@ -68,8 +68,8 @@ export function renderHomePage(currentLang = 'tr') {
 
           <p class="hero-lede">
             ${isTr 
-              ? 'Fabrikanızın su kalitesini, operasyonel verimliliğini ve teknik sürekliliğini destekleyen ölçülebilir kimyasal ve sistem çözümleri. Soğutma kulesi, kazan suyu, ters ozmoz (RO) ve saf su sistemlerinde Adana merkezli, Türkiye geneli mühendislik partneriniz.'
-              : 'Measurable chemical and engineering solutions ensuring process uptime, energy savings and boiler/cooling preservation. Delivering from Adana to all industrial zones.'}
+              ? 'Kağıt fabrikaları, deterjan sülfonasyon reaktörleri, Şişecam düzcam hatları, çelik haddehaneleri, kalsit mikronizasyon tesisleri, soğutma kuleleri ve ters ozmoz sistemlerinde Adana merkezli, Türkiye geneli endüstriyel kimya ve mühendislik partneriniz.'
+              : 'Factory-tailored chemical solutions and water engineering for paper mills, detergent sulfonation, glass manufacturing, steel rolling mills, calcite processing, cooling towers and boilers across Turkey.'}
           </p>
 
           <div class="hero-actions">
@@ -132,9 +132,16 @@ export function renderHomePage(currentLang = 'tr') {
       <section class="metrics-banner">
         <div class="container metrics-container">
           <div class="metric-item">
+            <span class="metric-num">10</span>
+            <div class="metric-info">
+              <strong>Endüstriyel Sektör</strong>
+              <small>Kağıt, Deterjan, Şişecam, Haddehane, Kalsit, Enerji</small>
+            </div>
+          </div>
+          <div class="metric-item">
             <span class="metric-num">06</span>
             <div class="metric-info">
-              <strong>Endüstriyel Kategori</strong>
+              <strong>Kimya & Sistem Grubu</strong>
               <small>Soğutma, Kazan, RO, Atık Su, Saf Su, Proses</small>
             </div>
           </div>
@@ -146,17 +153,10 @@ export function renderHomePage(currentLang = 'tr') {
             </div>
           </div>
           <div class="metric-item">
-            <span class="metric-num">%99.5</span>
-            <div class="metric-info">
-              <strong>Tuz & Mineral Giderme</strong>
-              <small>Reverse Osmosis & EDI Standartlarında</small>
-            </div>
-          </div>
-          <div class="metric-item">
             <span class="metric-num">24s</span>
             <div class="metric-info">
               <strong>Teknik Yanıt Süresi</strong>
-              <small>Laboratuvar Analizi ve Reçete Desteği</small>
+              <small>Laboratuvar Jar-Test ve Reçete Desteği</small>
             </div>
           </div>
         </div>
@@ -168,10 +168,10 @@ export function renderHomePage(currentLang = 'tr') {
           <div class="section-head">
             <div>
               <p class="kicker">01 / ÇÖZÜM MİMARİSİ</p>
-              <h2>Tek bir ürün değil,<br/><span>doğru proses.</span></h2>
+              <h2>Tek bir ürün değil,<br/><span>doğru kimyasal proses.</span></h2>
             </div>
             <p class="section-intro">
-              Her tesisin su karakteristiği, çalışma basıncı ve metalurjisi benzersizdir. Ham suyu laboratuvarda analiz eder, ihtiyaca tam uyan kimyasal şartlandırma programını kurgularız.
+              Her tesisin su karakteristiği, reaktör sıcaklığı ve metalurjisi benzersizdir. Ham suyu laboratuvarda analiz eder, ihtiyaca tam uyan kimyasal şartlandırma programını kurgularız.
             </p>
           </div>
 
@@ -217,23 +217,26 @@ export function renderHomePage(currentLang = 'tr') {
         <div class="container applications-layout">
           <div class="application-statement">
             <p class="kicker">02 / UYGULAMA ALANLARI</p>
-            <h2>Prosesin nerede<br/><em>çalışıyorsa,</em><br/>orada çözüm var.</h2>
+            <h2>Ağır sanayiden<br/><em>yüksek teknolojiye,</em><br/>tesise özel kimya.</h2>
             <p>
-              Gıda üretiminden çelik haddehanelerine, boyahanelerden enerji santrallerine kadar her sektörün su döngüsünü inceliyor ve deşarj limitlerine uygun mühendislik reçeteleri hazırlıyoruz.
+              Kağıt ambalajdan deterjan sülfonasyonuna, Şişecam düzcam fırınlarından çelik haddehanelerine ve mikronize kalsit tesislerine kadar bölgesel dev sanayi kuruluşlarının proses döngüsünü şartlandırıyoruz.
             </p>
             <div class="statement-points">
               <div class="point-item">
-                <strong>HACCP & Gıda Uygunluğu:</strong> Gıda temaslı buhar ve soğutma sularında toksik olmayan formüller.
+                <strong>Kağıt Fabrikaları:</strong> C-PAM retansiyon polimeri ve yağ alkolü bazlı silikonsuz köpük kesicilerle sıfır elyaf kaybı.
               </div>
               <div class="point-item">
-                <strong>Ağır Sanayi Mukavemeti:</strong> Yüksek ısı ve demir-çelik haddesinde korozyon direnci.
+                <strong>Demir-Çelik Haddaneler:</strong> Mannich bazlı %20 HCl asitleme (pickling) inhibitörü ve 24M Da tufal flokülantı.
               </div>
               <div class="point-item">
-                <strong>Geri Kazanım Oranı:</strong> Tekstil ve kimyada atık suyu prosese geri döndüren membranlar.
+                <strong>Cam Sanayi & Şişecam:</strong> Kalay elektrot ceketleri için nitritsiz molibdat inhibitörü ve sentetik rodaj soğutma sıvıları.
+              </div>
+              <div class="point-item">
+                <strong>Deterjan & Kalsit Tesisleri:</strong> 120°C termal PBTC soğutma şartlandırması ve düşük MW sodyum poliakrilat dispersantı.
               </div>
             </div>
             <a class="button button-primary" href="#/sektorler" data-nav="/sektorler">
-              Sektörel Çözümleri Keşfet →
+              10 Sektörel Çözümü İncele →
             </a>
           </div>
 
@@ -241,13 +244,13 @@ export function renderHomePage(currentLang = 'tr') {
             ${industrialSectors.map((sector, idx) => `
               <div class="sector-preview-card">
                 <div class="sector-head">
-                  <span class="sector-num">0${idx + 1}</span>
+                  <span class="sector-num">${idx < 9 ? '0' + (idx + 1) : idx + 1}</span>
                   <h4>${sector.name}</h4>
                   <span class="sector-badge">${sector.badge}</span>
                 </div>
                 <p>${sector.desc}</p>
                 <div class="sector-chips">
-                  ${sector.recommendedProducts.map(prod => `
+                  ${sector.recommendedProducts.slice(0, 3).map(prod => `
                     <span class="chip">${prod}</span>
                   `).join('')}
                 </div>

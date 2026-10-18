@@ -1,6 +1,8 @@
 {
   "firestore": {
-    "rules": "firestore.rules"
+    "database": "elifkimya",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "hosting": {
     "site": "elifkimya",
@@ -95,9 +97,22 @@
         "headers": [
           {
             "key": "Cache-Control",
+            "key_comment": "Immutable asset caching",
             "value": "public, max-age=31536000, immutable"
           }
         ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/cozumler",
+        "destination": "/urunler",
+        "type": 301
+      },
+      {
+        "source": "/uygulama-alanlari",
+        "destination": "/sektorler",
+        "type": 301
       }
     ],
     "rewrites": [

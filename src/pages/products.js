@@ -12,9 +12,9 @@ export function renderProductsPage(activeCategoryFilter = 'all', currentLang = '
       <div class="page-header-bar">
         <div class="container">
           <p class="kicker">ÜRÜN VE HİZMET MİMARİSİ</p>
-          <h1>Endüstriyel Kimyasallar &<br/><span>Teknik Çözüm Kataloğu</span></h1>
+          <h1>Endüstriyel Kimyasallar &<br/><span>Fabrika Çözüm Kataloğu</span></h1>
           <p class="page-lede">
-            Fabrikanızın su arıtma, soğutma, buhar ve proses sistemlerinde kullanılan, TDS (Teknik Veri Föyü) ve SDS (Güvenlik Bilgi Formu) onaylı kimyasallar ve mühendislik ekipmanları.
+            Kağıt fabrikaları, deterjan sülfonasyon hatları, Şişecam düzcam tesisleri, çelik haddehaneleri, soğutma kuleleri ve ters ozmoz sistemleri için TDS ve SDS onaylı kimyasal maddeler ve formülasyonlar.
           </p>
 
           <!-- Filtreleme Butonları -->
@@ -35,10 +35,10 @@ export function renderProductsPage(activeCategoryFilter = 'all', currentLang = '
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
               </svg>
-              <input type="text" id="productSearchInput" placeholder="Ürün adı, etken madde veya teknik özellik ara..." />
+              <input type="text" id="productSearchInput" placeholder="Ürün adı, etken kimyasal (C-PAM, PBTC, Molibdat, Mannich, DBNPA...) veya özellik ara..." />
             </div>
             <div class="search-tip">
-              *Tüm ürünler ADR standartlarında ambalajlı (30kg bidon, 1000kg IBC veya dökme tanker) sevk edilir.
+              *Tüm ürünler ADR standartlarında ambalajlı (30kg PE bidon, 1000kg IBC veya 25 tonluk tanker) teknik analiz sertifikası (COA) ile sevk edilir.
             </div>
           </div>
         </div>
@@ -61,15 +61,25 @@ export function renderProductsPage(activeCategoryFilter = 'all', currentLang = '
 
                 <div class="subcategories-grid">
                   ${cat.subcategories.map(sub => `
-                    <div class="product-item-card" data-product-name="${sub.name.toLowerCase()}">
+                    <div class="product-item-card" 
+                         data-product-name="${sub.name.toLowerCase()}" 
+                         data-active-chem="${(sub.activeChemical || '').toLowerCase()}">
                       <div class="item-head">
                         <h3>${sub.name}</h3>
                         <span class="badge-tds">TDS Hazır</span>
                       </div>
+                      
+                      ${sub.activeChemical ? `
+                        <div class="item-chem-highlight">
+                          <span class="chem-lead">Etken Kimyasallar / Bileşen:</span>
+                          <span class="chem-val">${sub.activeChemical}</span>
+                        </div>
+                      ` : ''}
+
                       <p class="item-desc">${sub.desc}</p>
                       
                       <div class="item-specs">
-                        <strong>Teknik Parametreler & Ambalaj:</strong>
+                        <strong>Teknik Parametreler & Formülasyon:</strong>
                         <ul>
                           ${sub.specs.map(spec => `<li><span>✓</span> ${spec}</li>`).join('')}
                         </ul>
@@ -103,15 +113,15 @@ export function renderProductsPage(activeCategoryFilter = 'all', currentLang = '
             <button class="modal-close" id="tdsModalClose" aria-label="Kapat">&times;</button>
           </div>
           <div class="modal-body">
-            <p>Seçilen Ürün: <strong id="tdsSelectedProduct">—</strong></p>
+            <p>Seçilen Ürün / Formülasyon: <strong id="tdsSelectedProduct">—</strong></p>
             <form id="tdsRequestForm">
               <label>
-                Firma Adı
-                <input type="text" id="tdsCompany" placeholder="Firmanızın yasal unvanı" required />
+                Firma Adı & Faaliyet Alanı
+                <input type="text" id="tdsCompany" placeholder="Örn: X Kağıt A.Ş. veya Y Demir Çelik A.Ş." required />
               </label>
               <label>
                 Yetkili E-posta (Şartname Gönderilecek)
-                <input type="email" id="tdsEmail" placeholder="ad@firma.com" required />
+                <input type="email" id="tdsEmail" placeholder="muhendislik@firma.com" required />
               </label>
               <label>
                 Telefon Numarası
@@ -119,7 +129,7 @@ export function renderProductsPage(activeCategoryFilter = 'all', currentLang = '
               </label>
               <label class="consent">
                 <input type="checkbox" required checked /> 
-                Teknik dokümanların e-posta adresime iletilmesini onaylıyorum.
+                TDS ve SDS dokümanlarının teknik e-posta adresime iletilmesini onaylıyorum.
               </label>
               <button type="submit" class="button button-primary" style="width: 100%; margin-top: 10px;">
                 TDS & SDS Dokümanını Gönder

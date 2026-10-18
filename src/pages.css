@@ -983,6 +983,33 @@
   font-weight: 700;
 }
 
+.item-chem-highlight {
+  background: rgba(45, 212, 191, 0.08);
+  border-left: 3px solid var(--turq);
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border-radius: 0 3px 3px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.item-chem-highlight .chem-lead {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: #127a69;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.item-chem-highlight .chem-val {
+  font-size: 11px;
+  color: var(--navy);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
 .item-desc {
   font-size: 12px;
   color: var(--muted);
@@ -1281,6 +1308,33 @@
 /* ==========================================================================
    9. SEKTÖRLER VE UYGULAMA ALANLARI SAYFASI
    ========================================================================== */
+.sector-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.sector-filter-tab {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(239, 251, 248, 0.75);
+  padding: 8px 16px;
+  font-size: 12px;
+  font-family: 'DM Mono', monospace;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sector-filter-tab:hover,
+.sector-filter-tab.active {
+  background: var(--turq);
+  color: var(--navy);
+  border-color: var(--turq);
+  font-weight: 700;
+}
+
 .sectors-body {
   padding: 60px 0 100px;
 }
@@ -1296,7 +1350,7 @@
   background: var(--white);
   border: 1px solid var(--line);
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 360px 1fr;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
@@ -1308,30 +1362,90 @@
   flex-direction: column;
 }
 
+.sec-index-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
 .sec-index {
   font-family: 'DM Mono', monospace;
   font-size: 14px;
   color: var(--turq);
   font-weight: 700;
-  margin-bottom: 6px;
 }
 
 .sec-side-header .sec-badge {
   align-self: flex-start;
-  margin-bottom: 16px;
 }
 
 .sec-side-header h2 {
   font-size: 22px;
   margin: 0 0 14px;
+  line-height: 1.15;
+}
+
+.sec-target-plants {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 3px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: var(--turq-soft);
+  line-height: 1.4;
+}
+
+.sec-target-plants strong {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: rgba(239, 251, 248, 0.5);
+  margin-bottom: 2px;
+  text-transform: uppercase;
 }
 
 .sec-summary {
   font-size: 13px;
   color: rgba(239, 251, 248, 0.7);
   line-height: 1.55;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   flex-grow: 1;
+}
+
+.sec-key-chemicals {
+  margin-bottom: 20px;
+}
+
+.sec-key-chemicals small {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--turq);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.chem-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chem-tag {
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  color: var(--turq-soft);
+  font-size: 10px;
+  padding: 3px 7px;
+  border-radius: 2px;
+  font-family: 'DM Mono', monospace;
+}
+
+.sec-header-action {
+  margin-top: 10px;
 }
 
 .sec-side-content {
@@ -1365,6 +1479,10 @@
   line-height: 1.55;
 }
 
+.analysis-box li {
+  margin-bottom: 6px;
+}
+
 .recommended-strip {
   border-top: 1px solid var(--line);
   padding-top: 16px;
@@ -1384,8 +1502,19 @@
   color: #0d6e5d;
   font-size: 11px;
   font-weight: 600;
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 3px;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  transition: all 0.2s;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.rec-chip:hover {
+  background: var(--turq);
+  color: var(--navy);
+  transform: translateY(-2px);
+  border-color: var(--turq);
 }
 
 .sector-consult-banner {
@@ -1407,6 +1536,12 @@
   margin: 0;
   font-size: 13px;
   color: var(--muted);
+}
+
+.banner-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 /* ==========================================================================

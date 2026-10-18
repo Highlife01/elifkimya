@@ -2,70 +2,581 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // This security rules file assumes the following data structures:
+    //
+    // 1. Collection: users
+    //    Document ID: {userId} (Firebase Auth UID)
+    //    Fields:
+    //      - role: string (required, enum: ['superadmin', 'sales', 'technical', 'warehouse', 'viewer', 'customer'])
+    //      - email: string (optional, 3..150 chars)
+    //      - displayName / name: string (optional, 1..150 chars)
+    //      - phone: string (optional, 3..50 chars)
+    //      - companyName: string (optional, 1..200 chars)
+    //      - department: string (optional, 1..100 chars)
+    //      - createdAt / updatedAt: timestamp or ISO string
+    //
+    // 2. Collection: crmRequests
+    //    Document ID: {requestId}
+    //    Fields:
+    //      - companyName: string (required on public create, 2..200 chars)
+    //      - email: string (required on public create, 5..150 chars)
+    //      - phone: string (required on public create, 6..50 chars)
+    //      - stage: string (required on public create == 'Yeni Talep', 1..100 chars)
+    //      - contactPerson / name / city / category / productDetail / purpose / notes: string (optional, bounded)
+    //
+    // 3. Collection: customers
+    //    Document ID: {customerId}
+    //    Fields:
+    //      - companyName: string (required/optional, 1..250 chars)
+    //      - portalUid: string (optional, Auth UID for customer portal linkage)
+    //      - email / phone / city / taxOffice / taxNumber / notes: string (optional, bounded)
+    //
+    // 4. Collection: products
+    //    Document ID: {productId}
+    //    Fields:
+    //      - published: bool (controls public visibility)
+    //      - name / title / code / category / description: string (optional, bounded)
+    //
+    // 5. Collection: documents
+    //    Document ID: {docId}
+    //    Fields:
+    //      - published: bool (controls visibility)
+    //      - accessLevel: string (enum: ['public', 'portal_customer', 'internal', 'staff'])
+    //      - title / docType / fileUrl / productCode: string (optional, bounded)
+    //
+    // 6. Collection: projects
+    //    Document ID: {projectId}
+    //    Fields:
+    //      - customerUid: string (optional, Auth UID for customer portal access)
+    //      - title / projectName / status / city / notes: string (optional, bounded)
+    //
+    // 7. Collection: proposals (INTERNAL ONLY - Contains sensitive unitCost / profit margins)
+    //    Document ID: {proposalId}
+    //    Fields:
+    //      - status: string (enum includes ['draft', 'sent', 'approved', 'rejected', 'revised', 'expired'])
+    //      - isImmutable: bool (locks arbitrary edits once finalized)
+    //      - unitCost / totalCost / grossProfit / profitMarginPercent / internalAdminNotes: restricted internal fields
+    //
+    // 8. Collection: portalShares (SANITIZED Customer Portal View - Must NEVER contain internal cost fields)
+    //    Document ID: {shareToken} (32+ char unguessable token)
+    //    Fields:
+    //      - active: bool (controls token access)
+    //      - customerUid: string (optional, Auth UID)
+    //      - customerEmail: string (optional, customer email)
+    //      - Forbidden fields: unitCost, totalCost, grossProfit, profitMarginPercent, internalAdminNotes
+    //
+    // 9. Collection: orders
+    //    Document ID: {orderId}
+    //    Fields:
+    //      - customerUid: string (optional)
+    //      - contactEmail: string (optional)
+    //      - status / orderNo / companyName / notes: string (optional, bounded)
+    //
+    // 10. Collection: inventoryItems
+    //     Document ID: {itemId}
+    //     Fields:
+    //       - sku / name / category / unit / warehouseLocation: string (optional, bounded)
+    //
+    // 11. Collection: inventoryMovements (IMMUTABLE Stock Ledger)
+    //     Document ID: {movementId}
+    //     Fields:
+    //       - itemId / movementType / referenceNo / notes: string (optional, bounded)
+    //
+    // 12. Collections: suppliers & purchaseOrders
+    //     Document IDs: {supplierId}, {poId}
+    //
+    // 13. Collection: serviceRecords
+    //     Document ID: {serviceId}
+    //     Fields:
+    //       - customerUid: string (optional)
+    //       - customerEmail: string (optional)
+    //
+    // 14. Collection: siteSettings
+    //     Document ID: {docId} ('general', 'seo', 'categories', etc.)
+    //
+    // 15. Collections: notificationLogs & auditLogs (IMMUTABLE System Logs)
+    //     Document ID: {logId}
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isAdmin() {
-      return isAuthenticated() && 
-        (request.auth.token.admin == true || 
-         request.auth.token.email.matches('.*@elifkimya[.]com'));
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Teklif Talepleri (Quote Requests)
-    // Dışarıdan anonim / müşteri teklif oluşturabilir; okuma ve durum yönetimi sadece yöneticiye açıktır.
-    match /quoteRequests/{quoteId} {
-      allow create: if request.resource.data.companyName is string &&
-                       request.resource.data.email is string &&
-                       request.resource.data.phone is string &&
-                       request.resource.data.email.size() > 5;
-      allow read, update, delete: if isAdmin();
+    function isBootstrapAdmin() {
+      return isAuthenticated() &&
+        (request.auth.token.admin == true ||
+         request.auth.token.email in ['cebrailkara@gmail.com', 'cebokar@gmail.com']);
     }
 
-    // İletişim Mesajları (Contact Messages)
-    match /contactMessages/{messageId} {
-      allow create: if request.resource.data.name is string &&
-                       request.resource.data.email is string &&
-                       request.resource.data.message is string;
-      allow read, update, delete: if isAdmin();
+    function getUserRole() {
+      return (isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid)))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : null;
     }
 
-    // Şirket & Cari Kayıtları (Companies)
-    match /companies/{companyId} {
-      allow read: if isAdmin() || (isAuthenticated() && request.auth.uid == companyId);
-      allow write: if isAdmin();
+    function hasRole(roles) {
+      return isBootstrapAdmin() ||
+        (isAuthenticated() &&
+         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in roles);
     }
 
-    // Ürün Kataloğu (Products)
-    // Herkes ürünleri ve TDS/MSDS teknik bilgilerini listeleyebilir, sadece yönetici düzenleyebilir.
+    function isStaff() {
+      return hasRole(['superadmin', 'sales', 'technical', 'warehouse', 'viewer']);
+    }
+
+    function isSuperAdmin() {
+      return hasRole(['superadmin']);
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+        request.resource.data[field] == null ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen);
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators (Called on BOTH create and update)
+    // ===============================================================
+
+    function isValidUser(data) {
+      return data.size() <= 35 &&
+        'role' in data &&
+        data.role is string &&
+        data.role in ['superadmin', 'sales', 'technical', 'warehouse', 'viewer', 'customer'] &&
+        isValidOptionalString('email', 3, 150) &&
+        isValidOptionalString('displayName', 1, 150) &&
+        isValidOptionalString('name', 1, 150) &&
+        isValidOptionalString('phone', 3, 50) &&
+        isValidOptionalString('companyName', 1, 200) &&
+        isValidOptionalString('department', 1, 100) &&
+        isValidOptionalString('uid', 1, 128);
+    }
+
+    function isValidPublicCrmCreate(data) {
+      return data.size() <= 50 &&
+        data.companyName is string &&
+        data.companyName.size() >= 2 &&
+        data.companyName.size() <= 200 &&
+        data.email is string &&
+        data.email.size() >= 5 &&
+        data.email.size() <= 150 &&
+        data.phone is string &&
+        data.phone.size() >= 6 &&
+        data.phone.size() <= 50 &&
+        data.stage == 'Yeni Talep' &&
+        isValidOptionalString('contactPerson', 1, 150) &&
+        isValidOptionalString('name', 1, 150) &&
+        isValidOptionalString('city', 1, 120) &&
+        isValidOptionalString('category', 1, 200) &&
+        isValidOptionalString('productDetail', 0, 500) &&
+        isValidOptionalString('purpose', 0, 300) &&
+        isValidOptionalString('systemCapacity', 0, 200) &&
+        isValidOptionalString('requestedAmount', 0, 200) &&
+        isValidOptionalString('waterSource', 0, 200) &&
+        isValidOptionalString('packaging', 0, 200) &&
+        isValidOptionalString('waterReportNotes', 0, 5000) &&
+        isValidOptionalString('message', 0, 5000) &&
+        isValidOptionalString('notes', 0, 5000) &&
+        isValidOptionalString('taxInfo', 0, 250) &&
+        isValidOptionalString('source', 0, 100);
+    }
+
+    function isValidStaffCrmRequest(data) {
+      return data.size() <= 60 &&
+        isValidOptionalString('companyName', 1, 250) &&
+        isValidOptionalString('email', 3, 150) &&
+        isValidOptionalString('phone', 3, 50) &&
+        isValidOptionalString('stage', 1, 100) &&
+        isValidOptionalString('status', 1, 100) &&
+        isValidOptionalString('notes', 0, 10000);
+    }
+
+    function isValidCustomer(data) {
+      return data.size() <= 60 &&
+        isValidOptionalString('companyName', 1, 250) &&
+        isValidOptionalString('email', 3, 150) &&
+        isValidOptionalString('phone', 3, 50) &&
+        isValidOptionalString('city', 1, 120) &&
+        isValidOptionalString('taxOffice', 0, 150) &&
+        isValidOptionalString('taxNumber', 0, 50) &&
+        isValidOptionalString('portalUid', 0, 128) &&
+        isValidOptionalString('notes', 0, 10000);
+    }
+
+    function isValidProduct(data) {
+      return data.size() <= 60 &&
+        (!('published' in data) || data.published is bool) &&
+        isValidOptionalString('name', 1, 250) &&
+        isValidOptionalString('title', 1, 250) &&
+        isValidOptionalString('code', 1, 100) &&
+        isValidOptionalString('category', 1, 150) &&
+        isValidOptionalString('description', 0, 15000);
+    }
+
+    function isValidDocument(data) {
+      return data.size() <= 50 &&
+        (!('published' in data) || data.published is bool) &&
+        (!('accessLevel' in data) || data.accessLevel in ['public', 'portal_customer', 'internal', 'staff']) &&
+        isValidOptionalString('title', 1, 250) &&
+        isValidOptionalString('docType', 1, 100) &&
+        isValidOptionalString('fileUrl', 0, 2000) &&
+        isValidOptionalString('description', 0, 5000);
+    }
+
+    function isValidProject(data) {
+      return data.size() <= 60 &&
+        isValidOptionalString('title', 1, 250) &&
+        isValidOptionalString('projectName', 1, 250) &&
+        isValidOptionalString('customerUid', 0, 128) &&
+        isValidOptionalString('status', 1, 100) &&
+        isValidOptionalString('notes', 0, 10000);
+    }
+
+    function isValidProposal(data) {
+      return data.size() <= 80 &&
+        isValidOptionalString('proposalNo', 1, 100) &&
+        isValidOptionalString('companyName', 1, 250) &&
+        isValidOptionalString('status', 1, 100) &&
+        isValidOptionalString('internalAdminNotes', 0, 10000) &&
+        isValidOptionalString('notes', 0, 10000);
+    }
+
+    function isValidPortalShare(data) {
+      return data.size() <= 60 &&
+        !('unitCost' in data) &&
+        !('totalCost' in data) &&
+        !('grossProfit' in data) &&
+        !('profitMarginPercent' in data) &&
+        !('internalAdminNotes' in data) &&
+        (!('active' in data) || data.active is bool) &&
+        isValidOptionalString('customerEmail', 3, 150) &&
+        isValidOptionalString('customerUid', 1, 128) &&
+        isValidOptionalString('companyName', 1, 250) &&
+        isValidOptionalString('status', 1, 100);
+    }
+
+    function isValidOrder(data) {
+      return data.size() <= 70 &&
+        isValidOptionalString('orderNo', 1, 100) &&
+        isValidOptionalString('companyName', 1, 250) &&
+        isValidOptionalString('customerUid', 0, 128) &&
+        isValidOptionalString('contactEmail', 3, 150) &&
+        isValidOptionalString('status', 1, 100) &&
+        isValidOptionalString('notes', 0, 10000);
+    }
+
+    function isValidInventoryItem(data) {
+      return data.size() <= 60 &&
+        isValidOptionalString('sku', 1, 100) &&
+        isValidOptionalString('name', 1, 250) &&
+        isValidOptionalString('category', 1, 150) &&
+        isValidOptionalString('unit', 1, 50) &&
+        isValidOptionalString('notes', 0, 5000);
+    }
+
+    function isValidInventoryMovement(data) {
+      return data.size() <= 40 &&
+        isValidOptionalString('itemId', 1, 128) &&
+        isValidOptionalString('movementType', 1, 50) &&
+        isValidOptionalString('referenceNo', 0, 100) &&
+        isValidOptionalString('notes', 0, 5000);
+    }
+
+    function isValidSupplier(data) {
+      return data.size() <= 60 &&
+        isValidOptionalString('companyName', 1, 250) &&
+        isValidOptionalString('name', 1, 250) &&
+        isValidOptionalString('email', 3, 150) &&
+        isValidOptionalString('phone', 3, 50) &&
+        isValidOptionalString('notes', 0, 5000);
+    }
+
+    function isValidPurchaseOrder(data) {
+      return data.size() <= 70 &&
+        isValidOptionalString('poNumber', 1, 100) &&
+        isValidOptionalString('supplierName', 1, 250) &&
+        isValidOptionalString('status', 1, 100) &&
+        isValidOptionalString('notes', 0, 10000);
+    }
+
+    function isValidServiceRecord(data) {
+      return data.size() <= 70 &&
+        isValidOptionalString('customerUid', 0, 128) &&
+        isValidOptionalString('customerEmail', 3, 150) &&
+        isValidOptionalString('companyName', 1, 250) &&
+        isValidOptionalString('status', 1, 100) &&
+        isValidOptionalString('notes', 0, 15000);
+    }
+
+    function isValidSiteSetting(data) {
+      return data.size() <= 80 &&
+        isValidOptionalString('siteTitle', 0, 250) &&
+        isValidOptionalString('companyName', 0, 250) &&
+        isValidOptionalString('contactEmail', 0, 150) &&
+        isValidOptionalString('contactPhone', 0, 50);
+    }
+
+    function isValidNotificationLog(data) {
+      return data.size() <= 35 &&
+        isValidOptionalString('channel', 1, 50) &&
+        isValidOptionalString('recipient', 1, 250) &&
+        isValidOptionalString('subject', 0, 300) &&
+        isValidOptionalString('status', 1, 50);
+    }
+
+    function isValidAuditLog(data) {
+      return data.size() <= 35 &&
+        isValidOptionalString('action', 1, 150) &&
+        isValidOptionalString('collection', 1, 100) &&
+        isValidOptionalString('targetId', 0, 150) &&
+        isValidOptionalString('actorEmail', 0, 150) &&
+        isValidOptionalString('actorUid', 0, 128) &&
+        isValidOptionalString('details', 0, 5000);
+    }
+
+    function isValidLegacyQuoteRequest(data) {
+      return data.size() <= 50 &&
+        data.companyName is string &&
+        data.companyName.size() >= 2 &&
+        data.companyName.size() <= 200 &&
+        data.email is string &&
+        data.email.size() >= 5 &&
+        data.email.size() <= 150 &&
+        data.phone is string &&
+        data.phone.size() >= 6 &&
+        data.phone.size() <= 50 &&
+        isValidOptionalString('contactPerson', 1, 150) &&
+        isValidOptionalString('city', 1, 120) &&
+        isValidOptionalString('waterReportNotes', 0, 5000);
+    }
+
+    function isValidLegacyContactMessage(data) {
+      return data.size() <= 35 &&
+        data.name is string &&
+        data.name.size() >= 2 &&
+        data.name.size() <= 150 &&
+        data.email is string &&
+        data.email.size() >= 5 &&
+        data.email.size() <= 150 &&
+        data.message is string &&
+        data.message.size() >= 2 &&
+        data.message.size() <= 5000 &&
+        isValidOptionalString('company', 0, 200) &&
+        isValidOptionalString('phone', 0, 50) &&
+        isValidOptionalString('subject', 0, 200);
+    }
+
+    // ===============================================================
+    // Collection Security Rules
+    // ===============================================================
+
+    // 1. Users & Role-Based Access Control (Prevent Privilege Escalation)
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isStaff();
+      allow create: if isAuthenticated() &&
+        isValidUser(request.resource.data) &&
+        (isSuperAdmin() || (isOwner(userId) && request.resource.data.role == 'customer'));
+      allow update: if isAuthenticated() &&
+        isValidUser(request.resource.data) &&
+        (isSuperAdmin() ||
+         (isOwner(userId) &&
+          request.resource.data.role == resource.data.role &&
+          areImmutableFieldsUnchanged(['uid', 'createdAt'])));
+      allow delete: if isSuperAdmin();
+    }
+
+    // 2. CRM Requests (Website RFQ, Contact, Project & Service inquiries + CRM pipeline)
+    match /crmRequests/{requestId} {
+      allow create: if isValidPublicCrmCreate(request.resource.data) ||
+        (hasRole(['superadmin', 'sales', 'technical']) && isValidStaffCrmRequest(request.resource.data));
+      allow read: if isStaff();
+      allow update: if hasRole(['superadmin', 'sales', 'technical']) &&
+        isValidStaffCrmRequest(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 3. Customers (Müşteri / Cari Kartları)
+    match /customers/{customerId} {
+      allow read: if isStaff() ||
+        (isAuthenticated() && resource.data.portalUid == request.auth.uid);
+      allow create, update: if hasRole(['superadmin', 'sales']) &&
+        isValidCustomer(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 4. Products (Kimyasal Ürünler)
     match /products/{productId} {
-      allow read: if true;
-      allow write: if isAdmin();
+      allow read: if resource.data.published == true || isStaff();
+      allow create, update: if hasRole(['superadmin', 'sales', 'technical', 'warehouse']) &&
+        isValidProduct(request.resource.data);
+      allow delete: if isSuperAdmin();
     }
 
-    // Uygulama Alanları & Endüstriyel Çözümler (Application Areas)
-    match /applicationAreas/{areaId} {
-      allow read: if true;
-      allow write: if isAdmin();
+    // 5. Technical Documents (SDS/GBF, TDS, COA, Sertifikalar)
+    match /documents/{docId} {
+      allow read: if (resource.data.published == true && resource.data.accessLevel == 'public') ||
+        (isAuthenticated() && resource.data.published == true && resource.data.accessLevel == 'portal_customer') ||
+        isStaff();
+      allow create, update: if hasRole(['superadmin', 'technical', 'sales']) &&
+        isValidDocument(request.resource.data);
+      allow delete: if isSuperAdmin();
     }
 
-    // Site İçeriği & Kurumsal Konfigürasyon (Site Content)
-    match /siteContent/{docId} {
-      allow read: if true;
-      allow write: if isAdmin();
+    // 6. Water Treatment Projects (Su Arıtma Projeleri)
+    match /projects/{projectId} {
+      allow read: if isStaff() ||
+        (isAuthenticated() && resource.data.customerUid == request.auth.uid);
+      allow create, update: if hasRole(['superadmin', 'technical', 'sales']) &&
+        isValidProject(request.resource.data);
+      allow delete: if isSuperAdmin();
     }
 
-    // Muhasebe & B2B Sipariş Kayıtları (Accounting Entries)
-    match /accountingEntries/{entryId} {
-      allow read, write: if isAdmin();
+    // 7. Internal Proposals & Costing (İÇ MALİYET İÇERİR - Müşteriye Kapalıdır)
+    match /proposals/{proposalId} {
+      allow read: if hasRole(['superadmin', 'sales', 'technical', 'viewer']);
+      allow create: if hasRole(['superadmin', 'sales', 'technical']) &&
+        isValidProposal(request.resource.data);
+      allow update: if hasRole(['superadmin', 'sales', 'technical']) &&
+        isValidProposal(request.resource.data) &&
+        (resource.data.isImmutable != true ||
+         request.resource.data.status in ['approved', 'rejected', 'revised', 'expired']);
+      allow delete: if isSuperAdmin();
     }
 
-    // Denetim Günlükleri - Değiştirilemez Loglar (Audit Logs)
+    // 8. Customer Portal Shares (İç maliyet içermez; güvenli token veya müşteri girişi ile erişilir)
+    match /portalShares/{shareToken} {
+      allow get: if resource == null ||
+        !('active' in resource.data) ||
+        resource.data.active == true ||
+        isStaff() ||
+        (isAuthenticated() &&
+         (resource.data.customerEmail == request.auth.token.email ||
+          resource.data.customerUid == request.auth.uid));
+      allow list: if isStaff() ||
+        (isAuthenticated() && resource.data.customerEmail == request.auth.token.email) ||
+        (isAuthenticated() && resource.data.customerUid == request.auth.uid);
+      allow create, update: if hasRole(['superadmin', 'sales', 'technical']) &&
+        isValidPortalShare(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 9. Approved Orders (Onaylanan Siparişler)
+    match /orders/{orderId} {
+      allow read: if isStaff() ||
+        (isAuthenticated() &&
+         (resource.data.customerUid == request.auth.uid ||
+          resource.data.contactEmail == request.auth.token.email));
+      allow create, update: if hasRole(['superadmin', 'sales', 'warehouse']) &&
+        isValidOrder(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 10. Warehouse Inventory Items (Depo Stok Kalemleri)
+    match /inventoryItems/{itemId} {
+      allow read: if isStaff();
+      allow create, update: if hasRole(['superadmin', 'warehouse', 'sales']) &&
+        isValidInventoryItem(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 11. Immutable Inventory Movements (Değiştirilemez Stok Hareket Kayıtları)
+    match /inventoryMovements/{movementId} {
+      allow read: if isStaff();
+      allow create: if hasRole(['superadmin', 'warehouse', 'sales']) &&
+        isValidInventoryMovement(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    // 12. Suppliers & Purchase Orders (Tedarikçi ve Satınalma)
+    match /suppliers/{supplierId} {
+      allow read: if hasRole(['superadmin', 'warehouse', 'sales', 'viewer']);
+      allow create, update: if hasRole(['superadmin', 'warehouse', 'sales']) &&
+        isValidSupplier(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    match /purchaseOrders/{poId} {
+      allow read: if hasRole(['superadmin', 'warehouse', 'sales', 'viewer']);
+      allow create, update: if hasRole(['superadmin', 'warehouse', 'sales']) &&
+        isValidPurchaseOrder(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 13. Service & Maintenance Records (Servis ve Bakım Kayıtları)
+    match /serviceRecords/{serviceId} {
+      allow read: if isStaff() ||
+        (isAuthenticated() &&
+         (resource.data.customerUid == request.auth.uid ||
+          resource.data.customerEmail == request.auth.token.email));
+      allow create, update: if hasRole(['superadmin', 'technical', 'sales']) &&
+        isValidServiceRecord(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 14. Site Settings (Sistem, İletişim, Kategori, SEO ve Bildirim Ayarları)
+    match /siteSettings/{docId} {
+      allow read: if docId in ['general', 'seo', 'categories'] || isStaff();
+      allow create, update: if (isSuperAdmin() ||
+        (docId in ['general', 'seo', 'categories'] && hasRole(['superadmin', 'sales']))) &&
+        isValidSiteSetting(request.resource.data);
+      allow delete: if isSuperAdmin() ||
+        (docId in ['general', 'seo', 'categories'] && hasRole(['superadmin', 'sales']));
+    }
+
+    // 15. Notification Logs (Değiştirilemez Bildirim Gönderim Kayıtları)
+    match /notificationLogs/{logId} {
+      allow read: if isStaff();
+      allow create: if hasRole(['superadmin', 'sales', 'technical']) &&
+        isValidNotificationLog(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    // 16. Audit Logs (Değiştirilemez Denetim Günlüğü)
     match /auditLogs/{logId} {
-      allow create: if isAuthenticated();
-      allow read: if isAdmin();
-      allow update, delete: if false; // Değiştirilemez denetim izi
+      allow read: if hasRole(['superadmin', 'viewer']);
+      allow create: if isAuthenticated() &&
+        isValidAuditLog(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    // 17. Legacy Collections Compatibility
+    match /quoteRequests/{id} {
+      allow create: if isValidLegacyQuoteRequest(request.resource.data);
+      allow read: if isStaff();
+      allow update: if isStaff() && isValidLegacyQuoteRequest(request.resource.data);
+      allow delete: if isStaff();
+    }
+
+    match /contactMessages/{id} {
+      allow create: if isValidLegacyContactMessage(request.resource.data);
+      allow read: if isStaff();
+      allow update: if isStaff() && isValidLegacyContactMessage(request.resource.data);
+      allow delete: if isStaff();
+    }
+
+    // Default deny for any unmatched paths
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
