@@ -16,7 +16,7 @@ import { renderAdminPage } from './pages/admin.js';
 import { applyDynamicPageSeoAndGeo } from './utils/seo-geo.js';
 import { findPublicRoute, renderNotFoundPage, renderPublicLanding } from './pages/seo-landings.js';
 import { renderSafeHtml } from './utils/security.js';
-import { applyDocumentLanguage, subscribeLanguage } from './utils/i18n.js';
+import { applyDocumentLanguage, initDomTranslator, subscribeLanguage, translatePageDom } from './utils/i18n.js';
 
 const appRoot = document.getElementById('app');
 let navbarEl = null;
@@ -105,6 +105,8 @@ function routeCurrentUrl() {
         }
       });
     });
+    initDomTranslator(appRoot);
+    translatePageDom(appRoot);
     window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
@@ -150,6 +152,9 @@ function routeCurrentUrl() {
       });
       break;
   }
+
+  initDomTranslator(appRoot);
+  translatePageDom(appRoot);
 
   if (window.location.hash && !window.location.hash.startsWith('#/')) {
     const targetEl = document.querySelector(window.location.hash);

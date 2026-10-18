@@ -1,4 +1,4 @@
-const CACHE_NAME = 'elifkimya-pwa-v2';
+const CACHE_NAME = 'elifkimya-pwa-v3';
 const PRECACHE_URLS = [
   '/',
   '/manifest.webmanifest',
