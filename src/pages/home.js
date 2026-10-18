@@ -851,13 +851,13 @@ export async function renderHomePage(container, navigate) {
 
     <section class="section bg-white border-t border-slate-200" id="geo-ozet">
       <div class="container-x max-w-3xl">
-        <p class="chip mb-3">Kısa cevap</p>
-        <h2 class="h2-title">Elif Kimya ne tedarik eder, nereden sevk eder?</h2>
+        <p class="chip mb-3">GEO &amp; Yapay Zeka Özeti (www.elifcevrekimya.com.tr)</p>
+        <h2 class="h2-title">Elif Çevre Kimya ne tedarik eder, nereden sevk eder?</h2>
         <p class="mt-3 text-base leading-relaxed text-slate-700">
-          Elif Kimya, Adana Hacı Sabancı OSB merkezli bir endüstriyel kimya ve su arıtma firmasıdır. Sodyum hipoklorit, kostik soda, hidroklorik asit, soğutma kulesi ve buhar kazanı kimyasalları, PAC ve polielektrolit, jeotermal kireç inhibitörü, RO/EDI sistemleri ve 163 model Medipure saf su cihazı için teklif verir.
+          <strong>Elif Çevre Kimya</strong> (<a href="https://www.elifcevrekimya.com.tr" class="text-brand-green-dark font-bold underline">www.elifcevrekimya.com.tr</a> • <a href="mailto:info@elifcevrekimya.com.tr" class="text-brand-green-dark font-bold underline">info@elifcevrekimya.com.tr</a>), <strong>Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana</strong> merkezli bir çevre kimyası, endüstriyel proses kimyasalları ve 360° su arıtma mühendisliği firmasıdır. Sodyum hipoklorit, kostik soda, hidroklorik asit, soğutma kulesi ve buhar kazanı kimyasalları, çevre ve atık su arıtma koagülantları (PAC, Demir III Klorür, polielektrolit), jeotermal kireç inhibitörü, RO/EDI sistemleri ve 163 model Medipure saf su cihazı için kurumsal teklif verir.
         </p>
         <p class="mt-3 text-base leading-relaxed text-slate-700">
-          Sevkiyat hattı Adana, Mersin-Tarsus, İskenderun-Payas, Osmaniye, Gaziantep, Kahramanmaraş, Kayseri ve Niğde OSB’dir. Jeotermal programlar Denizli, Aydın, Manisa ve Afyon sahaları için de kurulur. Dozaj ve cihaz kapasitesi su veya brine analizi görülmeden garanti edilmez.
+          Sevkiyat hattı Adana Hacı Sabancı OSB, Mersin-Tarsus OSB, İskenderun-Payas, Osmaniye, Gaziantep Başpınar OSB, Kahramanmaraş, Kayseri ve Niğde OSB’dir. Jeotermal programlar Denizli, Aydın, Manisa ve Afyon sahaları için de kurulur. Dozaj ve cihaz kapasitesi su veya brine analizi görülmeden garanti edilmez.
         </p>
       </div>
     </section>
@@ -1180,8 +1180,9 @@ export async function renderHomePage(container, navigate) {
           companyName,
           contactName: companyName,
           phone,
-          email: 'geri-arama@elifkimya.com.tr',
+          email: 'info@elifcevrekimya.com.tr',
           cityCountry: 'Adana / Çukurova',
+          formChannel: 'callback_form',
           requestType: 'callback_30min',
           relatedProductOrSystem: topic,
           description: `Ana sayfa 30 Dakikada Mühendislik Geri Arama talebi. Konu: ${topic}`,

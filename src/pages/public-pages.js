@@ -1132,10 +1132,10 @@ export function renderQuotePage(container, navigate) {
     <section class="page-hero">
       <div class="container">
         <div class="breadcrumb">
-          <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Kurumsal Teklif & Saha Jar-Test Başvurusu</span>
+          <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Kurumsal Sipariş, Teklif & Saha Jar-Test Formu</span>
         </div>
-        <h1>Kurumsal Teklif, Numune ve Ücretsiz Saha Etüdü Başvurusu</h1>
-        <p>Tesisinizin kimyasal veya su arıtma ihtiyacını iletin; kimya ve çevre mühendislerimiz 24 saat içinde teknik değerlendirme ve fiyat teklifiyle dönüş yapsın.</p>
+        <h1>Kurumsal Sipariş, Fiyat Teklifi ve Saha Etüdü Formu</h1>
+        <p>Toptan kimyasal/cihaz siparişinizi veya teklif talebinizi iletin; başvurunuz anında Elif Çevre Kimya Yönetim Paneli (Dashboard) ekranına düşer ve mühendislerimiz hızla dönüş yapar.</p>
       </div>
     </section>
 
@@ -1159,8 +1159,15 @@ export function renderQuotePage(container, navigate) {
           </div>
         </div>
 
-        <!-- Ana CRM Başvuru Formu -->
+        <!-- Ana Sipariş & CRM Başvuru Formu -->
         <div class="card" style="padding:2.5rem;">
+          <div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+            <div>
+              <span class="badge badge-teal">CANLI DASHBOARD ENTEGRASYONLU</span>
+              <h3 style="margin:0.35rem 0 0;">Sipariş & Kurumsal Teklif Formu</h3>
+            </div>
+            <span style="font-size:0.82rem;color:var(--text-secondary);">Gönderilen tüm sipariş ve teklif formları anında merkez operasyon ekranına düşer.</span>
+          </div>
           <form id="b2b-rfq-form" class="form-grid-2">
             <div class="form-group">
               <label class="form-label" for="rfq-company">Firma / Fabrika Ünvanı *</label>
@@ -1179,46 +1186,47 @@ export function renderQuotePage(container, navigate) {
               <input type="email" id="rfq-email" name="email" class="form-input" required placeholder="satinalma@fabrika.com.tr" />
             </div>
             <div class="form-group">
-              <label class="form-label" for="rfq-city">İl / OSB / Ülke *</label>
-              <input type="text" id="rfq-city" name="cityCountry" class="form-input" required value="${escapeAttr(preCity || 'Adana / Türkiye')}" placeholder="Örn: Osmaniye OSB / Türkiye" />
+              <label class="form-label" for="rfq-city">Sevk İli / OSB / Teslimat Adresi *</label>
+              <input type="text" id="rfq-city" name="cityCountry" class="form-input" required value="${escapeAttr(preCity || 'Adana / Türkiye')}" placeholder="Örn: Adana Hacı Sabancı OSB / Türkiye" />
             </div>
             <div class="form-group">
-              <label class="form-label" for="rfq-type">Talep Türü *</label>
+              <label class="form-label" for="rfq-type">İşlem Türü (Sipariş / Teklif / Analiz) *</label>
               <select id="rfq-type" name="requestType" class="form-select">
-                <option value="product_quote" ${preType === 'product_quote' ? 'selected' : ''}>Endüstriyel Kimyasal Fiyat Teklifi</option>
-                <option value="jar_test_trial" ${preProgram === 'program-jartest' || preProgram === 'canli-jar-test' || preProgram === 'program-pilot' || preProgram === 'pilot-30-gun' ? 'selected' : ''}>Yerinde Jar-Test / 30 Günlük Pilot Deneme</option>
-                <option value="water_audit" ${preProgram === 'program-audit' || preProgram === 'korozyon-lsi-checkup' ? 'selected' : ''}>Ücretsiz Su Analizi & LSI Korozyon Risk Etüdü</option>
-                <option value="water_project" ${preType === 'water_project' ? 'selected' : ''}>Su Arıtma Sistemi Kurulum & Proje Teklifi</option>
-                <option value="service_maintenance" ${preType === 'service_maintenance' ? 'selected' : ''}>Periyodik Servis, Membran CIP & Bakım Talebi</option>
-                <option value="document_request" ${preType === 'document_request' ? 'selected' : ''}>Teknik Belge (SDS / GBF / TDS / COA) Talebi</option>
+                <option value="order_request" ${preType === 'order_request' || preType === 'order' ? 'selected' : ''}>🛒 Doğrudan Ürün / Cihaz Siparişi (Sevkiyat Talebi)</option>
+                <option value="product_quote" ${!preType || preType === 'product_quote' ? 'selected' : ''}>📋 Endüstriyel Kimyasal / Sistem Fiyat Teklifi</option>
+                <option value="jar_test_trial" ${preProgram === 'program-jartest' || preProgram === 'canli-jar-test' || preProgram === 'program-pilot' || preProgram === 'pilot-30-gun' ? 'selected' : ''}>🧪 Yerinde Jar-Test / 30 Günlük Pilot Deneme</option>
+                <option value="water_audit" ${preProgram === 'program-audit' || preProgram === 'korozyon-lsi-checkup' ? 'selected' : ''}>💧 Ücretsiz Su Analizi & LSI Korozyon Risk Etüdü</option>
+                <option value="water_project" ${preType === 'water_project' ? 'selected' : ''}>⚙️ Su Arıtma Sistemi Kurulum & Proje Teklifi</option>
+                <option value="service_maintenance" ${preType === 'service_maintenance' ? 'selected' : ''}>🔧 Periyodik Servis, Membran CIP & Bakım Talebi</option>
+                <option value="document_request" ${preType === 'document_request' ? 'selected' : ''}>📄 Teknik Belge (SDS / GBF / TDS / COA) Talebi</option>
               </select>
             </div>
             <div class="form-group full-width">
-              <label class="form-label" for="rfq-product">İlgili Kimyasal Ürün, Proses veya Su Arıtma Sistemi *</label>
-              <input type="text" id="rfq-product" name="relatedProductOrSystem" class="form-input" required value="${escapeAttr(initialProductVal)}" placeholder="Örn: Anyonik Poliakrilamid (IV>16), %96 LABSA, RO Antiskalant veya 20 m³/saat RO Sistemi" />
+              <label class="form-label" for="rfq-product">Sipariş / Talep Edilen Kimyasal Ürün, Saf Su Cihazı veya Sistem *</label>
+              <input type="text" id="rfq-product" name="relatedProductOrSystem" class="form-input" required value="${escapeAttr(initialProductVal)}" placeholder="Örn: Sodyum Hipoklorit, PAC %17, Anyonik Polielektrolit, RO Antiskalant veya Medipure Saf Su Cihazı" />
             </div>
             <div class="form-group">
-              <label class="form-label" for="rfq-packaging">Tercih Edilen Ambalaj & Tahmini Tüketim</label>
-              <input type="text" id="rfq-packaging" name="packagingInfo" class="form-input" placeholder="Örn: 1000 kg IBC Tank - Aylık 15 Ton" />
+              <label class="form-label" for="rfq-packaging">Sipariş Miktarı & Ambalaj Tipi</label>
+              <input type="text" id="rfq-packaging" name="packagingInfo" class="form-input" placeholder="Örn: 5 Adet 1000 kg IBC Tank / Aylık 15 Ton" />
             </div>
             <div class="form-group">
-              <label class="form-label" for="rfq-followup">İstenen Geri Dönüş / Ziyaret Tarihi</label>
+              <label class="form-label" for="rfq-followup">İstenen Teslimat / Ziyaret Tarihi</label>
               <input type="date" id="rfq-followup" name="followUpDate" class="form-input" />
             </div>
             <div class="form-group full-width">
-              <label class="form-label" for="rfq-desc">Teknik Açıklama, Su Analizi veya Proses Detayları *</label>
-              <textarea id="rfq-desc" name="description" class="form-textarea" rows="5" required placeholder="Kullandığınız mevcut kimyasal, yaşadığınız proses problemi (kireçlenme, çamur nemi, banyo demir konsantrasyonu vb.) veya talep ettiğiniz miktar hakkında bilgi veriniz...">${escapeHtml(initialDescVal)}</textarea>
+              <label class="form-label" for="rfq-desc">Sipariş Notu, Teknik Açıklama veya Su Analizi Detayları *</label>
+              <textarea id="rfq-desc" name="description" class="form-textarea" rows="5" required placeholder="Sipariş miktarınız, teslimat adresiniz, kullandığınız mevcut kimyasal veya yaşadığınız proses problemi hakkında bilgi veriniz...">${escapeHtml(initialDescVal)}</textarea>
             </div>
             <div class="form-group full-width">
               <label class="checkbox-label">
                 <input type="checkbox" name="kvkkConsent" required checked />
-                <span>6698 sayılı KVKK kapsamında kurumsal iletişim ve talep bilgilerimin tekliflendirme amacıyla işlenmesini kabul ediyorum.</span>
+                <span>6698 sayılı KVKK kapsamında kurumsal iletişim, sipariş ve talep bilgilerimin işlenmesini kabul ediyorum.</span>
               </label>
             </div>
             <div class="form-group full-width" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-              <span style="font-size:0.85rem;color:var(--text-secondary);">Talebiniz doğrudan Elif Kimya CRM & Mühendislik sistemine kaydedilir.</span>
+              <span style="font-size:0.85rem;color:var(--text-secondary);">Formunuz doğrudan Elif Çevre Kimya Yönetim Dashboard'una canlı olarak düşer.</span>
               <button type="submit" class="btn btn-primary btn-lg" id="rfq-submit-btn">
-                Kurumsal Teklif Talebini Gönder
+                Sipariş / Teklif Formunu Gönder
               </button>
             </div>
           </form>
@@ -1257,12 +1265,13 @@ export function renderQuotePage(container, navigate) {
       const fd = new FormData(form);
       const packInfo = String(fd.get('packagingInfo') || '').trim();
       const rawDesc = String(fd.get('description') || '').trim();
-      const fullDesc = packInfo ? `[Ambalaj/Miktar: ${packInfo}] ${rawDesc}` : rawDesc;
+      const reqType = String(fd.get('requestType') || 'product_quote');
+      const fullDesc = packInfo ? `[Miktar/Ambalaj: ${packInfo}] ${rawDesc}` : rawDesc;
 
       try {
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.textContent = 'Sunucuya Kaydediliyor...';
+          submitBtn.textContent = 'Dashboard’a İletiliyor...';
         }
         const saved = await submitPublicCrmForm({
           companyName: fd.get('companyName'),
@@ -1270,21 +1279,30 @@ export function renderQuotePage(container, navigate) {
           phone: fd.get('phone'),
           email: fd.get('email'),
           cityCountry: fd.get('cityCountry'),
-          requestType: fd.get('requestType'),
+          formChannel: reqType === 'order_request' ? 'order_form' : 'quote_form',
+          requestType: reqType,
           relatedProductOrSystem: fd.get('relatedProductOrSystem'),
+          packagingInfo: packInfo,
+          requestedAmount: packInfo,
           description: fullDesc,
+          message: fullDesc,
           followUpDate: fd.get('followUpDate') || '',
           kvkkConsent: Boolean(fd.get('kvkkConsent')),
           sourcePage: '/teklif-al'
         });
 
-        showNotification('Talebiniz sunucuya başarıyla kaydedildi.', 'success');
+        showNotification(
+          reqType === 'order_request'
+            ? 'Sipariş formunuz doğrudan Yönetim Dashboard ekranına iletildi!'
+            : 'Teklif talebiniz doğrudan Yönetim Dashboard ekranına iletildi!',
+          'success'
+        );
         form.reset();
         if (confirmBox) {
           confirmBox.style.display = 'block';
           renderSafeHtml(confirmBox, `
-            <h4>Talebiniz Kayıt Altına Alındı (Referans No: <code>${escapeHtml(saved.id)}</code>)</h4>
-            <p>Sayın <strong>${escapeHtml(saved.contactName)}</strong>, <strong>${escapeHtml(saved.companyName)}</strong> adına ilettiğiniz <em>${escapeHtml(saved.relatedProductOrSystem)}</em> talebiniz CRM sistemimize <strong>Yeni Talep</strong> aşamasında kaydedilmiştir. İlgili satış ve proses mühendisimiz en kısa sürede sizinle iletişime geçecektir.</p>
+            <h4>${reqType === 'order_request' ? '🛒 Sipariş Talebiniz' : '📋 Teklif Başvurunuz'} Kayıt Altına Alındı (Ref No: <code>${escapeHtml(saved.id)}</code>)</h4>
+            <p>Sayın <strong>${escapeHtml(saved.contactName)}</strong>, <strong>${escapeHtml(saved.companyName)}</strong> adına ilettiğiniz <em>${escapeHtml(saved.relatedProductOrSystem)}</em> kaydınız Yönetim Paneli (Dashboard) ekranımıza <strong>Yeni Talep</strong> olarak düşmüştür. İlgili satış ve proses mühendisimiz en kısa sürede sizinle iletişime geçecektir.</p>
           `);
         }
       } catch (err) {
@@ -1292,7 +1310,7 @@ export function renderQuotePage(container, navigate) {
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = 'Kurumsal Teklif Talebini Gönder';
+          submitBtn.textContent = 'Sipariş / Teklif Formunu Gönder';
         }
       }
     });
@@ -1552,8 +1570,9 @@ export function renderContactPage(container, navigate) {
 
           <!-- Doğrudan İletişim Formu -->
           <div class="card" style="padding:2.25rem;">
-            <h3 style="margin-bottom:0.5rem;">Kurumsal İletişim ve Tedarikçi Kayıt Formu</h3>
-            <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1.5rem;">İletiniz doğrudan Elif Kimya CRM & Müşteri İlişkileri ekranımıza gerçek zamanlı düşer.</p>
+            <span class="badge badge-teal" style="margin-bottom:0.5rem;">CANLI DASHBOARD ENTEGRASYONLU</span>
+            <h3 style="margin-bottom:0.5rem;">Kurumsal İletişim, Sipariş & Tedarikçi Formu</h3>
+            <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1.5rem;">İletiniz doğrudan Elif Çevre Kimya Yönetim Paneli (Dashboard) ve CRM ekranımıza gerçek zamanlı düşer.</p>
 
             <form id="direct-contact-form" class="form-grid-2">
               <div class="form-group">
@@ -1577,17 +1596,19 @@ export function renderContactPage(container, navigate) {
                 <input type="text" name="cityCountry" class="form-input" value="Adana" />
               </div>
               <div class="form-group">
-                <label class="form-label">Konu / İlgili Departman *</label>
-                <input type="text" name="subject" class="form-input" required placeholder="Örn: Tedarikçi Kaydı / Ürün Bilgisi / İhale" />
+                <label class="form-label">Konu / İşlem Türü *</label>
+                <input type="text" name="subject" class="form-input" required placeholder="Örn: Kimyasal Siparişi / Ürün Bilgisi / İhale" />
               </div>
               <div class="form-group full-width">
-                <label class="form-label">Mesajınız *</label>
-                <textarea name="message" class="form-textarea" rows="4" required placeholder="Mesajınızı, talep ettiğiniz kimyasalları veya su arıtma sistemi ihtiyacınızı buraya yazınız..."></textarea>
+                <label class="form-label">Mesajınız / Sipariş Detayınız *</label>
+                <textarea name="message" class="form-textarea" rows="4" required placeholder="Mesajınızı, sipariş etmek istediğiniz kimyasalları veya su arıtma sistemi ihtiyacınızı buraya yazınız..."></textarea>
               </div>
               <div class="form-group full-width">
-                <button type="submit" class="btn btn-primary" id="contact-submit-btn" style="width:100%;">Mesajı Sunucuya Gönder</button>
+                <button type="submit" class="btn btn-primary" id="contact-submit-btn" style="width:100%;">Mesajı Yönetim Dashboard'una Gönder</button>
               </div>
             </form>
+
+            <div id="contact-confirmation-box" style="display:none;margin-top:1.25rem;" class="confirmation-card"></div>
           </div>
         </div>
 
@@ -1627,21 +1648,23 @@ export function renderContactPage(container, navigate) {
       try {
         if (btn) {
           btn.disabled = true;
-          btn.textContent = 'Kaydediliyor...';
+          btn.textContent = 'Dashboard’a Kaydediliyor...';
         }
         await submitPublicCrmForm({
           companyName: fd.get('companyName'),
           contactName: fd.get('contactName'),
           phone: fd.get('phone'),
-          email: 'geri-arama@elifkimya.com.tr',
+          email: 'info@elifcevrekimya.com.tr',
           cityCountry: 'Adana / Bölge',
-          requestType: 'product_quote',
+          formChannel: 'callback_form',
+          requestType: 'callback_30min',
+          subject: `[SİZİ ARAYALIM TALEBİ] ${fd.get('relatedProductOrSystem') || 'Genel Görüşme'}`,
           relatedProductOrSystem: `[SİZİ ARAYALIM TALEBİ] ${fd.get('relatedProductOrSystem') || 'Genel Görüşme'}`,
-          description: 'Müşteri /iletisim sayfasındaki "Sizi Arayalım" hızlı geri arama formu üzerinden acil telefon dönüşü talep etti.',
+          description: `Müşteri /iletisim sayfasındaki "Sizi Arayalım" hızlı geri arama formu üzerinden acil telefon dönüşü talep etti. Konu: ${fd.get('relatedProductOrSystem') || 'Genel Görüşme'}`,
           kvkkConsent: true,
           sourcePage: '/iletisim#sizi-arayalim'
         });
-        showNotification('Geri arama talebiniz sunucuya kaydedildi. Mühendisimiz en kısa sürede sizi arayacaktır.', 'success');
+        showNotification('Geri arama talebiniz Yönetim Dashboard ekranına düştü! Mühendisimiz en kısa sürede sizi arayacaktır.', 'success');
         cbForm.reset();
       } catch (err) {
         showNotification(err.message || 'Geri arama talebi gönderilemedi.', 'error');
@@ -1656,6 +1679,7 @@ export function renderContactPage(container, navigate) {
 
   // Doğrudan İletişim Formu
   const form = container.querySelector('#direct-contact-form');
+  const contactConfirmBox = container.querySelector('#contact-confirmation-box');
   if (form) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1664,9 +1688,9 @@ export function renderContactPage(container, navigate) {
       try {
         if (btn) {
           btn.disabled = true;
-          btn.textContent = 'Gönderiliyor...';
+          btn.textContent = 'Dashboard’a Gönderiliyor...';
         }
-        await submitContactMessage({
+        const saved = await submitContactMessage({
           name: fd.get('name'),
           companyName: fd.get('companyName'),
           phone: fd.get('phone'),
@@ -1674,16 +1698,24 @@ export function renderContactPage(container, navigate) {
           cityCountry: fd.get('cityCountry'),
           subject: fd.get('subject'),
           message: fd.get('message'),
-          kvkkConsent: true
+          kvkkConsent: true,
+          sourcePage: '/iletisim'
         });
-        showNotification('Mesajınız sunucuya kaydedildi. En kısa sürede dönüş yapılacaktır.', 'success');
+        showNotification('Mesajınız Yönetim Dashboard ekranına başarıyla iletildi!', 'success');
         form.reset();
+        if (contactConfirmBox) {
+          contactConfirmBox.style.display = 'block';
+          renderSafeHtml(contactConfirmBox, `
+            <h4>📩 İletişim Mesajınız Dashboard’a İletildi (Ref No: <code>${escapeHtml(saved.id)}</code>)</h4>
+            <p>Sayın <strong>${escapeHtml(saved.contactName)}</strong>, <strong>${escapeHtml(saved.companyName)}</strong> adına gönderdiğiniz <em>"${escapeHtml(saved.subject || saved.relatedProductOrSystem)}"</em> konulu mesajınız merkez operasyon ekranımıza düşmüştür.</p>
+          `);
+        }
       } catch (err) {
         showNotification(err.message || 'Mesaj gönderilemedi.', 'error');
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = 'Mesajı Sunucuya Gönder';
+          btn.textContent = 'Mesajı Yönetim Dashboard\'una Gönder';
         }
       }
     });

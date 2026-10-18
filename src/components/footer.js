@@ -60,8 +60,13 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
             ${escapeHtml(t('footer_tagline'))}
           </p>
           <div class="mt-4 space-y-1.5 text-xs text-slate-300">
-            <p class="font-bold text-emerald-400">${escapeHtml(email)}</p>
-            <p class="font-mono font-bold text-white text-sm">${escapeHtml(rawPhone)}</p>
+            <p>
+              <a href="https://www.elifcevrekimya.com.tr" class="font-bold text-white hover:text-emerald-400 transition-colors">🌐 www.elifcevrekimya.com.tr</a>
+            </p>
+            <p>
+              <a href="mailto:${escapeAttr(email)}" class="font-bold text-emerald-400 hover:text-emerald-300 transition-colors">✉️ ${escapeHtml(email)}</a>
+            </p>
+            <p class="font-mono font-bold text-white text-sm">📞 ${escapeHtml(rawPhone)}</p>
             <p>
               <a
                 href="https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&amp;ved=1t:8290&amp;ictx=111"
@@ -189,7 +194,7 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
 
       <div class="border-t border-white/10 bg-slate-950/60">
         <div class="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs text-slate-400 sm:flex-row font-semibold">
-          <p>© 2026 ELİF KİMYA SANAYİ VE TİCARET. Tüm hakları saklıdır.</p>
+          <p>© 2026 ELİF ÇEVRE KİMYA SANAYİ VE TİCARET (www.elifcevrekimya.com.tr). Tüm hakları saklıdır.</p>
           <div class="flex flex-wrap items-center gap-6">
             <a class="text-emerald-400 hover:text-white transition-colors" href="/teknik-bilgi" data-nav="/teknik-bilgi">Teknik Bilgi Merkezi</a>
             <a class="hover:text-emerald-400 transition-colors" href="/llms.txt" target="_blank" rel="noopener">AI / GEO Rehberi (llms.txt)</a>

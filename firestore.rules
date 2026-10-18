@@ -118,7 +118,8 @@ service cloud.firestore {
     function isBootstrapAdmin() {
       return isAuthenticated() &&
         (request.auth.token.admin == true ||
-         request.auth.token.email in ['cebrailkara@gmail.com', 'cebokar@gmail.com']);
+         request.auth.uid == 'WLmHlUPbQySb043sK70Oj6zKI633' ||
+         request.auth.token.email in ['cebrailkara@gmail.com', 'cebokar@gmail.com', 'info@elifcevrekimya.com.tr']);
     }
 
     function getUserRole() {

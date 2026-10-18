@@ -47,8 +47,8 @@ export function extractCustomerSafePdfModel(proposal, companySettings = {}) {
       subtitle: 'Endüstriyel Su Arıtma Sistemleri & Proses Kimyasalları Mühendisliği',
       address: companySettings.address || 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
       phone: companySettings.phone || '+90 (542) 590 36 26',
-      email: companySettings.email || 'info@elifkimya.com.tr',
-      website: 'https://elifkimya.web.app',
+      email: companySettings.email || 'info@elifcevrekimya.com.tr',
+      website: 'https://www.elifcevrekimya.com.tr',
       taxInfo: companySettings.taxInfo || 'Adana Vergi Dairesi'
     },
     proposalNo: String(proposal.proposalNo || 'EK-2026-001'),

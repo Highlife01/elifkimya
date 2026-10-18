@@ -1,4 +1,4 @@
-# Elif Kimya - Kurumsal SEO & GEO (AI Search) Robots Yapılandırması
+# Elif Çevre Kimya (www.elifcevrekimya.com.tr) - Kurumsal SEO & GEO (AI Search) Robots Yapılandırması
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -76,4 +76,4 @@ Allow: /
 Disallow: /admin
 Disallow: /portal
 
-Sitemap: https://elifkimya.web.app/sitemap.xml
+Sitemap: https://www.elifcevrekimya.com.tr/sitemap.xml

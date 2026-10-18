@@ -11,6 +11,7 @@ import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
@@ -30,6 +31,7 @@ import {
   where,
   orderBy,
   limit,
+  onSnapshot,
   runTransaction,
   serverTimestamp
 } from 'firebase/firestore';
@@ -107,7 +109,7 @@ export const ROLE_LABELS = {
   customer: 'Müşteri (Portal)'
 };
 
-const BOOTSTRAP_ADMINS = new Set(['cebrailkara@gmail.com', 'cebokar@gmail.com']);
+const BOOTSTRAP_ADMINS = new Set(['cebrailkara@gmail.com', 'cebokar@gmail.com', 'info@elifcevrekimya.com.tr']);
 
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
@@ -198,9 +200,22 @@ export async function writeAuditLog(action, collectionName, targetId, detailsObj
 
 export async function loginWithEmail(email, password) {
   if (!auth) throw new Error('Firebase Authentication yapılandırılmamış.');
-  const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
-  const profile = await ensureUserProfile(cred.user);
-  return { user: cred.user, profile };
+  const normalizedEmail = email.trim().toLowerCase();
+  try {
+    const cred = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+    const profile = await ensureUserProfile(cred.user);
+    return { user: cred.user, profile };
+  } catch (err) {
+    if (
+      BOOTSTRAP_ADMINS.has(normalizedEmail) &&
+      (err?.code === 'auth/user-not-found' || err?.code === 'auth/invalid-credential')
+    ) {
+      const created = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
+      const profile = await ensureUserProfile(created.user);
+      return { user: created.user, profile };
+    }
+    throw err;
+  }
 }
 
 export async function loginWithGoogle() {
@@ -304,27 +319,44 @@ export async function submitPublicCrmForm(data) {
   const companyName = String(data.companyName || data.name || '').trim();
   const contactName = String(data.contactName || data.name || '').trim();
   const email = String(data.email || '').trim();
-  const phone = String(data.phone || '').trim();
+  const rawPhone = String(data.phone || '').trim();
+  const phone = rawPhone.length >= 6 ? rawPhone : 'Belirtilmedi';
 
   if (companyName.length < 2) throw new Error('Lütfen geçerli bir firma veya ad soyad girin.');
   if (!email.includes('@') || email.length < 5) throw new Error('Lütfen geçerli bir e-posta adresi girin.');
-  if (phone.length < 6) throw new Error('Lütfen geçerli bir telefon numarası girin.');
+
+  const reqType = String(data.requestType || 'product_quote');
+  let formChannel = String(data.formChannel || '').trim();
+  if (!formChannel) {
+    if (reqType === 'general_contact') formChannel = 'contact_form';
+    else if (reqType === 'order_request') formChannel = 'order_form';
+    else if (reqType === 'callback_30min') formChannel = 'callback_form';
+    else formChannel = 'quote_form';
+  }
 
   const nowIso = new Date().toISOString();
+  const descText = String(data.description || data.message || '').trim();
+  const packText = String(data.packagingInfo || data.packaging || data.requestedAmount || '').trim();
+
   const payload = {
     companyName,
     contactName: contactName || companyName,
     phone,
     email,
     cityCountry: String(data.cityCountry || 'Adana / Türkiye').trim(),
-    requestType: String(data.requestType || 'product_quote'),
-    relatedProductOrSystem: String(data.relatedProductOrSystem || '').trim(),
-    description: String(data.description || data.message || '').trim(),
+    formChannel,
+    requestType: reqType,
+    subject: String(data.subject || data.relatedProductOrSystem || '').trim().slice(0, 200),
+    relatedProductOrSystem: String(data.relatedProductOrSystem || data.subject || '').trim(),
+    packaging: packText.slice(0, 200),
+    requestedAmount: packText.slice(0, 200),
+    message: descText.slice(0, 5000),
+    description: descText.slice(0, 5000),
     assignedStaff: String(data.assignedStaff || '').trim(),
     followUpDate: String(data.followUpDate || '').trim(),
     stage: 'Yeni Talep',
     resolutionStatus: 'active',
-    kvkkConsent: Boolean(data.kvkkConsent),
+    kvkkConsent: Boolean(data.kvkkConsent ?? true),
     sourcePage: String(data.sourcePage || window.location.pathname),
     isTestRecord: Boolean(data.isTestRecord),
     stageHistory: [
@@ -348,24 +380,29 @@ export async function submitPublicCrmForm(data) {
 }
 
 export async function submitQuoteRequest(data) {
+  const isOrder = data.requestType === 'order_request' || data.formChannel === 'order_form';
   return submitPublicCrmForm({
     ...data,
+    formChannel: isOrder ? 'order_form' : 'quote_form',
     requestType: data.requestType || 'product_quote'
   });
 }
 
 export async function submitContactMessage(data) {
   return submitPublicCrmForm({
-    companyName: data.companyName || data.name,
-    contactName: data.name,
+    companyName: data.companyName || data.name || 'İletişim Formu Ziyaretçisi',
+    contactName: data.name || data.contactName || data.companyName,
     email: data.email,
     phone: data.phone || 'Belirtilmedi',
-    cityCountry: data.cityCountry || 'Türkiye',
+    cityCountry: data.cityCountry || 'Adana / Türkiye',
+    formChannel: 'contact_form',
     requestType: 'general_contact',
-    relatedProductOrSystem: data.subject || 'Genel İletişim',
-    description: data.message,
+    subject: data.subject || 'İletişim Formu Mesajı',
+    relatedProductOrSystem: data.subject || 'Genel İletişim Mesajı',
+    message: data.message || data.description || '',
+    description: data.message || data.description || '',
     kvkkConsent: data.kvkkConsent ?? true,
-    sourcePage: '/iletisim'
+    sourcePage: data.sourcePage || '/iletisim'
   });
 }
 
@@ -2106,6 +2143,113 @@ export async function updateChequeOrNoteStatus(instrumentId, newStatus, endorsed
   await writeAuditLog('UPDATE_CHEQUE_STATUS', COLLECTIONS.CHEQUES_AND_NOTES, instrumentId, { status: newStatus }, actor);
 }
 
+function normalizeInboundCrmRecord(item, fallbackChannel = null) {
+  const reqType = item.requestType || (fallbackChannel === 'contact_form' ? 'general_contact' : 'product_quote');
+  let formChannel = item.formChannel || fallbackChannel || '';
+  if (!formChannel) {
+    if (reqType === 'general_contact' || item.sourcePage?.includes('/iletisim')) formChannel = 'contact_form';
+    else if (reqType === 'order_request') formChannel = 'order_form';
+    else if (reqType === 'callback_30min') formChannel = 'callback_form';
+    else formChannel = 'quote_form';
+  }
+  return {
+    ...item,
+    companyName: item.companyName || item.company || item.name || 'İsimsiz Başvuru',
+    contactName: item.contactName || item.contactPerson || item.name || item.companyName || '-',
+    phone: item.phone || '-',
+    email: item.email || '-',
+    cityCountry: item.cityCountry || item.city || 'Adana / Türkiye',
+    formChannel,
+    requestType: reqType,
+    subject: item.subject || item.relatedProductOrSystem || item.productDetail || 'Kurumsal Talep',
+    relatedProductOrSystem: item.relatedProductOrSystem || item.subject || item.productDetail || item.category || 'Genel Talep',
+    packaging: item.packaging || item.requestedAmount || '',
+    requestedAmount: item.requestedAmount || item.packaging || '',
+    description: item.description || item.message || item.waterReportNotes || item.notes || '',
+    message: item.message || item.description || item.waterReportNotes || item.notes || '',
+    stage: item.stage || 'Yeni Talep',
+    resolutionStatus: item.resolutionStatus || 'active',
+    createdAtIso: item.createdAtIso || (item.createdAt?.toDate ? item.createdAt.toDate().toISOString() : '')
+  };
+}
+
+export function subscribeToAdminInbox(onUpdate) {
+  if (!db || typeof onUpdate !== 'function') return () => {};
+  let initialized = false;
+  let knownIds = new Set();
+
+  const q = query(collection(db, COLLECTIONS.CRM_REQUESTS), limit(250));
+  const unsubscribe = onSnapshot(
+    q,
+    (snap) => {
+      const items = [];
+      let newCount = 0;
+      let latestNewItem = null;
+
+      snap.forEach((d) => {
+        const normalized = normalizeInboundCrmRecord({ id: d.id, ...d.data() });
+        items.push(normalized);
+        if (initialized && !knownIds.has(d.id)) {
+          newCount += 1;
+          latestNewItem = normalized;
+        }
+        knownIds.add(d.id);
+      });
+
+      items.sort((a, b) => {
+        const tA = a.updatedAtIso || a.createdAtIso || '';
+        const tB = b.updatedAtIso || b.createdAtIso || '';
+        return tB.localeCompare(tA);
+      });
+
+      const wasInit = initialized;
+      initialized = true;
+      onUpdate(items, { isInitial: !wasInit, newCount, latestNewItem });
+    },
+    (_err) => {
+      // Bağlantı veya yetki kesintisinde sessizce geç
+    }
+  );
+
+  return unsubscribe;
+}
+
+export async function convertCrmRequestToOrder(crmReq, grandTotalTry, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'manage_orders')) {
+    throw new Error('Sipariş oluşturma yetkiniz bulunmuyor.');
+  }
+  const orderNo = `SIP-${new Date().getFullYear()}-${String(Date.now()).slice(-4)}`;
+  const orderPayload = {
+    orderNo,
+    companyName: crmReq.companyName || crmReq.contactName || 'Müşteri',
+    customerName: crmReq.companyName || crmReq.contactName || 'Müşteri',
+    contactEmail: crmReq.email && crmReq.email !== '-' ? crmReq.email : '',
+    status: 'Sipariş Alındı',
+    fulfillmentStatus: 'Sipariş Alındı',
+    grandTotal: Math.max(Number(grandTotalTry || 0), 0),
+    collectedAmount: 0,
+    paidAmount: 0,
+    paymentStatus: 'Bekliyor',
+    deliveryDate: crmReq.followUpDate || new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10),
+    notes: `[Web Sipariş/Teklif Formundan Aktarıldı - Ref: ${crmReq.id}] Ürün/Sistem: ${crmReq.relatedProductOrSystem || ''} | Miktar/Ambalaj: ${crmReq.requestedAmount || '-'} | Not: ${crmReq.description || ''}`.slice(0, 4000)
+  };
+
+  const createdOrder = await saveOrderRecord(orderPayload, actor);
+  if (crmReq.id && !String(crmReq.id).startsWith('legacy_')) {
+    try {
+      await createOrUpdateCrmRequest({
+        id: crmReq.id,
+        stage: 'Onaylandı',
+        resolutionStatus: 'active'
+      }, actor);
+    } catch (_e) {
+      // Aşama güncellemesi başarısız olsa da sipariş oluştu
+    }
+  }
+  return createdOrder;
+}
+
 export async function loadAdminAllData() {
   if (!db) {
     return {
@@ -2138,7 +2282,9 @@ export async function loadAdminAllData() {
   };
 
   const [
-    crmRequests,
+    rawCrmRequests,
+    legacyContacts,
+    legacyQuotes,
     customers,
     rawProducts,
     rawDocuments,
@@ -2157,6 +2303,8 @@ export async function loadAdminAllData() {
     settings
   ] = await Promise.all([
     safeFetch(COLLECTIONS.CRM_REQUESTS),
+    safeFetch('contactMessages'),
+    safeFetch('quoteRequests'),
     safeFetch(COLLECTIONS.CUSTOMERS),
     safeFetch(COLLECTIONS.PRODUCTS),
     safeFetch(COLLECTIONS.DOCUMENTS),
@@ -2174,6 +2322,29 @@ export async function loadAdminAllData() {
     safeFetch(COLLECTIONS.AUDIT_LOGS),
     fetchAllSiteSettings()
   ]);
+
+  const mergedCrmMap = new Map();
+  rawCrmRequests.forEach((r) => {
+    mergedCrmMap.set(r.id, normalizeInboundCrmRecord(r));
+  });
+  legacyContacts.forEach((c) => {
+    const key = `legacy_contact_${c.id}`;
+    if (!mergedCrmMap.has(c.id)) {
+      mergedCrmMap.set(key, normalizeInboundCrmRecord({ ...c, id: key }, 'contact_form'));
+    }
+  });
+  legacyQuotes.forEach((q) => {
+    const key = `legacy_quote_${q.id}`;
+    if (!mergedCrmMap.has(q.id)) {
+      mergedCrmMap.set(key, normalizeInboundCrmRecord({ ...q, id: key }, 'quote_form'));
+    }
+  });
+
+  const crmRequests = Array.from(mergedCrmMap.values()).sort((a, b) => {
+    const tA = a.updatedAtIso || a.createdAtIso || '';
+    const tB = b.updatedAtIso || b.createdAtIso || '';
+    return tB.localeCompare(tA);
+  });
 
   const products = rawProducts.map((p) => ({
     ...p,

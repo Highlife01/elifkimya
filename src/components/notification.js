@@ -53,7 +53,7 @@ export const showNotification = showToast;
 /**
  * Native confirm() yerine kullanılan, ana iş parçacığını bloklamayan kurumsal onay modalı.
  */
-export function showConfirmModal({ title = 'İşlemi Onayla', message = 'Devam etmek istiyor musunuz?', confirmText = 'Onayla', cancelText = 'Vazgeç', danger = false }) {
+export function showConfirmModal({ title = 'İşlemi Onayla', message = 'Devam etmek istiyor musunuz?', confirmText = 'Onayla', cancelText = 'Vazgeç', danger = false, inputLabel = '', inputType = 'text', inputPlaceholder = '', inputRequired = false }) {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -84,13 +84,38 @@ export function showConfirmModal({ title = 'İşlemi Onayla', message = 'Devam e
     confirmBtn.className = `button ${danger ? 'button-danger' : 'button-primary'} button-small`;
     confirmBtn.textContent = confirmText;
 
+    let inputEl = null;
+    if (inputLabel) {
+      const field = document.createElement('label');
+      field.className = 'form-label';
+      field.textContent = inputLabel;
+      inputEl = document.createElement('input');
+      inputEl.type = inputType;
+      inputEl.className = 'form-input';
+      inputEl.placeholder = inputPlaceholder;
+      inputEl.required = Boolean(inputRequired);
+      if (inputType === 'number') {
+        inputEl.min = '0.01';
+        inputEl.step = '0.01';
+      }
+      field.appendChild(inputEl);
+      dialog.appendChild(field);
+    }
+
     const cleanup = (result) => {
       overlay.remove();
-      resolve(result);
+      if (inputEl) resolve(result ? String(inputEl.value || '').trim() : null);
+      else resolve(result);
     };
 
     cancelBtn.addEventListener('click', () => cleanup(false));
-    confirmBtn.addEventListener('click', () => cleanup(true));
+    confirmBtn.addEventListener('click', () => {
+      if (inputEl && inputRequired && !String(inputEl.value || '').trim()) {
+        inputEl.focus();
+        return;
+      }
+      cleanup(true);
+    });
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) cleanup(false);
     });
@@ -99,6 +124,7 @@ export function showConfirmModal({ title = 'İşlemi Onayla', message = 'Devam e
     actions.appendChild(confirmBtn);
     dialog.appendChild(titleEl);
     dialog.appendChild(msgEl);
+    if (inputEl) dialog.appendChild(inputEl.parentElement);
     dialog.appendChild(actions);
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);

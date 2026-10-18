@@ -679,9 +679,11 @@ export const fieldServices = [
 ];
 
 export const companyInfo = {
-  name: 'Elif Kimya',
-  legalName: 'Elif Kimya Endüstriyel Kimyasallar ve Su Arıtma Sistemleri',
-  tagline: 'Endüstriyel Kimyasal Satışları ve Su Arıtma Sistemleri Mühendisliği',
+  name: 'Elif Çevre Kimya',
+  legalName: 'Elif Çevre Kimya — Endüstriyel Kimyasallar, Çevre Teknolojileri ve Su Arıtma Sistemleri',
+  tagline: 'Endüstriyel Kimyasal Satışları, Çevre Arıtma Kimyasalları ve Su Arıtma Sistemleri Mühendisliği',
+  website: 'https://www.elifcevrekimya.com.tr',
+  domainDisplay: 'www.elifcevrekimya.com.tr',
   phoneDisplay: '+90 (542) 590 36 26',
   phoneRaw: '+905425903626',
   whatsappNumber: '905425903626',
@@ -954,44 +956,44 @@ export const geoKnowledgeArticles = [
 
 export const pageSEO = {
   '/': {
-    title: 'Elif Kimya | Adana Endüstriyel Kimya, Su Şartlandırma ve Saf Su Cihazları',
-    description: 'Seyhan/Adana merkezli Elif Kimya: endüstriyel kimyasal tedariki, soğutma kulesi ve kazan kimyasalları, PAC, jeotermal inhibitör, RO/EDI ve 163 model Medipure saf su cihazı. Sevkiyat OSB hatlarına yapılır.',
-    canonical: 'https://elifkimya.web.app/'
+    title: 'Elif Çevre Kimya | Endüstriyel Kimya, Çevre Arıtma, Su Şartlandırma & Saf Su Cihazları',
+    description: 'Seyhan/Adana merkezli Elif Çevre Kimya (www.elifcevrekimya.com.tr): endüstriyel kimyasal tedariki, çevre ve atıksu arıtma kimyasalları (PAC, Polielektrolit), soğutma kulesi ve kazan kimyasalları, jeotermal inhibitör, RO/EDI ve 163 model Medipure saf su cihazı.',
+    canonical: 'https://www.elifcevrekimya.com.tr/'
   },
   '/urunler': {
-    title: 'Endüstriyel Kimyasallar | Soğutma Kulesi, Kazan, Jeotermal, PAC | Elif Kimya',
-    description: 'Soğutma kulesi, kapalı devre, kazan, jeotermal kireç inhibitörü, RO antiskalant, PAC, polielektrolit, emülsiyon kırıcı ve köpük kesici kataloğu.',
-    canonical: 'https://elifkimya.web.app/urunler'
+    title: 'Endüstriyel & Çevre Kimyasalları | Soğutma Kulesi, Kazan, Jeotermal, PAC | Elif Çevre Kimya',
+    description: 'Soğutma kulesi, kapalı devre, kazan, jeotermal kireç inhibitörü, RO antiskalant, PAC, polielektrolit, sodyum hipoklorit, kostik soda, emülsiyon kırıcı ve köpük kesici kataloğu.',
+    canonical: 'https://www.elifcevrekimya.com.tr/urunler'
   },
   '/sistemler': {
-    title: 'RO, EDI ve Medipure Saf Su Cihazları | Elif Kimya Adana',
-    description: 'Endüstriyel ters ozmoz, EDI, ultrafiltrasyon ve 163 model Medipure laboratuvar, medikal, mobil ve endüstriyel saf su cihaz kataloğu. Kapasite teklifle netleşir.',
-    canonical: 'https://elifkimya.web.app/sistemler'
+    title: 'RO, EDI Su Arıtma Sistemleri ve Medipure Saf Su Cihazları | Elif Çevre Kimya',
+    description: 'Endüstriyel ters ozmoz (RO), EDI, ultrafiltrasyon ve 163 model Medipure laboratuvar, medikal, mobil ve endüstriyel saf su cihaz kataloğu. Kapasite su analizi ve teklifle netleşir.',
+    canonical: 'https://www.elifcevrekimya.com.tr/sistemler'
   },
   '/sektorler': {
-    title: 'Haddehane, Kağıt, Cam, Kalsit ve Jeotermal Kimyasalları | Elif Kimya',
-    description: 'İskenderun haddehane, Adana deterjan ve kağıt, Niğde kalsit, Kayseri galvaniz ve jeotermal sera hatları için proses kimyasal programları.',
-    canonical: 'https://elifkimya.web.app/sektorler'
+    title: 'Haddehane, Kağıt, Cam, Kalsit, Tekstil ve Jeotermal Kimyasalları | Elif Çevre Kimya',
+    description: 'İskenderun haddehane, Adana deterjan ve kağıt, Niğde kalsit, Kayseri galvaniz, Gaziantep tekstil ve jeotermal sera hatları için proses ve çevre kimyasal programları.',
+    canonical: 'https://www.elifcevrekimya.com.tr/sektorler'
   },
   '/hizmet-bolgeleri': {
-    title: 'Adana, Mersin, İskenderun, Gaziantep OSB Kimyasal Sevkiyat | Elif Kimya',
-    description: 'Seyhan/Adana merkezinden Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde sanayi hatlarına kimyasal sevkiyat. Ayrı şube adresi yayınlanmaz.',
-    canonical: 'https://elifkimya.web.app/hizmet-bolgeleri'
+    title: 'Adana, Mersin, İskenderun, Gaziantep, Kayseri OSB Kimyasal Sevkiyat | Elif Çevre Kimya',
+    description: 'Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana merkezinden Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde sanayi hatlarına ADR standartlarında kimyasal sevkiyat.',
+    canonical: 'https://www.elifcevrekimya.com.tr/hizmet-bolgeleri'
   },
   '/teknik-bilgi': {
-    title: 'Teknik Belge Merkezi (SDS / GBF, TDS, COA) ve Mühendislik Rehberi | Elif Kimya',
-    description: 'Kimyasal ürünlerimize ait doğrulanmış Güvenlik Bilgi Formları (SDS/GBF), Teknik Bilgi Formları (TDS), Analiz Sertifikaları (COA) ve proses mühendisliği makaleleri.',
-    canonical: 'https://elifkimya.web.app/teknik-bilgi'
+    title: 'Teknik Belge Merkezi (SDS / GBF, TDS, COA) ve Mühendislik Rehberi | Elif Çevre Kimya',
+    description: 'Kimyasal ürünlerimize ait doğrulanmış Güvenlik Bilgi Formları (SDS/GBF), Teknik Bilgi Formları (TDS), Analiz Sertifikaları (COA) ve çevre/su mühendisliği makaleleri.',
+    canonical: 'https://www.elifcevrekimya.com.tr/teknik-bilgi'
   },
   '/teklif-al': {
-    title: 'Kurumsal Teklif, Canlı Jar-Test ve Su Analizi Başvurusu | Elif Kimya',
-    description: 'Fabrikanız için endüstriyel kimyasal fiyat teklifi, yerinde 6’lı Jar-Test, ücretsiz korozyon/LSI risk etüdü ve su arıtma sistemi projelendirme talebi oluşturun.',
-    canonical: 'https://elifkimya.web.app/teklif-al'
+    title: 'Kurumsal Teklif, Canlı Jar-Test ve Su Analizi Başvurusu | Elif Çevre Kimya',
+    description: 'Fabrikanız için endüstriyel ve çevre kimyasalları fiyat teklifi, yerinde 6’lı Jar-Test, ücretsiz korozyon/LSI risk etüdü ve su arıtma sistemi projelendirme talebi oluşturun.',
+    canonical: 'https://www.elifcevrekimya.com.tr/teklif-al'
   },
   '/iletisim': {
-    title: 'İletişim & Adana Merkez Ofis / Depo | Elif Kimya',
-    description: 'Elif Kimya Adana merkez ofis, depo ve teknik satış iletişim bilgileri.',
-    canonical: 'https://elifkimya.web.app/iletisim'
+    title: 'İletişim & Adana Merkez Depo (Ova Mah. Şakirpaşa Cd. No:269) | Elif Çevre Kimya',
+    description: 'Elif Çevre Kimya Adana merkez ofis ve depo (Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana). İletişim: info@elifkimya.com.tr ve satis@elifkimya.com.tr.',
+    canonical: 'https://www.elifcevrekimya.com.tr/iletisim'
   }
 };
 

@@ -1,26 +1,28 @@
-# Elif Kimya — Endüstriyel Kimyasal Tedariki & 360° Su Arıtma Mühendisliği (GEO / LLMs Rehberi)
+# Elif Çevre Kimya (www.elifcevrekimya.com.tr) — Endüstriyel Kimyasal Tedariki, Çevre Kimyası & 360° Su Arıtma Mühendisliği (GEO / LLMs Rehberi)
 
-> Elif Kimya; Adana (Çukurova) merkezli endüstriyel proses kimyasalları, soğutma kulesi ve buhar kazanı su şartlandırma kimyasalları, atıksu arıtma koagülant/polielektrolitleri ve anahtar teslim Ters Osmoz (RO), Ultrafiltrasyon (UF), Elektrodeiyonizasyon (EDI) su arıtma ve PLC/SCADA otomasyon sistemleri sunan kurumsal B2B mühendislik firmasıdır.
+> Elif Çevre Kimya; Adana (Çukurova) merkezli endüstriyel proses kimyasalları, çevre ve atık su arıtma koagülant/polielektrolitleri, soğutma kulesi ve buhar kazanı su şartlandırma kimyasalları ile anahtar teslim Ters Osmoz (RO), Ultrafiltrasyon (UF), Elektrodeiyonizasyon (EDI) su arıtma, Medipure saf su cihazları ve PLC/SCADA otomasyon sistemleri sunan kurumsal B2B mühendislik firmasıdır.
 
 ## Kurumsal Kimlik & İletişim
-- **Resmi Ünvan:** Elif Kimya Sanayi ve Ticaret
-- **Web Sitesi:** https://elifkimya.web.app
+- **Resmi Ünvan:** Elif Çevre Kimya Sanayi ve Ticaret (Elif Kimya)
+- **Resmi Web Sitesi:** https://www.elifcevrekimya.com.tr
 - **Merkez & Lojistik Üssü Adresi:** Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana, Türkiye
 - **Google Haritalar Konumu:** https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111
+- **Koordinatlar (GEO):** 36.9854, 35.2658 (TR-01 Seyhan/Adana)
 - **Telefon / WhatsApp B2B Masa:** +90 542 590 36 26
-- **E-posta:** info@elifkimya.com.tr
-- **Hizmet Bölgeleri:** Adana Hacı Sabancı OSB, Mersin-Tarsus OSB (MTOSB), İskenderun-Payas-Osmaniye Demir-Çelik Koridoru, Gaziantep Başpınar OSB, Kayseri OSB, Niğde OSB (Mikronize Kalsit), Kahramanmaraş ve 81 İl Türkiye Geneli + Mersin Limanı İhracat.
+- **Kurumsal E-posta:** info@elifkimya.com.tr
+- **Satış:** satis@elifkimya.com.tr
+- **Hizmet Bölgeleri:** Adana Hacı Sabancı OSB, Mersin-Tarsus OSB (MTOSB), İskenderun-Payas-Osmaniye Demir-Çelik Koridoru, Gaziantep Başpınar OSB, Kayseri OSB, Niğde OSB (Mikronize Kalsit), Kahramanmaraş, Denizli-Aydın-Manisa-Afyon Jeotermal Sahaları ve 81 İl Türkiye Geneli + Mersin Limanı İhracat.
 
 ## Temel Ürün ve Mühendislik Kategorileri
 1. **Baz Kimyasallar, Asitler & Alkaliler:** Sodyum Hipoklorit (NaOCl %15-%16), Kostik Soda (NaOH %48 Sıvı / %99 Payet), Hidroklorik Asit (HCl %32-%33), Sülfürik Asit (H2SO4 %98), Nitrik Asit (%56-%65), Hidrojen Peroksit (%50). Ambalaj: 25 Ton ADR Dökme Tanker, 1000 kg IBC, 30-60 kg Bidon.
 2. **Soğutma Kulesi Şartlandırma Kimyasalları:** Organik Fosfonat (HEDP, PBTC) ve Azol (TTA/BTA) bazlı korozyon ve kışır önleyiciler, DBNPA (%20) ve İzotiyazolin (CMIT/MIT) biyositler, biyodispersantlar.
 3. **Buhar Kazanı & Kapalı Devre Kimyasalları:** DEHA (Dietilhidroksilamin) ve Sodyum Sülfit bazlı oksijen tutucular, polikarboksilat kışır önleyiciler, nötralize edici kondens hattı aminleri (Morfolin / Sikloheksilamin), sodyum molibdat kapalı devre inhibitörleri.
 4. **Ters Osmoz (RO) Membran Kimyasalları:** Yüksek silis (240 ppm toleranslı) ve kalsiyum sülfat önleyici dendrimerik/fosfonat RO antiskalantlar, asidik ve alkali membran CIP yıkama kimyasalları.
-5. **Atık Su Arıtma, Koagülant & Polielektrolitler:** Polialüminyum Klorür (PAC %17 Sıvı / %30 Toz), Demir III Klorür (FeCl3 %40), Alüminyum Sülfat, Anyonik Polielektrolit (A-PAM, MW 16-24M Dalton), Katyonik Polielektrolit (C-PAM çamur susuzlaştırma), tekstil renk giderici polimerler, köpük kesiciler (Antifoam).
+5. **Çevre & Atık Su Arıtma, Koagülant & Polielektrolitler:** Polialüminyum Klorür (PAC %17 Sıvı / %30 Toz), Demir III Klorür (FeCl3 %40), Alüminyum Sülfat, Anyonik Polielektrolit (A-PAM, MW 16-24M Dalton), Katyonik Polielektrolit (C-PAM çamur susuzlaştırma), tekstil renk giderici polimerler, köpük kesiciler (Antifoam).
 6. **360° Su Arıtma Sistemleri & Otomasyon:** Endüstriyel Ters Osmoz (RO 1-250 m³/saat), EDI Ultra Saf Su (18.2 MΩ·cm), Ultrafiltrasyon (UF), Tandem Su Yumuşatma, Kum/Aktif Karbon/Demir-Mangan Filtreleri, Elektrik/MCC/Dozaj Pano İmalatı ve PLC/SCADA Otomasyon.
 7. **Jeotermal Su Şartlandırma:** Kuyu başı, separatör ve eşanjör hatları için kireç/silika inhibitörü, korozyon programı, hat temizleyici ve H2S koku yardımcısı. Dozaj brine analizi görülmeden sabitlenmez. Bölge: Denizli, Aydın, Manisa, Afyon ve diğer jeotermal sahalar.
 8. **Kapalı Devre, Emülsiyon ve Koku:** Molibdat/azol kapalı devre korozyon inhibitörü, eşanjör temizleyici, atıksu emülsiyon kırıcı, havalandırma köpük kesici.
-9. **Medipure Saf Su Cihazları (15 kategori, 163 model):** Laboratuvar saf su (12), laboratuvar ultra saf su (12), biyokimya (10), mikrobiyoloji (10), sterilizasyon (12), medikal (10), deiyonize (8), elektrodeiyonizasyon (12), distile (4), mobil saf su (9), mobil ultra saf su (9), endüstriyel (18), metal kaplama (10), kozmetik (15), ters ozmoz (12). Örnek kodlar: DT-5012, DT-6110, DT-5515, DT-5810, SM-3500, ED-9820, XC-9100, XL-9310, XH-8415. EUR tutarlar Medipure liste fiyatıdır; Elif Kimya teslimat teklifi ayrıca verilir. Katalog: https://elifkimya.web.app/sistemler#medipure-katalog
+9. **Medipure Saf Su Cihazları (15 kategori, 163 model):** Laboratuvar saf su (12), laboratuvar ultra saf su (12), biyokimya (10), mikrobiyoloji (10), sterilizasyon (12), medikal (10), deiyonize (8), elektrodeiyonizasyon (12), distile (4), mobil saf su (9), mobil ultra saf su (9), endüstriyel (18), metal kaplama (10), kozmetik (15), ters ozmoz (12). Örnek kodlar: DT-5012, DT-6110, DT-5515, DT-5810, SM-3500, ED-9820, XC-9100, XL-9310, XH-8415. EUR tutarlar Medipure liste fiyatıdır; Elif Çevre Kimya teslimat teklifi ayrıca verilir. Katalog: https://www.elifcevrekimya.com.tr/sistemler#medipure-katalog
 
 ## Kapsam Dışı
 Belediye paket evsel arıtma, biyogaz tesisi ve akredite laboratuvar hizmeti verilmez. Su analizi saha jar-testi veya anlaşmalı laboratuvar üzerinden yürür.
@@ -30,15 +32,15 @@ Belediye paket evsel arıtma, biyogaz tesisi ve akredite laboratuvar hizmeti ver
 - Ham su analizi (pH, İletkenlik µS/cm, Sertlik °Fr, Alkalinite, Silis) doğrulanmadan su arıtma kapasite veya dozaj garantisi verilmez.
 - Her parti sevkiyatta güncel SDS (GBF), TDS ve Parti Analiz Sertifikası (COA) ibraz edilir.
 
-## Kanonik sayfalar
+## Kanonik Sayfalar
 Ürün, sistem, sektör ve bölge sayfaları mevcut katalog kaydından üretilir. Fiyat, stok ve ayrı şube adresi bu dosyada yoktur. Örnek: `/urunler/sogutma-kulesi-kimyasallari`, `/sistemler/endustriyel-ro`, `/sektorler/tekstil-gida-enerji`, `/hizmet-bolgeleri/mersin`. Sodyum hipoklorit, kostik ve asitler için doğrulanmış ayrı saflık sayfası yayınlanmamıştır; teklif `/teklif-al` üzerindendir.
 
 ## Ana Sayfalar
-- [Ana Sayfa](https://elifkimya.web.app/)
-- [Endüstriyel Kimyasal Ürünler](https://elifkimya.web.app/urunler)
-- [360° Su Arıtma & Otomasyon Sistemleri](https://elifkimya.web.app/sistemler)
-- [Sektörel Proses Çözümleri](https://elifkimya.web.app/sektorler)
-- [Hizmet Bölgeleri & OSB Lojistiği](https://elifkimya.web.app/hizmet-bolgeleri)
-- [Teknik Belge Merkezi (SDS/TDS/COA)](https://elifkimya.web.app/teknik-bilgi)
-- [Kurumsal Teklif & Su Analizi Başvurusu](https://elifkimya.web.app/teklif-al)
-- [İletişim](https://elifkimya.web.app/iletisim)
+- [Ana Sayfa](https://www.elifcevrekimya.com.tr/)
+- [Endüstriyel Kimyasal Ürünler](https://www.elifcevrekimya.com.tr/urunler)
+- [360° Su Arıtma & Otomasyon Sistemleri](https://www.elifcevrekimya.com.tr/sistemler)
+- [Sektörel Proses Çözümleri](https://www.elifcevrekimya.com.tr/sektorler)
+- [Hizmet Bölgeleri & OSB Lojistiği](https://www.elifcevrekimya.com.tr/hizmet-bolgeleri)
+- [Teknik Belge Merkezi (SDS/TDS/COA)](https://www.elifcevrekimya.com.tr/teknik-bilgi)
+- [Kurumsal Teklif & Su Analizi Başvurusu](https://www.elifcevrekimya.com.tr/teklif-al)
+- [İletişim](https://www.elifcevrekimya.com.tr/iletisim)

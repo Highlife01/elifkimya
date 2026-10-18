@@ -2091,6 +2091,70 @@ code {
   gap: 0.25rem;
 }
 
+button.admin-kpi-card,
+button.financial-split-card,
+button.recent-activity-item,
+button.dash-money-row,
+button.dash-work-item {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+button.admin-kpi-card:hover,
+button.financial-split-card:hover,
+button.recent-activity-item:hover,
+button.dash-money-row:hover,
+button.dash-work-item:hover {
+  border-color: var(--accent-teal);
+}
+
+.dash-money-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.7rem;
+  margin-top: 0.45rem;
+}
+
+.dash-work-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.dash-work-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  margin-top: 0.45rem;
+}
+
+.dash-focus-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--accent-teal);
+  border-radius: var(--radius-sm);
+  background: #f0fdfa;
+}
+
 .kpi-title {
   font-size: 0.78rem;
   font-weight: 700;
@@ -2152,6 +2216,32 @@ code {
   align-items: center;
   gap: 0.75rem;
   font-size: 0.8rem;
+}
+
+button.bar-chart-row {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.2rem 0;
+}
+
+button.bar-chart-row:hover .bar-chart-fill {
+  filter: brightness(0.92);
+}
+
+.badge-amber {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.btn-xs {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 7px;
 }
 
 .bar-chart-track {

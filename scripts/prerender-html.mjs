@@ -32,7 +32,7 @@ function applyHead(html, { title, description, canonical, robots }) {
   );
   out = out.replace(
     /<meta property="og:url" content="[^"]*"\s*\/?>/,
-    `<meta property="og:url" content="${escapeText(canonical || 'https://elifkimya.web.app/')}" />`
+    `<meta property="og:url" content="${escapeText(canonical || 'https://www.elifcevrekimya.com.tr/')}" />`
   );
   out = out.replace(
     /<meta property="og:title" content="[^"]*"\s*\/?>/,

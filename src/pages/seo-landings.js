@@ -12,7 +12,7 @@ import {
   waterTreatmentSystems
 } from '../data/products.js';
 
-const SITE = 'https://elifkimya.web.app';
+const SITE = 'https://www.elifcevrekimya.com.tr';
 
 export const REGION_SLUGS = [
   'adana',
@@ -54,7 +54,7 @@ export function buildPublicRoutes() {
   productCategories.forEach((cat) => {
     routes.push(route(
       `/urunler/${cat.id}`,
-      `${cat.title} | Elif Kimya`,
+      `${cat.title} | Elif Çevre Kimya`,
       cat.shortDesc || cat.description,
       cat.title,
       'product',
@@ -76,7 +76,7 @@ export function buildPublicRoutes() {
   waterTreatmentSystems.forEach((sys) => {
     routes.push(route(
       `/sistemler/${sys.id}`,
-      `${sys.title} | Elif Kimya`,
+      `${sys.title} | Elif Çevre Kimya`,
       sys.summary,
       sys.title,
       'system',
@@ -98,7 +98,7 @@ export function buildPublicRoutes() {
   sectorsData.forEach((sector) => {
     routes.push(route(
       `/sektorler/${sector.id}`,
-      `${sector.title} | Elif Kimya`,
+      `${sector.title} | Elif Çevre Kimya`,
       sector.summary,
       sector.title,
       'sector',
@@ -122,14 +122,14 @@ export function buildPublicRoutes() {
     if (!slug) return;
     routes.push(route(
       `/hizmet-bolgeleri/${slug}`,
-      `${region.region} | Elif Kimya sevkiyat`,
+      `${region.region} | Elif Çevre Kimya Sevkiyat`,
       region.details,
       region.region,
       'region',
       {
         paragraphs: [
           region.details,
-          'Kayıtlı adres Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana’dır. Bu sayfa sevkiyat bölgesini anlatır; ayrı şube adresi ilan etmez.'
+          'Kayıtlı adres Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana’dır. Site adresi www.elifcevrekimya.com.tr. Bu sayfa sevkiyat bölgesini anlatır; ayrı şube adresi ilan etmez.'
         ],
         items: [{
           title: region.badge,

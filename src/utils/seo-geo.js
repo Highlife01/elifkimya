@@ -8,50 +8,16 @@ import { faqItems, productCategories } from '../data/products.js';
 import { findPublicRoute } from '../pages/seo-landings.js';
 import { MEDIPURE_CATEGORIES, MEDIPURE_PRODUCT_COUNT } from '../data/medipure-catalog.js';
 
-export const SEO_KEYWORD_CLUSTERS = [
+const RAW_KEYWORD_CLUSTERS = [
   {
-    id: 'baz_asit_alkali',
-    title: '1. Temel Baz Kimyasallar, Asitler & Alkaliler',
-    intent: 'Yüksek Hacimli Satınalma (Tanker / IBC / Palet)',
-    targetRegions: 'Adana AOSB, Mersin, İskenderun, Gaziantep, Kayseri, 81 İl',
+    id: 'cevre_atiksu_kimya',
+    title: '1. Çevre Kimyasalları, Atık Su Arıtma, Koagülant & Polielektrolit',
+    intent: 'Jar-Test Odaklı Çevre Mühendisliği & Arıtma Tesisi Satınalması',
+    targetRegions: 'Adana, Mersin, Gaziantep, İskenderun, Kayseri & Türkiye OSB Arıtmaları',
     keywords: [
-      'sodyum hipoklorit fiyat',
-      'sıvı klor tedarikçisi adana',
-      'kostik soda naoh %48 sıvı',
-      'payet kostik %99 fiyat',
-      'hidroklorik asit hcl %32 dökme tanker',
-      'sülfürik asit %98 endüstriyel',
-      'nitrik asit %56 %65 tedarikçisi',
-      'hidrojen peroksit %50 teknik',
-      'fosforik asit %85 gıda ve teknik',
-      'adr belgeli kimyasal nakliye'
-    ]
-  },
-  {
-    id: 'su_sartlandirma',
-    title: '2. Soğutma Kulesi, Buhar Kazanı & RO Şartlandırma',
-    intent: 'Teknik Mühendislik & Sürekli Sözleşmeli Tedarik',
-    targetRegions: 'Çukurova, İç Anadolu, Güneydoğu Sanayi Tesisleri',
-    keywords: [
-      'soğutma kulesi kimyasalları',
-      'kazan suyu şartlandırma kimyasalları',
-      'ters osmoz ro antiskalant',
-      'yüksek silis antiskalantı',
-      'deha oksijen tutucu kimyasal',
-      'korozyon ve kışır önleyici inhibitör',
-      'dbnpa biyosit legionella kontrolü',
-      'izotiyazolin cmit mit yosun önleyici',
-      'kondens hattı koruyucu nötralize amin',
-      'ro membran cip yıkama kimyasalları'
-    ]
-  },
-  {
-    id: 'atiksu_polimer',
-    title: '3. Atık Su Arıtma, Koagülant & Polielektrolit (Flokülant)',
-    intent: 'Jar-Test Odaklı Çevre & Arıtma Tesisi Satınalması',
-    targetRegions: 'Organize Sanayi Bölgeleri Merkezi & Fabrika Arıtmaları',
-    keywords: [
-      'polialüminyum klorür pac %30 sıvı',
+      'elif çevre kimya',
+      'çevre ve atıksu arıtma kimyasalları',
+      'polialüminyum klorür pac %17 %30 sıvı toz',
       'demir iii klorür %40 koagülant',
       'alüminyum sülfat katı sıvı',
       'anyonik polielektrolit a-pam flokülant',
@@ -59,113 +25,172 @@ export const SEO_KEYWORD_CLUSTERS = [
       'dekantör ve belt pres polimeri',
       'tekstil atıksu renk giderici kimyasal',
       'silikonlu ve silikonsuz köpük kesici antifoam',
-      'haddehane tufal çukuru polimeri',
+      'atıksu emülsiyon kırıcı kimyasal',
       'bakteri ve mikrobesin kültürleri'
     ]
   },
   {
+    id: 'baz_asit_alkali',
+    title: '2. Temel Baz Kimyasallar, Endüstriyel Asitler & Alkaliler',
+    intent: 'Yüksek Hacimli Endüstriyel Satınalma (ADR Tanker / 1000 kg IBC / Palet)',
+    targetRegions: 'Adana Seyhan Merkez Depo, Mersin, İskenderun, Gaziantep, Kayseri, 81 İl',
+    keywords: [
+      'sodyum hipoklorit %15-16 sıvı klor fiyat',
+      'kostik soda naoh %48 sıvı tedarikçisi',
+      'payet kostik %99 fiyat adana',
+      'hidroklorik asit hcl %32 dökme tanker',
+      'sülfürik asit %98 endüstriyel',
+      'nitrik asit %56 %65 tedarikçisi',
+      'hidrojen peroksit %50 teknik',
+      'fosforik asit %85 teknik ve gıda',
+      'sitrik asit monohidrat anhidrat',
+      'adr belgeli kimyasal tanker nakliye'
+    ]
+  },
+  {
+    id: 'su_sartlandirma',
+    title: '3. Soğutma Kulesi, Buhar Kazanı & Kapalı Devre Su Şartlandırma',
+    intent: 'Teknik Mühendislik, LSI Etüdü & Sözleşmeli Şartlandırma',
+    targetRegions: 'Çukurova, İç Anadolu, Güneydoğu ve Ege Sanayi Tesisleri',
+    keywords: [
+      'soğutma kulesi şartlandırma kimyasalları',
+      'buhar kazanı suyu şartlandırma kimyasalları',
+      'pbtc hedp korozyon ve kışır önleyici inhibitör',
+      'deha uçucu oksijen tutucu kimyasal',
+      'kondens hattı koruyucu nötralize edici amin',
+      'dbnpa biyosit legionella kontrolü',
+      'izotiyazolin cmit mit yosun önleyici biyosit',
+      'kapalı devre sodyum molibdat korozyon inhibitörü',
+      'eşanjör ve kazan kışır sökücü descaler',
+      'su şartlandırma firmaları adana'
+    ]
+  },
+  {
+    id: 'ro_membran_cip',
+    title: '4. Ters Ozmoz (RO) Membran Antiskalant & CIP Yıkama Kimyasalları',
+    intent: 'Membran Ömrü Uzatma, Yüksek Silis Kontrolü & CIP Bakım',
+    targetRegions: 'Yüksek Silisli Kuyu Suyu Kullanan Tüm Endüstriyel Tesisler',
+    keywords: [
+      'ters osmoz ro antiskalant fiyat',
+      '240 ppm yüksek silis antiskalantı',
+      'fosfonat ve dendrimer bazlı ro antiskalant',
+      'ro membran asidik cip yıkama kimyasalı',
+      'ro membran alkali cip organik temizleyici',
+      'sodyum metabisülfit sbs klor giderici',
+      'membran koruyucu biyosit dbnpa',
+      'ultrasaf su edi reçine ve membran bakımı'
+    ]
+  },
+  {
     id: 'su_aritma_sistemleri',
-    title: '4. 360° Endüstriyel Su Arıtma Sistemleri & Otomasyon',
-    intent: 'Anahtar Teslim EPC Proje & Yedek Parça / Servis',
-    targetRegions: 'Türkiye Geneli & Orta Doğu / Afrika İhracat',
+    title: '5. 360° Endüstriyel Su Arıtma Sistemleri, Pano & Otomasyon',
+    intent: 'Anahtar Teslim EPC Proje, Pano İmalatı & Periyodik Servis',
+    targetRegions: 'Türkiye Geneli & Orta Doğu / Afrika / Balkanlar İhracat',
     keywords: [
       'endüstriyel su arıtma sistemleri adana',
       'endüstriyel ters osmoz ro sistemi fiyatları',
-      'edi elektro deiyonizasyon saf su sistemi',
+      'edi elektrodeiyonizasyon ultra saf su sistemi',
       'ultrafiltrasyon uf su arıtma ünitesi',
       'tandem endüstriyel su yumuşatma sistemi',
-      'kum ve aktif karbon filtrasyon sistemleri',
-      'demir mangan giderme filtreleri',
-      'kimyasal dozaj pompası ve otomasyon panosu',
-      'plc scada su arıtma otomasyonu',
-      'sıfır atık su geri kazanım projeleri'
+      'multimedya kum ve aktif karbon filtrasyon',
+      'demir mangan giderme filtre sistemleri',
+      'oransal kimyasal dozaj pompası ve panosu',
+      'plc scada su arıtma otomasyon panosu',
+      'atıksu geri kazanım sıfır atık zld projeleri'
+    ]
+  },
+  {
+    id: 'saf_su_medipure',
+    title: '6. Medipure Saf Su, Ultra Saf Su ve Deiyonize Cihazlar (163 Model)',
+    intent: 'Laboratuvar, Medikal, Kozmetik ve Endüstriyel Saf Su Cihaz Teklifi',
+    targetRegions: 'Adana Merkez ve Türkiye Geneli Laboratuvar / Fabrika Kurulumu',
+    keywords: [
+      'medipure saf su cihazı',
+      'laboratuvar ultra saf su cihazı 18.2 megohm',
+      'laboratuvar saf su cihazı fiyat',
+      'biyokimya otoanalizör saf su cihazı',
+      'mikrobiyoloji saf su sistemi',
+      'sterilizasyon otoklav su arıtma sistemi',
+      'medikal hemodiyaliz saf su sistemi',
+      'deiyonize saf su cihazı reçineli',
+      'mobil saf su ve mobil ultra saf su cihazı',
+      'kozmetik ve metal kaplama saf su sistemi',
+      'elektrodeiyonizasyon edi saf su cihazı',
+      'endüstriyel saf su cihazı katalog'
+    ]
+  },
+  {
+    id: 'jeotermal_sartlandirma',
+    title: '7. Jeotermal Kuyu, Eşanjör, Silika & H₂S Koku Şartlandırma',
+    intent: 'Brine Analizi ve Kupon Ölçümü Odaklı Saha Programı',
+    targetRegions: 'Denizli, Aydın, Manisa, Afyonkarahisar ve Jeotermal Sera Bölgeleri',
+    keywords: [
+      'jeotermal kireç önleyici antiskalant',
+      'jeotermal silika dispersant ve inhibitörü',
+      'jeotermal kuyu ve hat korozyon inhibitörü',
+      'sera ve bölgesel ısıtma jeotermal su şartlandırma',
+      'plakalı eşanjör kireç ve silis temizleyici',
+      'h2s hidrojen sülfür koku giderici kimyasal',
+      'jeotermal brine analizi ve korozyon kuponu'
     ]
   },
   {
     id: 'sektorel_proses',
-    title: '5. Ağır Sanayi & Sektörel Proses Kimyasalları',
-    intent: 'Fabrika Üretim Müdürü & Teknik Satınalma',
-    targetRegions: 'İskenderun, Osmaniye, Adana, Mersin, Niğde, Kayseri',
+    title: '8. Ağır Sanayi, Haddehane, Kağıt, Cam, Kalsit & Metal Yüzey İşlem',
+    intent: 'Fabrika Üretim Müdürü, İşletme Şefi & Teknik Satınalma',
+    targetRegions: 'İskenderun, Payas, Osmaniye, Adana, Mersin, Niğde, Kayseri, Gaziantep',
     keywords: [
-      'demir çelik haddehane su şartlandırma',
+      'demir çelik haddehane tufal çukuru polimeri',
       'asitleme hattı pickling inhibitörü hcl',
       'kağıt sanayi retansiyon polimeri ve biyosit',
       'deterjan hammaddeleri labsa %96 sles %70',
-      'niğde mikronize kalsit öğütme dispersantı',
-      'düzcam ve fırın kapalı devre molibdat inhibitörü',
-      'galvaniz ve boru profil yüzey işlem kimyasalları',
+      'niğde mikronize kalsit yaş öğütme dispersantı',
+      'düzcam float kalay banyosu molibdat inhibitörü',
+      'metal yüzey işlem alkali yağ alma ve fosfatlama',
+      'sulu boya kabini boya çürütme detackifier',
       'tekstil boyahane sıfır sertlik proses suyu',
-      'gıda ve içecek cip dezenfeksiyon kimyasalları',
       'enerji santrali demineralize su hazırlama'
     ]
   },
   {
     id: 'bolgesel_geo_osb',
-    title: '6. Bölgesel OSB & GEO (Yapay Zeka Arama) Otorite Kelimeleri',
-    intent: 'Yerel & Bölgesel Hızlı Teslimat / Acil Tedarik',
-    targetRegions: 'Adana, Mersin, Hatay, Osmaniye, Gaziantep, Kayseri, Niğde',
+    title: '9. Bölgesel OSB & GEO (Yapay Zeka Arama) Otorite Kelimeleri',
+    intent: 'Yerel & Bölgesel Hızlı Teslimat / Acil IBC & Tanker Sevkiyatı',
+    targetRegions: 'Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana Merkez • Çukurova • İç ve Güneydoğu Anadolu',
     keywords: [
-      'adana organize sanayi bölgesi kimya firmaları',
+      'elif çevre kimya adana',
+      'elifcevrekimya.com.tr',
+      'adana seyhan şakirpaşa kimya deposu',
       'adana hacı sabancı osb endüstriyel kimyasal',
-      'mersin tarsus osb su arıtma ve kimya',
+      'mersin tarsus osb su arıtma ve çevre kimya',
       'iskenderun payas demir çelik kimyasal tedarikçisi',
       'osmaniye osb su şartlandırma ve polimer',
-      'gaziantep başpınar osb atıksu kimyasalları',
-      'kayseri osb su arıtma ve yüzey işlem kimyasalları',
+      'gaziantep başpınar osb atıksu ve çevre kimyasalları',
+      'kayseri ve niğde osb kimyasal sevkiyat',
       'kahramanmaraş tekstil ve kağıt kimyasalları',
       'çukurova dökme kimyasal tanker sevkiyatı',
       'mersin limanı ihracat kimyasal tedarikçisi'
     ]
-  },
-  {
-    id: 'saf_su_medipure',
-    title: '7. Medipure Saf Su, Ultra Saf Su ve Deiyonize Cihazlar',
-    intent: 'Laboratuvar, Medikal ve Endüstriyel Cihaz Teklifi',
-    targetRegions: 'Adana, Türkiye geneli laboratuvar ve üretim tesisleri',
-    keywords: [
-      'laboratuvar saf su cihazı',
-      'ultra saf su cihazı',
-      'deiyonize su cihazı',
-      'medipure saf su cihazı',
-      'biyokimya saf su cihazı',
-      'mikrobiyoloji saf su cihazı',
-      'sterilizasyon su arıtma sistemi',
-      'medikal saf su sistemi',
-      'mobil saf su cihazı',
-      'kozmetik saf su sistemi',
-      'elektrodeiyonizasyon cihazı',
-      'endüstriyel saf su cihazı fiyat'
-    ]
-  },
-  {
-    id: 'jeotermal_sartlandirma',
-    title: '8. Jeotermal, Kapalı Devre, Koku ve Emülsiyon',
-    intent: 'Saha Analizi Sonrası Program Teklifi',
-    targetRegions: 'Denizli, Aydın, Manisa, Afyon ve Çukurova sanayi',
-    keywords: [
-      'jeotermal kireç önleyici',
-      'jeotermal silika inhibitörü',
-      'jeotermal korozyon inhibitörü',
-      'sera jeotermal su şartlandırma',
-      'kapalı devre korozyon inhibitörü',
-      'molibdat kapalı devre kimyasalı',
-      'eşanjör kireç temizleyici',
-      'atıksu emülsiyon kırıcı',
-      'h2s koku giderici kimyasal',
-      'havalandırma havuzu köpük kesici'
-    ]
   }
 ];
 
+export const SEO_KEYWORD_CLUSTERS = RAW_KEYWORD_CLUSTERS.map((c) => ({
+  ...c,
+  clusterTitle: c.title,
+  searchIntent: c.intent,
+  geoFocus: c.targetRegions,
+  primaryKeywords: c.keywords
+}));
+
 const PAGE_CLUSTER_IDS = {
-  '/': ['baz_asit_alkali', 'su_sartlandirma', 'saf_su_medipure', 'bolgesel_geo_osb'],
-  '/urunler': ['baz_asit_alkali', 'su_sartlandirma', 'atiksu_polimer', 'jeotermal_sartlandirma', 'sektorel_proses'],
-  '/sistemler': ['su_aritma_sistemleri', 'saf_su_medipure'],
-  '/sektorler': ['sektorel_proses', 'jeotermal_sartlandirma', 'bolgesel_geo_osb'],
-  '/hizmet-bolgeleri': ['bolgesel_geo_osb', 'jeotermal_sartlandirma'],
-  '/teknik-bilgi': ['su_sartlandirma', 'atiksu_polimer', 'saf_su_medipure'],
-  '/teklif-al': ['bolgesel_geo_osb', 'su_aritma_sistemleri', 'saf_su_medipure'],
-  '/iletisim': ['bolgesel_geo_osb']
+  '/': ['cevre_atiksu_kimya', 'baz_asit_alkali', 'su_sartlandirma', 'saf_su_medipure', 'bolgesel_geo_osb'],
+  '/urunler': ['cevre_atiksu_kimya', 'baz_asit_alkali', 'su_sartlandirma', 'ro_membran_cip', 'jeotermal_sartlandirma', 'sektorel_proses'],
+  '/sistemler': ['su_aritma_sistemleri', 'saf_su_medipure', 'ro_membran_cip'],
+  '/sektorler': ['sektorel_proses', 'cevre_atiksu_kimya', 'jeotermal_sartlandirma', 'bolgesel_geo_osb'],
+  '/hizmet-bolgeleri': ['bolgesel_geo_osb', 'cevre_atiksu_kimya', 'jeotermal_sartlandirma'],
+  '/teknik-bilgi': ['su_sartlandirma', 'ro_membran_cip', 'cevre_atiksu_kimya', 'saf_su_medipure'],
+  '/teklif-al': ['bolgesel_geo_osb', 'cevre_atiksu_kimya', 'su_aritma_sistemleri', 'saf_su_medipure'],
+  '/iletisim': ['bolgesel_geo_osb', 'cevre_atiksu_kimya']
 };
 
 export function keywordsForPath(pathname) {
@@ -184,7 +209,7 @@ export function keywordsForPath(pathname) {
     const words = byId.get(id)?.keywords || [];
     words.slice(0, 6).forEach((word) => picked.push(word));
   });
-  return picked.slice(0, 24).join(', ');
+  return picked.slice(0, 28).join(', ');
 }
 
 /**
@@ -350,15 +375,15 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
 
   if (isNoIndex) {
     document.title = pathname.startsWith('/admin')
-      ? 'Elif Kimya Yönetim Paneli | Kurumsal ERP, CRM & Muhasebe'
-      : 'Elif Kimya Müşteri Portalı | Teklif & Sipariş Takibi';
+      ? 'Elif Çevre Kimya Yönetim Paneli | Kurumsal ERP, CRM & Muhasebe'
+      : 'Elif Çevre Kimya Müşteri Portalı | Teklif & Sipariş Takibi';
     return;
   }
 
   const record = findPublicRoute(pathname);
   if (!record) {
-    document.title = 'Sayfa bulunamadı | Elif Kimya';
-    upsertMetaTag('name', 'description', 'Bu adres Elif Kimya sitesinde yok.');
+    document.title = 'Sayfa bulunamadı | Elif Çevre Kimya';
+    upsertMetaTag('name', 'description', 'Bu adres Elif Çevre Kimya (www.elifcevrekimya.com.tr) sitesinde bulunamadı.');
     upsertMetaTag('name', 'robots', 'noindex, nofollow');
     const staleCanonical = document.querySelector('link[rel="canonical"]');
     staleCanonical?.remove();
@@ -378,19 +403,20 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
     ? customSeoSettings.metaDescription
     : baseSeo.description;
   const keywords = customSeoSettings?.metaKeywords || keywordsForPath(pathname);
-  const canonical = baseSeo.canonical || `https://elifkimya.web.app${pathname === '/' ? '/' : pathname}`;
+  const canonical = baseSeo.canonical || `https://www.elifcevrekimya.com.tr${pathname === '/' ? '/' : pathname}`;
 
   document.title = title;
   upsertMetaTag('name', 'description', description);
   upsertMetaTag('name', 'keywords', keywords);
 
-  // Bölgesel GEO Meta Etiketleri (Adana / Çukurova Merkez)
+  // Bölgesel GEO Meta Etiketleri (Seyhan / Adana, Çukurova Merkez)
   upsertMetaTag('name', 'geo.region', 'TR-01');
-  upsertMetaTag('name', 'geo.placename', 'Adana, Çukurova, Türkiye');
-  upsertMetaTag('name', 'geo.position', '37.0000;35.3213');
-  upsertMetaTag('name', 'ICBM', '37.0000, 35.3213');
+  upsertMetaTag('name', 'geo.placename', 'Seyhan, Adana, Çukurova, Türkiye');
+  upsertMetaTag('name', 'geo.position', '36.9854;35.2658');
+  upsertMetaTag('name', 'ICBM', '36.9854, 35.2658');
 
   // OpenGraph & Twitter
+  upsertMetaTag('property', 'og:site_name', 'Elif Çevre Kimya');
   upsertMetaTag('property', 'og:title', title);
   upsertMetaTag('property', 'og:description', description);
   upsertMetaTag('property', 'og:url', canonical);
@@ -422,8 +448,8 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
     {
       '@type': 'ListItem',
       position: 1,
-      name: 'Elif Kimya',
-      item: 'https://elifkimya.web.app/'
+      name: 'Elif Çevre Kimya',
+      item: 'https://www.elifcevrekimya.com.tr/'
     }
   ];
   if (pathname !== '/' && breadcrumbNames[pathname]) {
@@ -438,8 +464,8 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
     breadcrumbItems.push({
       '@type': 'ListItem',
       position: 2,
-      name: breadcrumbNames[parentPath] || 'Elif Kimya',
-      item: `https://elifkimya.web.app${parentPath}`
+      name: breadcrumbNames[parentPath] || 'Elif Çevre Kimya',
+      item: `https://www.elifcevrekimya.com.tr${parentPath}`
     });
     breadcrumbItems.push({
       '@type': 'ListItem',
@@ -454,15 +480,38 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
     '@graph': [
       {
         '@type': ['Organization', 'LocalBusiness'],
-        '@id': 'https://elifkimya.web.app/#organization',
-        name: 'Elif Kimya',
-        legalName: 'Elif Kimya Sanayi ve Ticaret',
-        url: 'https://elifkimya.web.app/',
-        logo: 'https://elifkimya.web.app/logo.svg',
-        image: 'https://elifkimya.web.app/assets/hero-chemical.jpg',
+        '@id': 'https://www.elifcevrekimya.com.tr/#organization',
+        name: 'Elif Çevre Kimya',
+        alternateName: ['Elif Kimya', 'Elif Çevre ve Endüstriyel Kimya'],
+        legalName: 'Elif Çevre Kimya Sanayi ve Ticaret',
+        url: 'https://www.elifcevrekimya.com.tr/',
+        sameAs: [
+          'https://www.elifcevrekimya.com.tr',
+          'https://elifkimya.web.app'
+        ],
+        logo: 'https://www.elifcevrekimya.com.tr/logo.svg',
+        image: 'https://www.elifcevrekimya.com.tr/assets/hero-chemical.jpg',
         description,
         telephone: '+905425903626',
         email: 'info@elifkimya.com.tr',
+        contactPoint: [
+          {
+            '@type': 'ContactPoint',
+            telephone: '+905425903626',
+            email: 'satis@elifkimya.com.tr',
+            contactType: 'sales',
+            areaServed: 'TR',
+            availableLanguage: ['Turkish', 'English']
+          },
+          {
+            '@type': 'ContactPoint',
+            telephone: '+905425903626',
+            email: 'info@elifkimya.com.tr',
+            contactType: 'customer support',
+            areaServed: 'TR',
+            availableLanguage: ['Turkish']
+          }
+        ],
         hasMap: 'https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111',
         address: {
           '@type': 'PostalAddress',
@@ -493,19 +542,20 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
           { '@type': 'Country', name: 'Türkiye' }
         ],
         knowsAbout: [
+          'Çevre Kimyası ve Endüstriyel Atık Su Arıtma Kimyasalları',
+          'Polialüminyum Klorür (PAC %17 Sıvı / %30 Toz), Demir III Klorür ve Polielektrolitler',
           'Endüstriyel Su Şartlandırma Kimyasalları',
           'Soğutma Kulesi ve Buhar Kazanı Kimyasalları',
           'Jeotermal Kireç, Silika ve Korozyon Şartlandırması',
           'Ters Osmoz (RO) Antiskalant ve Membran CIP Kimyasalları',
           'Endüstriyel Su Arıtma Sistemleri (RO, EDI, UF, Su Yumuşatma)',
-          'Medipure Laboratuvar ve Endüstriyel Saf Su Cihazları',
-          'Atık Su Arıtma Koagülantları (PAC, Demir III Klorür) ve Polielektrolitler',
+          'Medipure Laboratuvar ve Endüstriyel Saf Su Cihazları (15 Kategori, 163 Model)',
           'Sodyum Hipoklorit, Kostik Soda, Hidroklorik ve Sülfürik Asit Tedariki',
           'PLC / SCADA Su Arıtma Otomasyonu ve Dozaj Panoları'
         ],
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
-          name: 'Elif Kimya Endüstriyel Kimyasal ve Su Arıtma Kataloğu',
+          name: 'Elif Çevre Kimya Endüstriyel Kimyasal, Çevre Kimyası ve Su Arıtma Kataloğu',
           itemListElement: productCategories.map((cat, idx) => ({
             '@type': 'OfferCatalog',
             position: idx + 1,
@@ -521,11 +571,11 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
       },
       {
         '@type': 'WebSite',
-        '@id': 'https://elifkimya.web.app/#website',
-        url: 'https://elifkimya.web.app/',
-        name: 'Elif Kimya',
+        '@id': 'https://www.elifcevrekimya.com.tr/#website',
+        url: 'https://www.elifcevrekimya.com.tr/',
+        name: 'Elif Çevre Kimya',
         inLanguage: 'tr-TR',
-        publisher: { '@id': 'https://elifkimya.web.app/#organization' }
+        publisher: { '@id': 'https://www.elifcevrekimya.com.tr/#organization' }
       },
       {
         '@type': 'WebPage',
@@ -534,8 +584,8 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
         name: title,
         description,
         inLanguage: 'tr-TR',
-        isPartOf: { '@id': 'https://elifkimya.web.app/#website' },
-        about: { '@id': 'https://elifkimya.web.app/#organization' }
+        isPartOf: { '@id': 'https://www.elifcevrekimya.com.tr/#website' },
+        about: { '@id': 'https://www.elifcevrekimya.com.tr/#organization' }
       },
       ...(record.kind === 'hub' ? [] : [{
         '@type': 'Service',
@@ -544,12 +594,12 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
         description: record.description,
         serviceType: record.kind,
         url: canonical,
-        provider: { '@id': 'https://elifkimya.web.app/#organization' },
+        provider: { '@id': 'https://www.elifcevrekimya.com.tr/#organization' },
         areaServed: { '@type': 'Country', name: 'Türkiye' }
       }]),
       {
         '@type': 'ItemList',
-        '@id': 'https://elifkimya.web.app/sistemler#medipure-katalog',
+        '@id': 'https://www.elifcevrekimya.com.tr/sistemler#medipure-katalog',
         name: `Medipure saf su cihaz kataloğu (${MEDIPURE_PRODUCT_COUNT} model)`,
         numberOfItems: MEDIPURE_CATEGORIES.length,
         itemListElement: MEDIPURE_CATEGORIES.map((category, index) => ({
@@ -565,7 +615,7 @@ export function applyDynamicPageSeoAndGeo(pathname, customSeoSettings = null) {
   if (pathname === '/') {
     graphSchema['@graph'].push({
       '@type': 'FAQPage',
-      '@id': 'https://elifkimya.web.app/#faq',
+      '@id': 'https://www.elifcevrekimya.com.tr/#faq',
       mainEntity: faqItems.map((item) => ({
         '@type': 'Question',
         name: item.question,
