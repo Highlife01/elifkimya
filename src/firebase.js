@@ -63,7 +63,10 @@ export const COLLECTIONS = {
   SERVICE_RECORDS: 'serviceRecords',
   SITE_SETTINGS: 'siteSettings',
   NOTIFICATION_LOGS: 'notificationLogs',
-  AUDIT_LOGS: 'auditLogs'
+  AUDIT_LOGS: 'auditLogs',
+  ACCOUNTING_INVOICES: 'accountingInvoices',
+  ACCOUNTING_TRANSACTIONS: 'accountingTransactions',
+  CHEQUES_AND_NOTES: 'chequesAndNotes'
 };
 
 export const CRM_STAGES = [
@@ -158,6 +161,8 @@ export function hasPermission(role, permissionKey) {
     manage_orders: [ROLES.SUPERADMIN, ROLES.SALES, ROLES.WAREHOUSE],
     manage_inventory: [ROLES.SUPERADMIN, ROLES.WAREHOUSE, ROLES.SALES],
     manage_service: [ROLES.SUPERADMIN, ROLES.TECHNICAL, ROLES.SALES],
+    manage_accounting: [ROLES.SUPERADMIN, ROLES.SALES],
+    view_accounting: [ROLES.SUPERADMIN, ROLES.SALES, ROLES.VIEWER],
     manage_settings: [ROLES.SUPERADMIN],
     manage_content: [ROLES.SUPERADMIN, ROLES.SALES]
   };
@@ -246,6 +251,13 @@ export async function ensureUserProfile(user) {
 
   if (snap.exists()) {
     const data = snap.data();
+    if (isBootstrap && data.role !== ROLES.SUPERADMIN) {
+      await updateDoc(userDocRef, {
+        role: ROLES.SUPERADMIN,
+        updatedAt: serverTimestamp()
+      });
+      return { id: snap.id, ...data, role: ROLES.SUPERADMIN };
+    }
     return { id: snap.id, ...data };
   }
 
@@ -1851,6 +1863,249 @@ export async function sendTestNotificationLog(channel, recipient, actor) {
   }, actor);
 }
 
+export async function saveAccountingInvoice(invoiceData, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'manage_accounting')) {
+    throw new Error('Fatura oluşturma ve düzenleme yetkiniz bulunmuyor.');
+  }
+
+  const partyName = String(invoiceData.partyName || '').trim();
+  if (!partyName || partyName.length < 2) {
+    throw new Error('Cari ünvanı (Müşteri veya Tedarikçi) zorunludur.');
+  }
+
+  const nowIso = new Date().toISOString();
+  const invoiceType = String(invoiceData.invoiceType || 'SATIS').toUpperCase();
+  const eDocumentType = String(invoiceData.eDocumentType || 'E-FATURA').toUpperCase();
+  const currency = String(invoiceData.currency || 'TRY').toUpperCase();
+  const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(invoiceData.exchangeRate || 1), 0.0001);
+
+  const subtotalExclVat = Math.max(Number(invoiceData.subtotalExclVat || 0), 0);
+  const discountTotal = Math.max(Number(invoiceData.discountTotal || 0), 0);
+  const netMatrah = Math.max(subtotalExclVat - discountTotal, 0);
+  const vatRate = Math.max(Number(invoiceData.vatRate ?? 20), 0);
+  const rawVat = Number(((netMatrah * vatRate) / 100).toFixed(2));
+
+  // KDV Tevkifatı (Örn: 0, 2, 5, 7, 9 -> X/10)
+  const withholdingNumer = Math.min(Math.max(Number(invoiceData.withholdingNumerator || 0), 0), 10);
+  const withholdingAmount = withholdingNumer > 0 ? Number(((rawVat * withholdingNumer) / 10).toFixed(2)) : 0;
+  const payableVat = Number((rawVat - withholdingAmount).toFixed(2));
+  const grandTotal = Number((netMatrah + payableVat).toFixed(2));
+  const grandTotalTry = Number((grandTotal * exchangeRate).toFixed(2));
+  const paidAmountTry = Math.max(Number(invoiceData.paidAmountTry || 0), 0);
+  const remainingAmountTry = Math.max(Number((grandTotalTry - paidAmountTry).toFixed(2)), 0);
+
+  let paymentStatus = 'Bekliyor';
+  if (paidAmountTry >= grandTotalTry && grandTotalTry > 0) {
+    paymentStatus = 'Ödendi';
+  } else if (paidAmountTry > 0) {
+    paymentStatus = 'Kısmi Ödendi';
+  } else if (invoiceData.dueDate && new Date(invoiceData.dueDate).getTime() < Date.now()) {
+    paymentStatus = 'Vadesi Geçti';
+  }
+
+  const invoiceNo = String(
+    invoiceData.invoiceNo ||
+    `ELF${new Date().getFullYear()}${String(Date.now()).slice(-6)}`
+  ).trim();
+
+  const payload = {
+    invoiceNo: invoiceNo.slice(0, 95),
+    invoiceType,
+    eDocumentType,
+    partyType: invoiceType === 'ALIS' ? 'SUPPLIER' : 'CUSTOMER',
+    partyName: partyName.slice(0, 240),
+    taxOffice: optStr(invoiceData.taxOffice, 140) || '',
+    taxNumber: optStr(invoiceData.taxNumber, 45) || '',
+    issueDate: String(invoiceData.issueDate || nowIso.slice(0, 10)),
+    dueDate: String(invoiceData.dueDate || nowIso.slice(0, 10)),
+    currency,
+    exchangeRate,
+    subtotalExclVat,
+    discountTotal,
+    netMatrah,
+    vatRate,
+    vatAmount: rawVat,
+    withholdingNumerator: withholdingNumer,
+    withholdingAmount,
+    payableVat,
+    grandTotal,
+    grandTotalTry,
+    paidAmountTry,
+    remainingAmountTry,
+    paymentStatus,
+    linkedOrderId: optStr(invoiceData.linkedOrderId, 120) || '',
+    description: optStr(invoiceData.description, 1500) || '',
+    notes: optStr(invoiceData.notes, 4000) || '',
+    updatedByEmail: actor?.email || actor?.uid || '',
+    updatedAt: serverTimestamp(),
+    updatedAtIso: nowIso
+  };
+
+  let docId = invoiceData.id;
+  if (docId) {
+    await updateDoc(doc(db, COLLECTIONS.ACCOUNTING_INVOICES, docId), payload);
+    await writeAuditLog('UPDATE_ACCOUNTING_INVOICE', COLLECTIONS.ACCOUNTING_INVOICES, docId, { invoiceNo, grandTotalTry }, actor);
+  } else {
+    payload.createdAt = serverTimestamp();
+    payload.createdAtIso = nowIso;
+    const ref = await addDoc(collection(db, COLLECTIONS.ACCOUNTING_INVOICES), payload);
+    docId = ref.id;
+    await writeAuditLog('CREATE_ACCOUNTING_INVOICE', COLLECTIONS.ACCOUNTING_INVOICES, docId, { invoiceNo, grandTotalTry }, actor);
+  }
+
+  // Eğer onaylı bir siparişten faturalandıysa siparişi "Faturalandı" olarak işaretle
+  if (payload.linkedOrderId) {
+    try {
+      await updateDoc(doc(db, COLLECTIONS.ORDERS, payload.linkedOrderId), {
+        status: 'Faturalandı',
+        fulfillmentStatus: 'Faturalandı',
+        linkedInvoiceNo: payload.invoiceNo,
+        updatedAt: serverTimestamp(),
+        updatedAtIso: nowIso
+      });
+    } catch (_err) {
+      // Sipariş güncelleme hatası ana faturayı engellemesin
+    }
+  }
+
+  return { id: docId, ...payload };
+}
+
+export async function saveAccountingTransaction(trxData, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'manage_accounting')) {
+    throw new Error('Kasa/Banka hareketi işleme yetkiniz bulunmuyor.');
+  }
+
+  const amount = Number(trxData.amount || 0);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('İşlem tutarı 0’dan büyük olmalıdır.');
+  }
+
+  const nowIso = new Date().toISOString();
+  const trxType = String(trxData.trxType || 'TAHSILAT').toUpperCase();
+  const currency = String(trxData.currency || 'TRY').toUpperCase();
+  const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(trxData.exchangeRate || 1), 0.0001);
+  const amountTry = Number((amount * exchangeRate).toFixed(2));
+  const trxNo = String(trxData.trxNo || `FIN-${Date.now().toString().slice(-6)}`).trim();
+
+  const payload = {
+    trxNo: trxNo.slice(0, 90),
+    trxType,
+    category: String(trxData.category || 'Müşteri Tahsilatı').slice(0, 140),
+    paymentMethod: String(trxData.paymentMethod || 'Banka Havale/EFT').slice(0, 95),
+    accountName: String(trxData.accountName || 'Merkez TL Banka Hesabı').slice(0, 140),
+    partyName: String(trxData.partyName || 'Genel Cari').slice(0, 240),
+    linkedInvoiceId: optStr(trxData.linkedInvoiceId, 120) || '',
+    linkedInvoiceNo: optStr(trxData.linkedInvoiceNo, 100) || '',
+    currency,
+    exchangeRate,
+    amount,
+    amountTry,
+    transactionDate: String(trxData.transactionDate || nowIso.slice(0, 10)),
+    referenceNo: optStr(trxData.referenceNo, 100) || '',
+    description: optStr(trxData.description, 2000) || '',
+    createdByEmail: actor?.email || actor?.uid || '',
+    createdAt: serverTimestamp(),
+    createdAtIso: nowIso,
+    updatedAt: serverTimestamp(),
+    updatedAtIso: nowIso
+  };
+
+  const ref = await addDoc(collection(db, COLLECTIONS.ACCOUNTING_TRANSACTIONS), payload);
+  await writeAuditLog('CREATE_ACCOUNTING_TRX', COLLECTIONS.ACCOUNTING_TRANSACTIONS, ref.id, { trxNo, trxType, amountTry }, actor);
+
+  // Eğer bir faturaya bağlı tahsilat/tediye ise ilgili faturanın ödenen tutarını güncelle
+  if (payload.linkedInvoiceId) {
+    try {
+      const invRef = doc(db, COLLECTIONS.ACCOUNTING_INVOICES, payload.linkedInvoiceId);
+      const invSnap = await getDoc(invRef);
+      if (invSnap.exists()) {
+        const inv = invSnap.data();
+        const newPaid = Number((Number(inv.paidAmountTry || 0) + amountTry).toFixed(2));
+        const totalTry = Number(inv.grandTotalTry || inv.grandTotal || 0);
+        const newRem = Math.max(Number((totalTry - newPaid).toFixed(2)), 0);
+        const newStatus = newPaid >= totalTry && totalTry > 0 ? 'Ödendi' : 'Kısmi Ödendi';
+        await updateDoc(invRef, {
+          paidAmountTry: newPaid,
+          remainingAmountTry: newRem,
+          paymentStatus: newStatus,
+          updatedAt: serverTimestamp(),
+          updatedAtIso: nowIso
+        });
+      }
+    } catch (_err) {
+      // Fatura bakiyesi güncellemesi ana hareketi kırmasın
+    }
+  }
+
+  return { id: ref.id, ...payload };
+}
+
+export async function saveChequeOrNote(instrumentData, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'manage_accounting')) {
+    throw new Error('Çek ve senet kaydetme yetkiniz bulunmuyor.');
+  }
+
+  const drawerName = String(instrumentData.drawerName || '').trim();
+  const amount = Number(instrumentData.amount || 0);
+  if (!drawerName || drawerName.length < 2) {
+    throw new Error('Keşideci / Cari ünvanı zorunludur.');
+  }
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw new Error('Çek/Senet tutarı 0’dan büyük olmalıdır.');
+  }
+
+  const nowIso = new Date().toISOString();
+  const currency = String(instrumentData.currency || 'TRY').toUpperCase();
+  const exchangeRate = currency === 'TRY' ? 1 : Math.max(Number(instrumentData.exchangeRate || 1), 0.0001);
+  const amountTry = Number((amount * exchangeRate).toFixed(2));
+  const instrumentNo = String(instrumentData.instrumentNo || `CEK-${Date.now().toString().slice(-6)}`).trim();
+
+  const payload = {
+    instrumentNo: instrumentNo.slice(0, 90),
+    instrumentType: String(instrumentData.instrumentType || 'MUSTERI_CEKI').slice(0, 55),
+    drawerName: drawerName.slice(0, 240),
+    bankName: String(instrumentData.bankName || '').slice(0, 140),
+    branchName: String(instrumentData.branchName || '').slice(0, 120),
+    dueDate: String(instrumentData.dueDate || nowIso.slice(0, 10)),
+    currency,
+    exchangeRate,
+    amount,
+    amountTry,
+    status: String(instrumentData.status || 'Portföyde').slice(0, 55),
+    endorsedTo: String(instrumentData.endorsedTo || '').slice(0, 200),
+    notes: optStr(instrumentData.notes, 2000) || '',
+    createdByEmail: actor?.email || actor?.uid || '',
+    createdAt: serverTimestamp(),
+    createdAtIso: nowIso,
+    updatedAt: serverTimestamp(),
+    updatedAtIso: nowIso
+  };
+
+  const ref = await addDoc(collection(db, COLLECTIONS.CHEQUES_AND_NOTES), payload);
+  await writeAuditLog('CREATE_CHEQUE_NOTE', COLLECTIONS.CHEQUES_AND_NOTES, ref.id, { instrumentNo, amountTry }, actor);
+  return { id: ref.id, ...payload };
+}
+
+export async function updateChequeOrNoteStatus(instrumentId, newStatus, endorsedTo, actor) {
+  if (!db) throw new Error('Veritabanı bağlantısı yok.');
+  if (!hasPermission(actor?.role, 'manage_accounting')) {
+    throw new Error('Çek/Senet durumu güncelleme yetkiniz bulunmuyor.');
+  }
+  const nowIso = new Date().toISOString();
+  const ref = doc(db, COLLECTIONS.CHEQUES_AND_NOTES, instrumentId);
+  await updateDoc(ref, {
+    status: String(newStatus || 'Portföyde').slice(0, 55),
+    endorsedTo: String(endorsedTo || '').slice(0, 200),
+    updatedAt: serverTimestamp(),
+    updatedAtIso: nowIso
+  });
+  await writeAuditLog('UPDATE_CHEQUE_STATUS', COLLECTIONS.CHEQUES_AND_NOTES, instrumentId, { status: newStatus }, actor);
+}
+
 export async function loadAdminAllData() {
   if (!db) {
     return {
@@ -1865,6 +2120,9 @@ export async function loadAdminAllData() {
       inventoryMovements: [],
       suppliers: [],
       serviceRecords: [],
+      accountingInvoices: [],
+      accountingTransactions: [],
+      chequesAndNotes: [],
       users: [],
       auditLogs: [],
       settings: {}
@@ -1891,6 +2149,9 @@ export async function loadAdminAllData() {
     inventoryMovements,
     suppliers,
     rawServices,
+    accountingInvoices,
+    accountingTransactions,
+    chequesAndNotes,
     users,
     auditLogs,
     settings
@@ -1906,6 +2167,9 @@ export async function loadAdminAllData() {
     safeFetch(COLLECTIONS.INVENTORY_MOVEMENTS),
     safeFetch(COLLECTIONS.SUPPLIERS),
     safeFetch(COLLECTIONS.SERVICE_RECORDS),
+    safeFetch(COLLECTIONS.ACCOUNTING_INVOICES),
+    safeFetch(COLLECTIONS.ACCOUNTING_TRANSACTIONS),
+    safeFetch(COLLECTIONS.CHEQUES_AND_NOTES),
     safeFetch(COLLECTIONS.USERS),
     safeFetch(COLLECTIONS.AUDIT_LOGS),
     fetchAllSiteSettings()
@@ -1979,6 +2243,9 @@ export async function loadAdminAllData() {
     inventoryMovements,
     suppliers,
     serviceRecords,
+    accountingInvoices,
+    accountingTransactions,
+    chequesAndNotes,
     users,
     auditLogs,
     settings

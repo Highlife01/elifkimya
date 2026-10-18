@@ -75,6 +75,90 @@ export const productCategories = [
           'ADR Sertifikalı Güvenli Sevkiyat'
         ],
         tdsReady: true
+      },
+      {
+        name: 'Kapalı Devre Korozyon İnhibitörleri',
+        slug: 'kapali-devre-korozyon-inhibitorleri',
+        activeChemical: 'Nitritsiz molibdat, TTA/BTA azol, organik film yapıcı',
+        desc: 'Chiller, kalıp soğutma ve kapalı ısıtma devrelerinde karbon çelik, bakır ve alüminyumun aynı hatta çalıştığı sistemler için korozyon programı.',
+        specs: [
+          'Açık kule programından ayrı, düşük blöflü kapalı devre formülü',
+          'Nitritli ve nitritsiz seçenek; metalürjiye göre seçilir',
+          'Ambalaj: 30 kg bidon, 1000 kg IBC'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Kazan, Eşanjör ve Hat Temizleyiciler',
+        slug: 'sistem-temizleme-kimyasallari',
+        activeChemical: 'İnhibitörlü asidik temizleyici, alkali organik çözücü',
+        desc: 'Kireç, demir oksit ve organik birikimi duruşta veya kontrollü çevrimde çözen temizleyiciler. Süre ve derişim, kışır tipine ve metal cinsine göre sahada belirlenir.',
+        specs: [
+          'Karbonat ve demir oksit birikimi',
+          'Temizlik sonrası nötralizasyon ve pasivasyon adımı',
+          'Ambalaj: 30 kg bidon, 1000 kg IBC'
+        ],
+        tdsReady: true
+      }
+    ]
+  },
+  {
+    id: 'jeotermal-su-sartlandirma',
+    code: '07',
+    title: 'Jeotermal Su Şartlandırma',
+    shortDesc: 'Jeotermal kuyu, eşanjör, sera ve bölgesel ısıtma hatlarında kireç, silika ve korozyon kontrolü. Dozaj, akışkan analizi görülmeden yazılmaz.',
+    tag: 'Jeotermal & Yüksek Sıcaklık',
+    badge: 'Analiz Şartlı',
+    icon: 'flame',
+    subcategories: [
+      {
+        name: 'Jeotermal Kireç ve Silika İnhibitörleri',
+        slug: 'jeotermal-kirec-silika',
+        activeChemical: 'Yüksek sıcaklık kararlı fosfonat ve polimer karışımları',
+        desc: 'Karbonat ve silika birikimine karşı kuyu çıkışı, separatör ve eşanjör hatlarında kullanılan inhibitörler. Sıcaklık bandı ve dozaj, brine analiziyle belirlenir.',
+        specs: [
+          'Uygulama: kuyu başı, yüzey hattı ve eşanjör',
+          'Hedef birikim: kalsiyum karbonat, silika ve metal silikat',
+          'Dozaj akışkan analizi olmadan sabitlenmez',
+          'Ambalaj: 30 kg bidon, 1000 kg IBC'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Jeotermal Korozyon İnhibitörleri',
+        slug: 'jeotermal-korozyon',
+        activeChemical: 'Film yapıcı ve azol destekli korozyon programı',
+        desc: 'Tuzlu ve çözünmüş gaz içeren jeotermal akışkanlarda karbon çelik hat ve eşanjör metal kaybını sınırlayan inhibitörler. Kireç programıyla birlikte kurulur.',
+        specs: [
+          'Karbon çelik yüzey hatları ve ısı eşanjörleri',
+          'Kireç inhibitörü ile birlikte programlanır',
+          'Korozyon kuponu ile saha doğrulaması'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Jeotermal Hat ve Eşanjör Temizleyiciler',
+        slug: 'jeotermal-hat-temizleme',
+        activeChemical: 'İnhibitörlü karbonat ve silikat çözücü',
+        desc: 'Karbonat ve silikat birikimini duruşta veya kontrollü çevrimde çözen temizleyiciler. Online veya offline uygulama, birikim tipine göre seçilir.',
+        specs: [
+          'Karbonat ve silikat birikimi',
+          'Duruşta veya kontrollü çevrimde uygulama',
+          'Temizlik sonrası nötralizasyon'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'H₂S Koku ve Mikrobiyolojik Yardımcılar',
+        slug: 'jeotermal-koku-biyosit',
+        activeChemical: 'Koku bastırıcı ve oksitleyici olmayan biyosit',
+        desc: 'Jeotermal soğutma ve tutma hatlarında hidrojen sülfür kokusu ile inhibitör stoklarındaki bakteri üremesine karşı yardımcı kimyasallar.',
+        specs: [
+          'H₂S kokusunun sahada bastırılması',
+          'İnhibitör stok çözeltilerinde biyolojik koruma',
+          'Açık soğutma destek devreleriyle birlikte kurulabilir'
+        ],
+        tdsReady: true
       }
     ]
   },
@@ -154,7 +238,7 @@ export const productCategories = [
     id: 'saf-su-ve-ultra-saf-su-sistemleri',
     code: '03',
     title: 'Saf Su ve Ultra Saf Su Sistemleri',
-    shortDesc: 'Laboratuvarlar, enerji santralleri ve kritik endüstriyel üretim hatları için 18.2 MΩ·cm direnç seviyesinde saf su teknolojileri.',
+    shortDesc: 'Laboratuvar, medikal ve endüstriyel hatlar için Medipure saf su cihaz kataloğu ve yüksek saflıkta su sistemleri. Model listesi Su Arıtma sayfasındadır.',
     tag: 'Laboratuvar & Yüksek Saflık',
     badge: 'Medipure & Analitik Standart',
     icon: 'activity',
@@ -333,6 +417,30 @@ export const productCategories = [
           'Bakteri Popülasyonunu Canlandırır, Çamur İndeksini Düşürür'
         ],
         tdsReady: true
+      },
+      {
+        name: 'Emülsiyon Kırıcılar',
+        slug: 'emulsiyon-kiricilar',
+        activeChemical: 'Katyonik demülsifiyer ve poliDADMAC karışımı',
+        desc: 'Hadde yağı, kesme sıvısı ve petrol türevi kaçakların atık suda kararlı emülsiyon kurmasını bozup yağ fazını ayıran emülsiyon kırıcılar.',
+        specs: [
+          'Yağ-su emülsiyonunun jar-test ile seçimi',
+          'Çökeltme veya flotasyon öncesi dozaj',
+          'Ambalaj: 30 kg bidon, 1000 kg IBC'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Atıksu Köpük Kesiciler',
+        slug: 'atiksu-kopuk-kesiciler',
+        activeChemical: 'Yağ alkolü ve silikonsuz emülsiyon antifoam',
+        desc: 'Havalandırma havuzu, DAF ve kimyasal arıtma girişinde taşan köpüğü kesen, çamur süspansiyonunu bozmayan köpük kesiciler.',
+        specs: [
+          'Havalandırma ve DAF köpüğü',
+          'Silikonlu ve silikonsuz seçenek, prosese göre',
+          'Ambalaj: 30 kg bidon, 1000 kg IBC'
+        ],
+        tdsReady: true
       }
     ]
   },
@@ -462,6 +570,98 @@ productCategories.forEach((cat) => {
   }));
 });
 
+export const solutionLines = [
+  {
+    id: 'su-sartlandirma',
+    title: 'Endüstriyel Su Şartlandırma',
+    summary: 'Açık kule, kapalı devre, buhar kazanı ve hat temizliği aynı program mantığıyla kurulur.',
+    points: ['Kışır ve korozyon inhibitörü', 'Kapalı devre molibdat / azol', 'Oksijen tutucu ve kondens amini', 'Eşanjör ve hat temizliği'],
+    href: '/urunler#sogutma-kulesi-kimyasallari'
+  },
+  {
+    id: 'jeotermal',
+    title: 'Jeotermal Şartlandırma',
+    summary: 'Kuyu, sera ve bölgesel ısıtma hatlarında kireç, silika ve korozyon. Dozaj brine analizine bağlıdır.',
+    points: ['Kireç ve silika inhibitörü', 'Korozyon programı', 'Hat ve eşanjör temizliği', 'H₂S koku yardımcısı'],
+    href: '/urunler#jeotermal-su-sartlandirma'
+  },
+  {
+    id: 'metal-yuzey',
+    title: 'Metal Yüzey ve Boya Kabini',
+    summary: 'Yağ alma, fosfatlama, pasivasyon ve sulu boya kabininde boya çürütme.',
+    points: ['Alkali yağ sökücü', 'Demir ve çinko fosfat', 'Pasivasyon', 'Boya detackifier'],
+    href: '/urunler#fabrika-ve-proses-kimyasallari'
+  },
+  {
+    id: 'maden',
+    title: 'Maden ve Tikiner',
+    summary: 'Kalsit yaş öğütme dispersantı ve maden tikiner / filtre pres flokülantı.',
+    points: ['Sodyum poliakrilat dispersant', 'Tikiner A-PAM', 'Filtre pres kek verimi', 'Çöktürme jar-testi'],
+    href: '/urunler#fabrika-ve-proses-kimyasallari'
+  },
+  {
+    id: 'atiksu',
+    title: 'Atıksu ve Çamur',
+    summary: 'Koagülant, polimer, renk giderimi, emülsiyon kırma ve çamur susuzlaştırma.',
+    points: ['PAC ve demir-III klorür', 'Toz ve emülsiyon polimer', 'Emülsiyon kırıcı', 'Dekantör C-PAM'],
+    href: '/urunler#atik-su-aritma-kimyasallari'
+  },
+  {
+    id: 'ham-su',
+    title: 'Ham Su, RO ve Saf Su',
+    summary: 'Ön arıtma, ters ozmoz, EDI ve Medipure laboratuvar / endüstri cihazları.',
+    points: ['Kum, karbon, yumuşatma', 'RO ve antiskalant', 'EDI ve deiyonize', 'Medipure model kataloğu'],
+    href: '/sistemler#medipure-katalog'
+  },
+  {
+    id: 'koku-kopuk',
+    title: 'Koku, Köpük ve Emülsiyon',
+    summary: 'H₂S koku, havalandırma köpüğü ve yağ emülsiyonu için ayrı ürün seçimi.',
+    points: ['H₂S koku giderici', 'Atıksu köpük kesici', 'Emülsiyon kırıcı', 'Kağıt silikonsuz antifoam'],
+    href: '/urunler#atik-su-aritma-kimyasallari'
+  },
+  {
+    id: 'saha',
+    title: 'Saha Analiz ve İşletme Takibi',
+    summary: 'Jar-test, LSI ve periyodik saha kontrolü. Akredite laboratuvar iddiası yok; analiz sahada veya anlaşmalı laboratuvarda yapılır.',
+    points: ['Yerinde jar-test', 'LSI ve korozyon kuponu', 'Dozaj programı revizyonu', 'Seviye ve tüketim takibi'],
+    href: '/teklif-al?type=water_audit'
+  }
+];
+
+export const fieldServices = [
+  {
+    title: 'Endüstriyel Ham Su Arıtma',
+    summary: 'Kuyu ve şebeke suyunu prosese hazırlayan filtrasyon, yumuşatma, RO ve EDI projesi.',
+    href: '/sistemler#endustriyel-ro'
+  },
+  {
+    title: 'Atıksu Kimyasal Arıtma Programı',
+    summary: 'Koagülant ve polimer seçimi jar-test ile yapılır; deşarj hedefi tesis verisine göre yazılır.',
+    href: '/teklif-al?type=jar_test_trial&product=At%C4%B1ksu%20Kimyasal%20Ar%C4%B1tma%20Program%C4%B1'
+  },
+  {
+    title: 'Çamur Susuzlaştırma',
+    summary: 'Dekantör, belt pres ve filtre pres için katyonik polimer programı ve kek kuruluğu takibi.',
+    href: '/urunler#atik-su-aritma-kimyasallari'
+  },
+  {
+    title: 'Koku Kontrol Programı',
+    summary: 'Terfi, çamur hattı ve jeotermal tutma noktalarında H₂S kokusuna karşı kimyasal program.',
+    href: '/urunler#atik-su-aritma-kimyasallari'
+  },
+  {
+    title: 'Proses Danışmanlığı',
+    summary: 'Mevcut arıtma veya şartlandırma hattının dozaj, blöf ve kimyasal tüketim açısından gözden geçirilmesi.',
+    href: '/teklif-al?type=water_audit&product=Proses%20Dan%C4%B1%C5%9Fmanl%C4%B1%C4%9F%C4%B1'
+  },
+  {
+    title: 'Periyodik İşletme Takibi',
+    summary: 'İletkenlik, pH ve stok seviyesine göre tekrarlayan saha ziyareti ve program düzeltmesi.',
+    href: '/teklif-al?type=water_project&product=Periyodik%20%C4%B0%C5%9Fletme%20Takibi'
+  }
+];
+
 export const companyInfo = {
   name: 'Elif Kimya',
   legalName: 'Elif Kimya Endüstriyel Kimyasallar ve Su Arıtma Sistemleri',
@@ -472,7 +672,8 @@ export const companyInfo = {
   whatsappUrl: 'https://wa.me/905425903626',
   email: 'info@elifkimya.com.tr',
   salesEmail: 'satis@elifkimya.com.tr',
-  address: 'Adana Hacı Sabancı OSB / Seyhan Sanayi Bölgesi, Adana / Türkiye',
+  address: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
+  mapsUrl: 'https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111',
   city: 'Adana',
   workingHours: 'Pazartesi – Cumartesi: 08:00 – 18:30'
 };
@@ -627,6 +828,13 @@ export const sectorsData = [
     region: 'Adana AOSB, Tarsus, Kayseri, Kahramanmaraş',
     summary: 'Sıfır sertlikte yumuşatma ve RO proses suyu tesisleri, buhar kazanı DEHA oksijen tutucuları, tekstil renk giderici koagülantlar ve kule biyositleri.',
     keyChemicals: ['DEHA Oksijen Tutucu', 'Renk Giderici Polimer', 'RO Antiskalant & CIP', 'Kule Biyosit & Dispersant']
+  },
+  {
+    id: 'jeotermal',
+    title: 'Jeotermal Enerji, Sera ve Bölgesel Isıtma',
+    region: 'Denizli, Aydın, Manisa, Afyon ve diğer jeotermal sahalar',
+    summary: 'Kuyu çıkışı, separatör ve eşanjör hatlarında kireç, silika ve korozyon programı. Dozaj, brine analizi ve korozyon kuponu olmadan sabitlenmez.',
+    keyChemicals: ['Jeotermal Kireç / Silika İnhibitörü', 'Film Yapıcı Korozyon İnhibitörü', 'Hat Temizleyici', 'H₂S Koku Yardımcısı']
   }
 ];
 
@@ -689,6 +897,14 @@ export const faqItems = [
   {
     question: 'Su arıtma sistemlerinde (RO, EDI, Yumuşatma) periyodik bakım ve membran CIP yıkama hizmetiniz var mı?',
     answer: 'Evet. Kurulumunu yaptığımız veya fabrikanızda mevcut olan Ters Ozmoz (RO), EDI, Ultrafiltrasyon ve Yumuşatma sistemleri için periyodik bakım sözleşmesi, membran CIP kimyasal yıkama, reçine/kum/karbon medya değişimi ve yedek parça desteği sağlıyoruz.'
+  },
+  {
+    question: 'Medipure saf su cihazı kataloğunda kaç model var ve fiyat nasıl verilir?',
+    answer: 'Katalogda laboratuvar, medikal, deiyonize, mobil ve endüstri gruplarında 163 Medipure modeli vardır. Kapasite lt/saat, ton/saat veya ton/gün olarak yazılır. Sitedeki EUR tutar Medipure liste fiyatıdır; Adana teslimat teklifi kur ve sevkiyata göre ayrıca verilir.'
+  },
+  {
+    question: 'Jeotermal kireç ve silika inhibitörü dozajını nasıl belirliyorsunuz?',
+    answer: 'Jeotermal akışkanın sıcaklığı, silika, kalsiyum ve çözünmüş gazı sahadan sahaya değişir. İnhibitör tipi ve dozajı brine analizi görülmeden sabitlenmez. Program kuyu başı, separatör ve eşanjör için birlikte kurulur.'
   }
 ];
 
@@ -707,33 +923,43 @@ export const geoKnowledgeArticles = [
     title: 'Ters Ozmoz (RO) Membranlarında Silis ve Kalsiyum Sülfat Tıkanmasını Önleme',
     content: 'Kuyu sularında yüksek silis (>40 ppm) ve yüksek sertlik bulunan Çukurova ve İç Anadolu tesislerinde, standart hekzametafosfat (SHMP) kullanımı membranlarda geri dönüşsüz tıkanmaya neden olur. Dendrimerik ve fosfonat bazlı özel RO antiskalantları 240 ppm silis seviyesine kadar çökeltisiz çalışmayı mümkün kılar.',
     metrics: ['240 ppm Silis Toleransı', 'Geri Kazanım %75–82', '2–4 ppm Dozaj']
+  },
+  {
+    title: 'Jeotermal Hatlarında Kireç ve Silika Programı Neden Analiz İster',
+    content: 'Jeotermal akışkanın sıcaklığı, silika, kalsiyum ve çözünmüş gaz yükü kuyudan kuyuya değişir. Bu yüzden kireç, silika ve korozyon inhibitörünün tipi ile dozajı brine analizi ve mümkünse korozyon kuponu görülmeden yazılmaz. Program kuyu başı, separatör ve eşanjör için birlikte kurulur.',
+    metrics: ['Brine Analizi Şart', 'Kuyu Başı ve Eşanjör', 'Kupon ile Doğrulama']
+  },
+  {
+    title: 'Laboratuvar ve Endüstriyel Saf Su Cihazı Nasıl Seçilir',
+    content: 'Medipure kataloğunda 163 model, 15 kategoride durur: laboratuvar saf su, ultra saf su, biyokimya, mikrobiyoloji, sterilizasyon, medikal, deiyonize, distile, elektrodeiyonizasyon, mobil saf su, mobil ultra saf su, endüstri, metal kaplama, kozmetik ve ters ozmoz. Kapasite cihaz kodunun yanında yazılıdır. EUR liste fiyatı vitrin fiyatıdır; teslimat teklifi Elif Kimya tarafından verilir.',
+    metrics: ['163 Model', '15 Kategori', 'EUR Liste + Ayrı Teklif']
   }
 ];
 
 export const pageSEO = {
   '/': {
-    title: 'Elif Kimya | Endüstriyel Kimyasal Satışları ve Su Arıtma Sistemleri (Adana & Türkiye)',
-    description: 'Adana merkezli Elif Kimya; endüstriyel proses kimyasalları, soğutma kulesi ve kazan suyu şartlandırma, haddehane/kağıt/deterjan kimyasalları ve RO/EDI su arıtma sistemleri sunar.',
+    title: 'Elif Kimya | Adana Endüstriyel Kimya, Su Şartlandırma ve Saf Su Cihazları',
+    description: 'Adana AOSB merkezli Elif Kimya: sodyum hipoklorit, kostik, soğutma kulesi ve kazan kimyasalları, PAC, jeotermal inhibitör, RO/EDI ve 163 model Medipure saf su cihazı.',
     canonical: 'https://elifkimya.web.app/'
   },
   '/urunler': {
-    title: 'Endüstriyel Kimyasal Ürünler ve Proses Formülasyonları | Elif Kimya',
-    description: 'Soğutma kulesi, kazan suyu, RO antiskalant, poliakrilamid flokülant, asitleme inhibitörü, LABSA, SLES, kostik ve endüstriyel bakım kimyasalları kataloğu.',
+    title: 'Endüstriyel Kimyasallar | Soğutma Kulesi, Kazan, Jeotermal, PAC | Elif Kimya',
+    description: 'Soğutma kulesi, kapalı devre, kazan, jeotermal kireç inhibitörü, RO antiskalant, PAC, polielektrolit, emülsiyon kırıcı ve köpük kesici kataloğu.',
     canonical: 'https://elifkimya.web.app/urunler'
   },
   '/sistemler': {
-    title: 'Endüstriyel Su Arıtma, Ters Ozmoz (RO) ve EDI Saf Su Sistemleri | Elif Kimya',
-    description: 'Ham su analizine dayalı endüstriyel Ters Ozmoz (RO), Elektrodeiyonizasyon (EDI), Ultrafiltrasyon (UF), su yumuşatma ve dozaj otomasyon sistemleri.',
+    title: 'RO, EDI ve Medipure Saf Su Cihazları | Elif Kimya Adana',
+    description: 'Endüstriyel ters ozmoz, EDI, ultrafiltrasyon ve 163 model Medipure laboratuvar, medikal, mobil ve endüstriyel saf su cihaz kataloğu. Kapasite teklifle netleşir.',
     canonical: 'https://elifkimya.web.app/sistemler'
   },
   '/sektorler': {
-    title: 'Çukurova Mega Sanayi Proses Çözümleri ve Canlı ROI Simülatörleri | Elif Kimya',
-    description: 'Demir-çelik haddehaneleri, deterjan sülfonasyon, kağıt/oluklu mukavva, düzcam, Niğde mikronize kalsit ve Kayseri boru/galvaniz tesisleri için kimyasal çözümler.',
+    title: 'Haddehane, Kağıt, Cam, Kalsit ve Jeotermal Kimyasalları | Elif Kimya',
+    description: 'İskenderun haddehane, Adana deterjan ve kağıt, Niğde kalsit, Kayseri galvaniz ve jeotermal sera hatları için proses kimyasal programları.',
     canonical: 'https://elifkimya.web.app/sektorler'
   },
   '/hizmet-bolgeleri': {
-    title: 'Hizmet Bölgeleri: Adana AOSB, Mersin, İskenderun, Osmaniye, Kayseri, Niğde | Elif Kimya',
-    description: 'Adana merkez depomuzdan Çukurova, İç Anadolu ve Türkiye genelindeki organize sanayi bölgelerine 2-6 saat içinde ADR sertifikalı kimyasal sevkiyatı.',
+    title: 'Adana, Mersin, İskenderun, Gaziantep OSB Kimyasal Sevkiyat | Elif Kimya',
+    description: 'Adana Hacı Sabancı OSB deposundan Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde hatlarına ADR kimyasal sevkiyatı.',
     canonical: 'https://elifkimya.web.app/hizmet-bolgeleri'
   },
   '/teknik-bilgi': {

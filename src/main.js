@@ -13,7 +13,7 @@ import {
 } from './pages/public-pages.js';
 import { renderPortalPage } from './pages/portal.js';
 import { renderAdminPage } from './pages/admin.js';
-import { pageSEO } from './data/products.js';
+import { applyDynamicPageSeoAndGeo } from './utils/seo-geo.js';
 
 const appRoot = document.getElementById('app');
 let navbarEl = null;
@@ -35,32 +35,7 @@ function ensurePublicLayout(currentPath) {
 }
 
 function updateSeoAndRobotsMeta(pathname) {
-  const isNoIndex = pathname.startsWith('/admin') || pathname.startsWith('/portal');
-  let robotsMeta = document.querySelector('meta[name="robots"]');
-  if (!robotsMeta) {
-    robotsMeta = document.createElement('meta');
-    robotsMeta.setAttribute('name', 'robots');
-    document.head.appendChild(robotsMeta);
-  }
-  robotsMeta.setAttribute(
-    'content',
-    isNoIndex
-      ? 'noindex, nofollow, noarchive'
-      : 'index, follow, max-image-preview:large, max-snippet:-1'
-  );
-
-  const seo = pageSEO[pathname] || pageSEO['/'];
-  if (isNoIndex) {
-    document.title = pathname.startsWith('/admin')
-      ? 'Elif Kimya Yönetim Paneli | Kurumsal ERP & CRM'
-      : 'Elif Kimya Müşteri Portalı | Teklif & Sipariş Takibi';
-  } else if (seo) {
-    document.title = seo.title;
-    const descMeta = document.querySelector('meta[name="description"]');
-    if (descMeta) descMeta.setAttribute('content', seo.description);
-    const canonicalLink = document.querySelector('link[rel="canonical"]');
-    if (canonicalLink && seo.canonical) canonicalLink.setAttribute('href', seo.canonical);
-  }
+  applyDynamicPageSeoAndGeo(pathname);
 }
 
 export function navigate(targetUrl, replace = false) {

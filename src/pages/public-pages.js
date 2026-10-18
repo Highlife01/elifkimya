@@ -2,6 +2,7 @@ import {
   companyInfo,
   productCategories,
   waterTreatmentSystems,
+  fieldServices,
   sectorsData,
   serviceRegions,
   faqItems,
@@ -25,6 +26,7 @@ import {
 } from '../firebase.js';
 import { showNotification } from '../components/notification.js';
 import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
+import { bindMedipureCatalog, renderMedipureCatalog } from '../components/medipure-catalog.js';
 
 function attachSpaLinks(container, navigate) {
   container.querySelectorAll('[data-nav]').forEach((link) => {
@@ -42,19 +44,69 @@ function attachSpaLinks(container, navigate) {
    1. KİMYASAL ÜRÜNLER SAYFASI (/urunler)
    ========================================================================== */
 export async function renderProductsPage(container, navigate) {
+  const categoryImages = [
+    '/assets/hero-cooling-towers.jpg',
+    '/assets/hero-chemical.jpg',
+    '/assets/hero-water-ro.jpg',
+    '/assets/hero-ultra-pure.jpg',
+    '/assets/hero-chemical-lab.jpg',
+    '/assets/hero-wastewater.jpg',
+    '/assets/hero-chemical.jpg'
+  ];
+  const categoryEmojis = ['💧', '🌋', '⚙️', '🔬', '🔥', '♻️', '🏭'];
+
   const html = `
-    <section class="page-hero">
-      <div class="container">
-        <div class="breadcrumb">
-          <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Kimyasal Ürünler</span>
-        </div>
-        <h1>Endüstriyel Kimyasal Ürünler ve Proses Formülasyonları</h1>
-        <p>Adana merkezli üretim ve tedarik gücüyle su şartlandırma, haddehane tufal/asit prosesleri, deterjan sülfonasyon hammaddeleri, kağıt/kalsit polimerleri ve endüstriyel bakım kimyasalları.</p>
+    <section class="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
+      <div class="container-x">
+        <p class="chip mb-3">Tam Katalog</p>
+        <h1 class="font-display text-4xl font-black text-slate-900 sm:text-5xl">Ürün Yelpazesi ve Teknik Formülasyonlar</h1>
+        <p class="mt-4 max-w-2xl text-slate-600 text-base sm:text-lg leading-relaxed">
+          Toptan, kurumsal ve endüstriyel tesisler için spesifikasyona göre üretilir — her hatta bidon, 1000 kg IBC ve dökme tanker seçeneği.
+        </p>
       </div>
     </section>
 
-    <section class="section">
-      <div class="container">
+    <section class="section bg-white" style="padding-top:0;padding-bottom:0;">
+      <div class="container-x">
+        <a href="/sistemler#medipure-katalog" data-nav class="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-500">
+          <div>
+            <p class="text-xs font-black uppercase tracking-wider text-emerald-800">Medipure cihaz vitrini</p>
+            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">163 saf su ve ultra saf su modeli, kapasite ve liste fiyatıyla</p>
+          </div>
+          <span class="text-sm font-extrabold text-emerald-800 group-hover:translate-x-1 transition">Kataloğu aç →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section bg-slate-50/60" style="padding-bottom:2rem;">
+      <div class="container-x">
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          ${productCategories.map((cat, idx) => `
+            <a href="#${escapeAttr(cat.slug)}" class="group relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
+              <div>
+                <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100">
+                  <img src="${escapeAttr(categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="1200" height="896" loading="lazy" class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity"></div>
+                  <span class="absolute top-3 left-3 text-2xl drop-shadow-sm">${categoryEmojis[idx % categoryEmojis.length]}</span>
+                  <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur-md text-[10px] font-mono font-bold text-emerald-800 border border-emerald-200/80 shadow-xs">${escapeHtml(cat.shortTitle)}</span>
+                </div>
+                <div class="pt-4 px-1">
+                  <h3 class="font-display text-base font-bold text-slate-900 group-hover:text-brand-green transition">${escapeHtml(cat.title)}</h3>
+                  <p class="mt-1.5 text-xs leading-relaxed text-slate-600 line-clamp-2">${escapeHtml(cat.description)}</p>
+                </div>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-100 px-1 flex items-center justify-between text-xs font-bold text-brand-green">
+                <span>Teknik Spesifikasyonlar</span>
+                <span class="group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </a>
+          `).join('')}
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-white" style="padding-top:2.5rem;">
+      <div class="container-x">
         <!-- Arama ve Kategori Filtre Barı -->
         <div class="catalog-toolbar">
           <div class="search-input-wrap">
@@ -292,7 +344,7 @@ export function renderSystemsPage(container, navigate) {
           <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Su Arıtma Sistemleri</span>
         </div>
         <h1>Endüstriyel Su Arıtma ve Saf Su Sistemleri Mühendisliği</h1>
-        <p>Kuyu suyu, nehir suyu, şebeke suyu veya proses geri kazanım suları için ham su analizine dayalı Ters Ozmoz (RO), EDI, Ultrafiltrasyon, Yumuşatma ve Demineralizasyon tesisleri.</p>
+        <p>Kuyu, şebeke ve proses suları için ham su analizine dayalı RO, EDI ve yumuşatma tesisleri. Laboratuvar, medikal ve endüstriyel Medipure saf su cihazlarının model kataloğu aynı sayfadadır.</p>
       </div>
     </section>
 
@@ -304,6 +356,21 @@ export function renderSystemsPage(container, navigate) {
             <strong>Mühendislik Doğrulama Prensibimiz:</strong> Eksik su analizi veya doğrulanmamış debi/iletkenlik verisiyle tahmini kapasite, membran dizilimi veya kimyasal dozaj önerisi üretmiyoruz. Tüm sistem tasarımlarımız ham su analiz raporunuzun yetkili mühendislerimizce incelenmesiyle oluşturulur.
           </div>
           <a href="#project-inquiry-form" class="btn btn-primary btn-sm">Keşif & Su Analizi İste</a>
+        </div>
+
+        <div class="systems-grid" style="margin-top:2rem;">
+          ${fieldServices.map((service) => `
+            <article class="system-card">
+              <div class="system-card-header">
+                <span class="system-capacity-tag">Saha hizmeti</span>
+                <h3>${escapeHtml(service.title)}</h3>
+              </div>
+              <p class="system-summary">${escapeHtml(service.summary)}</p>
+              <div style="margin-top:1.25rem;">
+                <a href="${escapeAttr(service.href)}" class="btn btn-primary btn-sm" data-nav>Teklif / keşif</a>
+              </div>
+            </article>
+          `).join('')}
         </div>
 
         <!-- 6 Adımlı Proje Süreci -->
@@ -366,6 +433,8 @@ export function renderSystemsPage(container, navigate) {
             </article>
           `).join('')}
         </div>
+
+        ${renderMedipureCatalog()}
 
         <!-- Su Arıtma Keşif & Proje Talep Formu -->
         <div class="card" id="project-inquiry-form" style="margin-top:3.5rem;padding:2.25rem;">
@@ -435,6 +504,7 @@ export function renderSystemsPage(container, navigate) {
 
   renderSafeHtml(container, html);
   attachSpaLinks(container, navigate);
+  bindMedipureCatalog(container);
 
   container.querySelectorAll('[data-select-system]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1228,9 +1298,10 @@ export function renderContactPage(container, navigate) {
     {
       badge: 'GENEL MÜDÜRLÜK · FABRİKA & MERKEZ DEPO',
       title: 'Adana Merkez Tesis & Lojistik Üssü',
-      region: 'Adana (Sarıhamzalı & Hacı Sabancı OSB Aksı)',
+      region: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
       address: companyInfo.address,
-      coverage: 'Adana AOSB, Ceyhan Enerji Endüstri Bölgesi, Kozan OSB ve Merkez Sevkiyat',
+      mapsUrl: companyInfo.mapsUrl,
+      coverage: 'Adana Merkez, Hacı Sabancı OSB (AOSB), Ceyhan Enerji Endüstri Bölgesi ve Çukurova Sevkiyat',
       phone: companyInfo.phoneDisplay,
       email: companyInfo.email,
       sla: 'Aynı Gün 90–120 Dakika Acil Sevkiyat & Laboratuvar Su Analizi'
@@ -1317,7 +1388,7 @@ export function renderContactPage(container, navigate) {
           <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Kurumsal İletişim & Bölge Müdürlükleri</span>
         </div>
         <h1>Kurumsal İletişim, Sizi Arayalım & Bölge Mühendislik Noktaları</h1>
-        <p>Adana merkez fabrika ve depomuz ile Mersin, İskenderun/Osmaniye, Gaziantep ve Kayseri/Niğde saha mühendislik ekiplerimizle 7/24 kesintisiz endüstriyel destek.</p>
+        <p>Adana merkez fabrika ve depomuz (<strong>${escapeHtml(companyInfo.address)}</strong>) ile Mersin, İskenderun/Osmaniye, Gaziantep ve Kayseri/Niğde saha mühendislik ekiplerimizle 7/24 kesintisiz endüstriyel destek.</p>
       </div>
     </section>
 
@@ -1409,7 +1480,10 @@ export function renderContactPage(container, navigate) {
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;padding-top:0.75rem;border-top:1px solid var(--border-subtle);font-size:0.85rem;">
                 <a href="tel:${escapeAttr(companyInfo.phoneRaw)}" style="font-weight:700;color:var(--text-primary);">📞 ${escapeHtml(off.phone)}</a>
-                <a href="/teklif-al?city=${encodeURIComponent(off.region)}" class="btn btn-sm btn-secondary" data-nav>Bölge Teklifi Al →</a>
+                <div style="display:flex;gap:0.4rem;">
+                  ${off.mapsUrl ? `<a href="${escapeAttr(off.mapsUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">📍 Haritada Aç</a>` : ''}
+                  <a href="/teklif-al?city=${encodeURIComponent(off.region)}" class="btn btn-sm btn-secondary" data-nav>Bölge Teklifi Al →</a>
+                </div>
               </div>
             </div>
           `).join('')}
@@ -1426,7 +1500,9 @@ export function renderContactPage(container, navigate) {
             <div class="contact-detail-list">
               <div class="contact-detail-item">
                 <strong>Genel Müdürlük & Merkez Depo</strong>
-                <span>${escapeHtml(companyInfo.address)}</span>
+                <a href="${escapeAttr(companyInfo.mapsUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent-teal);font-weight:700;text-decoration:underline;">
+                  📍 ${escapeHtml(companyInfo.address)}
+                </a>
               </div>
               <div class="contact-detail-item">
                 <strong>Kurumsal Telefon & WhatsApp</strong>
@@ -1446,9 +1522,22 @@ export function renderContactPage(container, navigate) {
               </div>
             </div>
 
-            <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-subtle);display:flex;gap:0.75rem;flex-wrap:wrap;">
-              <a href="/teklif-al" class="btn btn-primary" data-nav>Detaylı Teklif Formu</a>
-              <a href="/portal" class="btn btn-secondary" data-nav>Müşteri Portalı Girişi</a>
+            <div style="margin-top:1.5rem;border-radius:12px;overflow:hidden;border:2px solid var(--border-color);">
+              <iframe
+                title="Elif Kimya Merkez Konumu - Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana"
+                src="https://maps.google.com/maps?q=Ova%20Mah.%20%C5%9Eakirpa%C5%9Fa%20Cd.%20No:269,%2001080%20Seyhan/Adana&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
+                width="100%"
+                height="220"
+                style="border:0;display:block;"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+
+            <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border-subtle);display:flex;gap:0.75rem;flex-wrap:wrap;">
+              <a href="${escapeAttr(companyInfo.mapsUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">📍 Google Haritalar'da Yol Tarifi</a>
+              <a href="/teklif-al" class="btn btn-secondary" data-nav>Detaylı Teklif Formu</a>
+              <a href="/portal" class="btn btn-secondary" data-nav>Müşteri Portalı</a>
             </div>
           </div>
 

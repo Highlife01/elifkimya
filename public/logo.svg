@@ -1,0 +1,26 @@
+<svg width="240" height="56" viewBox="0 0 240 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="elifBrandGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="55%" stop-color="#0D9488"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="elifDropGrad" x1="12" y1="10" x2="36" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#A7F3D0"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+  <!-- Emblem Box -->
+  <rect x="2" y="4" width="48" height="48" rx="14" fill="url(#elifBrandGrad)"/>
+  <rect x="2.75" y="4.75" width="46.5" height="46.5" rx="13.25" stroke="#34D399" stroke-opacity="0.35" stroke-width="1.5"/>
+  <!-- Stylized Water Drop + Hexagonal Molecule -->
+  <path d="M26 12C26 12 15 24.2 15 31.5C15 37.5751 19.9249 42.5 26 42.5C32.0751 42.5 37 37.5751 37 31.5C37 24.2 26 12 26 12Z" fill="url(#elifDropGrad)" fill-opacity="0.95"/>
+  <path d="M21.5 30.5H30.5M21.5 26.5H28.5M21.5 34.5H30.5" stroke="#047857" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="31" cy="26.5" r="1.6" fill="#059669"/>
+  <!-- Wordmark -->
+  <text x="60" y="29" fill="#0F172A" font-family="Manrope, Inter, system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="-0.03em">ELİF</text>
+  <text x="111" y="29" fill="#059669" font-family="Manrope, Inter, system-ui, sans-serif" font-weight="900" font-size="22" letter-spacing="-0.03em">KİMYA</text>
+  <rect x="190" y="13" width="38" height="18" rx="6" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="1"/>
+  <text x="209" y="25" text-anchor="middle" fill="#047857" font-family="Inter, system-ui, sans-serif" font-weight="800" font-size="9.5" letter-spacing="0.06em">B2B</text>
+  <text x="60" y="44" fill="#64748B" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="9.2" letter-spacing="0.12em">ENDÜSTRİYEL KİMYA &amp; SU ARITMA</text>
+</svg>

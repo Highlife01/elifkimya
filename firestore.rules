@@ -386,6 +386,39 @@ service cloud.firestore {
         isValidOptionalString('subject', 0, 200);
     }
 
+    function isValidAccountingInvoice(data) {
+      return data.size() <= 80 &&
+        isValidOptionalString('invoiceNo', 1, 100) &&
+        isValidOptionalString('invoiceType', 1, 50) &&
+        isValidOptionalString('eDocumentType', 0, 50) &&
+        isValidOptionalString('partyName', 1, 250) &&
+        isValidOptionalString('currency', 1, 20) &&
+        isValidOptionalString('paymentStatus', 1, 60) &&
+        isValidOptionalString('notes', 0, 10000);
+    }
+
+    function isValidAccountingTransaction(data) {
+      return data.size() <= 70 &&
+        isValidOptionalString('trxNo', 1, 100) &&
+        isValidOptionalString('trxType', 1, 50) &&
+        isValidOptionalString('category', 1, 150) &&
+        isValidOptionalString('paymentMethod', 1, 100) &&
+        isValidOptionalString('accountName', 0, 150) &&
+        isValidOptionalString('partyName', 0, 250) &&
+        isValidOptionalString('currency', 1, 20) &&
+        isValidOptionalString('description', 0, 5000);
+    }
+
+    function isValidChequeOrNote(data) {
+      return data.size() <= 70 &&
+        isValidOptionalString('instrumentNo', 1, 100) &&
+        isValidOptionalString('instrumentType', 1, 60) &&
+        isValidOptionalString('drawerName', 1, 250) &&
+        isValidOptionalString('bankName', 0, 150) &&
+        isValidOptionalString('status', 1, 60) &&
+        isValidOptionalString('notes', 0, 5000);
+    }
+
     // ===============================================================
     // Collection Security Rules
     // ===============================================================
@@ -559,7 +592,29 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // 17. Legacy Collections Compatibility
+    // 17. Advanced Accounting & Finance Collections (Yalnızca Yetkili Personel)
+    match /accountingInvoices/{invoiceId} {
+      allow read: if hasRole(['superadmin', 'sales', 'viewer']);
+      allow create, update: if hasRole(['superadmin', 'sales']) &&
+        isValidAccountingInvoice(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    match /accountingTransactions/{trxId} {
+      allow read: if hasRole(['superadmin', 'sales', 'viewer']);
+      allow create, update: if hasRole(['superadmin', 'sales']) &&
+        isValidAccountingTransaction(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    match /chequesAndNotes/{instrumentId} {
+      allow read: if hasRole(['superadmin', 'sales', 'viewer']);
+      allow create, update: if hasRole(['superadmin', 'sales']) &&
+        isValidChequeOrNote(request.resource.data);
+      allow delete: if isSuperAdmin();
+    }
+
+    // 18. Legacy Collections Compatibility
     match /quoteRequests/{id} {
       allow create: if isValidLegacyQuoteRequest(request.resource.data);
       allow read: if isStaff();
