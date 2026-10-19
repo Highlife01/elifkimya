@@ -465,14 +465,41 @@ export const productCategories = [
         tdsReady: true
       },
       {
-        name: 'Analitik Laboratuvar Kimyasalları, Reaktifler ve Titrasyon Çözeltileri',
-        slug: 'analitik-laboratuvar-kimyasallari-ve-reaktifler',
-        activeChemical: 'EDTA Titrasyon Çözeltileri, Sertlik / Alkalinite İndikatörleri, DPD Klor Reaktifleri, Analitik Asit/Bazlar',
-        desc: 'Su ve atıksu kalite kontrol laboratuvarları için toplam sertlik, M/P alkalinite, klorür, sülfit, fosfat, silika, demir ve serbest/toplam klor (DPD) analiz reaktifleri ile volümetrik titrasyon çözeltileri.',
+        name: 'HACH LCK Küvet Testleri ve Toz Reaktif Yastıkları (Powder Pillows)',
+        slug: 'hach-kuvet-testleri-ve-toz-reaktifler',
+        activeChemical: 'HACH DPD Serbest Klor (2105569), FerroVer Demir (2105769), NitriVer 3 Nitrit (2107169), CuVer 1 Bakır (2105869), LCK 014/514 KOİ & LCK 348 Fosfat',
+        desc: 'İçme suyu, proses suyu ve atıksu arıtma laboratuvarlarında spektrofotometrik (DR3900 / DR6000 / DR1900) analizler için EPA uyumlu HACH toz reaktif yastıkları, LCK barkodlu küvet testleri ve StablCal bulanıklık standartları.',
         specs: [
-          'Saha Test Kitleri: Toplam Sertlik, Alkalinite, Klorür, Sülfit, DEHA ve Fosfonat damla/titrasyon kitleri',
-          'Spektrofotometrik Reaktifler: KOİ (COD) tüpleri, toplam azot, toplam fosfor, silika ve demir reaktifleri',
-          'Ambalaj: 100 mL – 1000 mL analitik şişe ve saha çantası yedek reaktif setleri'
+          'Toz Reaktif Paketleri (100 Test): DPD Serbest Klor, FerroVer Demir, NitriVer 3 Nitrit, CuVer 1 Bakır',
+          'Barkodlu Küvet Testleri (25 Test): LCK 014 KOİ (1000–10000 mg/L), LCK 514 KOİ (100–2000 mg/L), LCK 348 Fosfat, LCW 532 Mangan',
+          'Kalibrasyon: HACH StablCal 2100 N/N IS Bulanıklık (Turbidity) Kalibrasyon Kitleri',
+          'Ambalaj: 25 Test Küvet Kutusu ve 100 Test Powder Pillows Paket'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Merck EMSURE®, Suprapur®, Titrisol® ve Spectroquant® Analitik Kimyasalları',
+        slug: 'merck-emsure-suprapur-titrisol-kimyasallari',
+        activeChemical: 'Merck Suprapur®/EMSURE® Asitler, Titrisol® 0.01N–1N Volümetrik Çözeltiler, Spectroquant® Azot/Fosfat Hücre Testleri, CRM Standartlar',
+        desc: 'Akredite çevre ve sanayi laboratuvarları için Merck KGaA (Almanya) üretimi ACS/ISO/Reag. Ph. Eur. saflıkta asitler, bazlar, tuzlar, NIST SRM izlenebilir Titrisol® titrasyon konsantreleri ve Spectroquant® hücre testleri.',
+        specs: [
+          'Analitik Asit & Bazlar: %65 Nitrik Asit Suprapur® (100441), %97 Sülfürik Asit (100731), %85 Fosforik Asit (100573), %37 HCl, NaOH Pellet',
+          'Volümetrik & Tampon: Titrisol® HCl 1N (109970) & 0.01N (109974), Certipur® pH 4.00 / 7.00 / 10.00 Tampon Çözeltiler',
+          'Hücre Testleri & CRM: Spectroquant® Toplam Azot (100613) & Fosfat (114729), COD CRM Standart (125033), Cult Dip Combi® (100778)',
+          'Ambalaj: Orijinal Merck Güvenlik Mühürlü Şişe ve Test Kitleri'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'CPAChem CRM Standartları, Chembio Test Kitleri & Isolab / Carlo Erba / Tekkim Reaktifler',
+        slug: 'analitik-laboratuvar-kimyasallari-ve-reaktifler',
+        activeChemical: 'CPAChem ISO 17034 CRM (Cr 6+, Hazen 500), Chembio Sertlik & Klor Kitleri, Carlo Erba, Isolab, Sigma-Aldrich, SRL & Norateks',
+        desc: 'ISO 17034 / ISO 17025 akrediteli CPAChem referans standartları (CRM), Chembio ve Lovibond hızlı saha su analiz kitleri ile Isolab, Carlo Erba, Sigma-Aldrich, SRL, Honeywell, Tekkim ve Norateks laboratuvar kimyasalları.',
+        specs: [
+          'CRM Referanslar: CPAChem Krom (Cr 6+ 1000 mg/L) CRM, Pt-Co / Hazen 500 Renk Referans Standardı, Mettler Toledo 1413 µS/cm',
+          'Saha Test Kitleri: Chembio Toplam Sertlik (°fH) & Serbest Klor Kitleri, Lovibond DPD No.1 (500 Tablet)',
+          'Analitik Reaktifler: Gümüş Sülfat, Potasyum Dikromat, Demir(II) Sülfat, Baryum Klorür, Kjeldahl Tablet, Murexid, 0.1N Sodyum Tiyosülfat',
+          'Tedarik: Kurumsal Teklif & Sipariş Usulü (Parti Bazlı COA ve Türkçe SDS/GBF ile)'
         ],
         tdsReady: true
       }
@@ -666,10 +693,21 @@ export const productCategories = [
   }
 ];
 
+const CATEGORY_SHORT_TITLES = {
+  'sogutma-kulesi-kimyasallari': 'Soğutma Kulesi',
+  'kazan-suyu-kimyasallari': 'Kazan Suyu',
+  'atik-su-aritma-kimyasallari': 'Atık Su & Polimer',
+  'endustriyel-su-aritma-sistemleri': 'RO & Su Arıtma',
+  'saf-su-ve-ultra-saf-su-sistemleri': 'Medipure Saf Su',
+  'laboratuvar-kimyasallari-ve-horiba-cozeltileri': 'Laboratuvar & HORIBA',
+  'jeotermal-su-sartlandirma': 'Jeotermal Şartlandırma',
+  'fabrika-ve-proses-kimyasallari': 'Hipoklorit, Kostik & Proses'
+};
+
 // Kategori kartlarını hem eski hem yeni şemayla tam uyumlu hale getir
 productCategories.forEach((cat) => {
   cat.slug = cat.slug || cat.id;
-  cat.shortTitle = cat.shortTitle || cat.tag || cat.title;
+  cat.shortTitle = CATEGORY_SHORT_TITLES[cat.id] || cat.shortTitle || cat.tag || cat.title;
   cat.description = cat.description || cat.shortDesc || '';
   cat.packaging = cat.packaging || '25-30 kg Bidon / 1000 kg IBC / Dökme Tanker';
   cat.subProducts = (cat.subcategories || []).map((s) => ({

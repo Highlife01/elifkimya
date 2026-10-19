@@ -30,6 +30,7 @@ import { fold, t, withLanguageSearch, getLanguage } from '../utils/i18n.js';
 import { translateText } from '../utils/translation-catalog.js';
 import { REGION_SLUGS } from './seo-landings.js';
 import { bindMedipureCatalog, renderMedipureCatalog } from '../components/medipure-catalog.js';
+import { bindLabChemicalsCatalog, renderLabChemicalsCatalog } from '../components/lab-chemicals-catalog.js';
 import { openChemicalProductModal } from '../components/product-order-modal.js';
 import { TECHNICAL_BLOG_CATEGORIES, TECHNICAL_BLOG_POSTS } from '../data/technical-blog.js';
 import { TURKEY_81_PROVINCES, TURKEY_7_REGIONS_SUMMARY } from '../data/provinces-81.js';
@@ -53,13 +54,14 @@ export async function renderProductsPage(container, navigate) {
   const categoryImages = [
     '/assets/cat-cooling.jpg',
     '/assets/cat-boiler.jpg',
-    '/assets/cat-ro-membrane.jpg',
-    '/assets/cat-water-systems.jpg',
-    '/assets/cat-acids.jpg',
     '/assets/cat-coagulants.jpg',
-    '/assets/cat-caustic.jpg'
+    '/assets/cat-water-systems.jpg',
+    '/assets/hero-medipure-edi.jpg',
+    '/assets/hero-horiba-lab.jpg',
+    '/assets/cat-ro-membrane.jpg',
+    '/assets/cat-hypochlorite.jpg'
   ];
-  const categoryEmojis = ['💧', '🌋', '⚙️', '🔬', '🔥', '♻️', '🏭'];
+  const categoryEmojis = ['❄️', '⚡', '♻️', '⚙️', '💧', '🔬', '🌋', '🧪'];
 
   const html = `
     <section class="hero-bg border-b border-slate-200/80 py-16 text-slate-900 sm:py-20">
@@ -81,12 +83,12 @@ export async function renderProductsPage(container, navigate) {
           </div>
           <span class="text-sm font-extrabold text-emerald-800 group-hover:translate-x-1 transition">Kataloğu aç →</span>
         </a>
-        <a href="#laboratuvar-kimyasallari-ve-horiba-cozeltileri" class="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-sky-200 bg-sky-50 p-5 hover:border-sky-500">
+        <a href="#laboratuvar-kimyasallari-katalog" class="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-sky-200 bg-sky-50 p-5 hover:border-sky-500">
           <div>
-            <p class="text-xs font-black uppercase tracking-wider text-sky-900">HORIBA &amp; Laboratuvar Kimyasalları</p>
-            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">NIST izlenebilir pH tampon, iletkenlik (EC), iyon (ISE), ORP ve 3.33 M KCl çözeltileri</p>
+            <p class="text-xs font-black uppercase tracking-wider text-sky-900">HORIBA &amp; Laboratuvar Kimyasalları (95 Ürün)</p>
+            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">HORIBA kalibrasyon çözeltileri, HACH küvet/toz testleri, Merck, Isolab ve CRM standartları</p>
           </div>
-          <span class="text-sm font-extrabold text-sky-900 group-hover:translate-x-1 transition">Çözeltileri incele →</span>
+          <span class="text-sm font-extrabold text-sky-900 group-hover:translate-x-1 transition">95 Ürünü İncele →</span>
         </a>
       </div>
     </section>
@@ -254,12 +256,15 @@ export async function renderProductsPage(container, navigate) {
             </div>
           `).join('')}
         </div>
+
+        ${renderLabChemicalsCatalog()}
       </div>
     </section>
   `;
 
   renderSafeHtml(container, html);
   attachSpaLinks(container, navigate);
+  bindLabChemicalsCatalog(container);
 
   // Üst Kategori Kartları & Grup Butonları -> Kimyasal Açıklama & Sipariş Modalı
   container.querySelectorAll('[data-cat-chem-idx]').forEach((el) => {
@@ -423,6 +428,12 @@ export async function renderProductsPage(container, navigate) {
       const textMatch = !q || (card.dataset.search || '').includes(q);
       card.style.display = (catMatch && textMatch) ? '' : 'none';
     });
+
+    const labCatalogEl = container.querySelector('#laboratuvar-kimyasallari-katalog');
+    if (labCatalogEl) {
+      const showLab = activeCat === 'all' || activeCat === 'laboratuvar-kimyasallari-ve-horiba-cozeltileri';
+      labCatalogEl.style.display = showLab ? '' : 'none';
+    }
   }
 
   searchInput?.addEventListener('input', applyFilters);

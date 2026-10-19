@@ -150,12 +150,12 @@ const HOME_CATEGORY_CARDS = [
   },
   {
     id: 'laboratuvar-kimyasallari-ve-horiba-cozeltileri',
-    title: 'Laboratuvar & HORIBA Standart Çözeltileri',
+    title: 'Laboratuvar Kimyasalları & HORIBA Çözeltileri',
     emoji: '🔬',
-    specPill: 'HORIBA pH • EC • İyon (ISE) • KCl',
-    desc: 'HORIBA su kalitesi ölçerler için NIST izlenebilir pH tampon, iletkenlik, iyon (ISE), ORP ve 3.33 M KCl elektrot bakım çözeltileri.',
+    specPill: 'HORIBA • HACH • Merck • 95 Ürün',
+    desc: 'HORIBA kalibrasyon solüsyonları, HACH küvet/toz testleri, Merck, Isolab, CPAChem CRM ve Chembio su analiz kitleri.',
     image: '/assets/hero-horiba-lab.jpg',
-    href: '/urunler#laboratuvar-kimyasallari-ve-horiba-cozeltileri'
+    href: '/urunler#laboratuvar-kimyasallari-katalog'
   },
   {
     id: 'sodyum-hipoklorit-ve-baz-kimyasallar',

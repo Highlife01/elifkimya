@@ -20,6 +20,7 @@ const publicFiles = [
   'src/components/navbar.js',
   'src/components/footer.js',
   'src/components/medipure-catalog.js',
+  'src/components/lab-chemicals-catalog.js',
   'src/components/notification.js',
   'src/utils/seo-geo.js',
   ...fs.readdirSync(path.join(root, 'src/data'))

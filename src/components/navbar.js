@@ -16,6 +16,16 @@ export const NAV_ITEMS = [
   { path: '/iletisim', labelKey: 'nav_contact' }
 ];
 
+export const QUICK_CATEGORY_ITEMS = [
+  { path: '/urunler#sogutma-kulesi-kimyasallari', icon: '❄️', label: 'Soğutma & Kazan Kimyasalları' },
+  { path: '/urunler#atik-su-aritma-kimyasallari', icon: '♻️', label: 'Atık Su & Polimerler' },
+  { path: '/sistemler', icon: '⚙️', label: 'RO / UF Su Arıtma' },
+  { path: '/sistemler#medipure-katalog', icon: '💧', label: 'Medipure Saf Su & EDI' },
+  { path: '/urunler#laboratuvar-kimyasallari-katalog', icon: '🔬', label: 'Laboratuvar & HORIBA Çözeltileri' },
+  { path: '/urunler#fabrika-ve-proses-kimyasallari', icon: '🧪', label: 'Hipoklorit & Kostik Soda' },
+  { path: '/teknik-bilgi', icon: '📚', label: 'Teknik Bilgi (SDS/TDS)' }
+];
+
 function renderLanguageOptions() {
   return LANGUAGES.map((lang) => `
     <a
@@ -127,8 +137,24 @@ export function renderNavbar(activeRoute = '/') {
         </div>
       </div>
 
+      <!-- Masaüstü Hızlı Ürün & Sistem Kategori Şeridi (Optimize Edilmiş Alt Menü) -->
+      <div class="hidden lg:block border-t border-slate-200/80 bg-slate-50/95">
+        <div class="container-x flex items-center justify-between gap-1.5 py-1.5 overflow-x-auto">
+          ${QUICK_CATEGORY_ITEMS.map((item) => `
+            <a
+              href="${escapeAttr(item.path)}"
+              data-nav="${escapeAttr(item.path)}"
+              class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-extrabold text-slate-700 hover:bg-emerald-100/80 hover:text-emerald-900 transition"
+            >
+              <span aria-hidden="true">${item.icon}</span>
+              <span>${escapeHtml(item.label)}</span>
+            </a>
+          `).join('')}
+        </div>
+      </div>
+
       <!-- Mobil Gezinme Çekmecesi -->
-      <div id="mobileNavDrawer" class="hidden border-t border-slate-200 bg-white px-4 py-4 shadow-xl lg:hidden">
+      <div id="mobileNavDrawer" class="hidden border-t border-slate-200 bg-white px-4 py-4 shadow-xl lg:hidden max-h-[84vh] overflow-y-auto">
         <div class="flex flex-col gap-1.5">
           ${renderLanguageMenu('inline')}
           ${NAV_ITEMS.map((link) => {
@@ -143,6 +169,21 @@ export function renderNavbar(activeRoute = '/') {
               </a>
             `;
           }).join('')}
+          <div class="mt-2 pt-2.5 border-t border-slate-200">
+            <p class="px-2 mb-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-800">Hızlı Ürün &amp; Çözüm Grupları</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
+              ${QUICK_CATEGORY_ITEMS.map((item) => `
+                <a
+                  href="${escapeAttr(item.path)}"
+                  data-nav="${escapeAttr(item.path)}"
+                  class="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-800 hover:border-emerald-400 hover:bg-emerald-50 transition"
+                >
+                  <span aria-hidden="true">${item.icon}</span>
+                  <span>${escapeHtml(item.label)}</span>
+                </a>
+              `).join('')}
+            </div>
+          </div>
           <div class="mt-3 pt-3 border-t border-slate-200 flex flex-wrap gap-2">
             <a href="/teklif-al" data-nav="/teklif-al" class="btn-primary flex-1 text-center text-xs !py-2.5">
               <span>📋</span>

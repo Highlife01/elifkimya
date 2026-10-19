@@ -84,23 +84,18 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
           </h3>
           <ul class="mt-4 space-y-2.5 text-sm">
             <li>
-              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#sogutma-kulesi-kimyasallari" data-nav="/urunler">
+              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#sogutma-kulesi-kimyasallari" data-nav="/urunler#sogutma-kulesi-kimyasallari">
                 Soğutma Kulesi Kimyasalları
               </a>
             </li>
             <li>
-              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#kazan-suyu-kimyasallari" data-nav="/urunler">
+              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#kazan-suyu-kimyasallari" data-nav="/urunler#kazan-suyu-kimyasallari">
                 Buhar Kazanı &amp; Kondens Kimyasalları
               </a>
             </li>
             <li>
-              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#jeotermal-su-sartlandirma" data-nav="/urunler#jeotermal-su-sartlandirma">
-                Jeotermal Su Şartlandırma
-              </a>
-            </li>
-            <li>
-              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/sistemler#medipure-katalog" data-nav="/sistemler#medipure-katalog">
-                Medipure Saf Su Cihazları
+              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#atik-su-aritma-kimyasallari" data-nav="/urunler#atik-su-aritma-kimyasallari">
+                Atıksu Polimerleri (PAC, A-PAM, C-PAM)
               </a>
             </li>
             <li>
@@ -109,13 +104,23 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
               </a>
             </li>
             <li>
-              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#atik-su-aritma-kimyasallari" data-nav="/urunler">
-                Atıksu Polimerleri (PAC, A-PAM, C-PAM)
+              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/sistemler#medipure-katalog" data-nav="/sistemler#medipure-katalog">
+                Medipure Saf Su Cihazları (163 Model)
               </a>
             </li>
             <li>
-              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler" data-nav="/urunler">
-                Baz Kimyasallar (Hipoklorit, Kostik, HCl)
+              <a class="text-emerald-300 hover:text-white font-bold transition-colors" href="/urunler#laboratuvar-kimyasallari-katalog" data-nav="/urunler#laboratuvar-kimyasallari-katalog">
+                Laboratuvar Kimyasalları &amp; HORIBA (95 Ürün)
+              </a>
+            </li>
+            <li>
+              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#jeotermal-su-sartlandirma" data-nav="/urunler#jeotermal-su-sartlandirma">
+                Jeotermal Su Şartlandırma
+              </a>
+            </li>
+            <li>
+              <a class="text-slate-200 hover:text-emerald-400 font-semibold transition-colors" href="/urunler#fabrika-ve-proses-kimyasallari" data-nav="/urunler#fabrika-ve-proses-kimyasallari">
+                Sodyum Hipoklorit &amp; Kostik Soda
               </a>
             </li>
           </ul>
