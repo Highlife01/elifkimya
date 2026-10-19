@@ -73,7 +73,7 @@ export async function renderProductsPage(container, navigate) {
     </section>
 
     <section class="section bg-white" style="padding-top:0;padding-bottom:0;">
-      <div class="container-x">
+      <div class="container-x grid gap-4 lg:grid-cols-2">
         <a href="/sistemler#medipure-katalog" data-nav class="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-500">
           <div>
             <p class="text-xs font-black uppercase tracking-wider text-emerald-800">Medipure cihaz vitrini</p>
@@ -81,17 +81,24 @@ export async function renderProductsPage(container, navigate) {
           </div>
           <span class="text-sm font-extrabold text-emerald-800 group-hover:translate-x-1 transition">Kataloğu aç →</span>
         </a>
+        <a href="#laboratuvar-kimyasallari-ve-horiba-cozeltileri" class="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-sky-200 bg-sky-50 p-5 hover:border-sky-500">
+          <div>
+            <p class="text-xs font-black uppercase tracking-wider text-sky-900">HORIBA &amp; Laboratuvar Kimyasalları</p>
+            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">NIST izlenebilir pH tampon, iletkenlik (EC), iyon (ISE), ORP ve 3.33 M KCl çözeltileri</p>
+          </div>
+          <span class="text-sm font-extrabold text-sky-900 group-hover:translate-x-1 transition">Çözeltileri incele →</span>
+        </a>
       </div>
     </section>
 
     <section class="section bg-slate-50/60" style="padding-bottom:2rem;">
       <div class="container-x">
-        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           ${productCategories.map((cat, idx) => `
             <article data-cat-chem-idx="${idx}" class="group cursor-pointer relative rounded-3xl border border-slate-200/80 bg-white p-4 shadow-card hover:shadow-card-hover hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
               <div data-chem-open="detail">
                 <div class="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-100">
-                  <img src="${escapeAttr(categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="1200" height="896" loading="lazy" class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
+                  <img src="${escapeAttr(cat.image || categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="1200" height="896" loading="lazy" class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105" />
                   <div class="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity"></div>
                   <span class="absolute top-3 left-3 text-2xl drop-shadow-sm">${categoryEmojis[idx % categoryEmojis.length]}</span>
                   <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur-md text-[10px] font-mono font-bold text-emerald-800 border border-emerald-200/80 shadow-xs">${escapeHtml(cat.shortTitle)}</span>
@@ -188,7 +195,7 @@ export async function renderProductsPage(container, navigate) {
             <div class="category-detail-card" data-category-id="${escapeAttr(cat.id)}" id="${escapeAttr(cat.slug)}">
               <div class="category-detail-head" style="display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;">
                 <div style="display:flex;align-items:center;gap:1.25rem;flex:1;min-width:280px;">
-                  <img src="${escapeAttr(categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="140" height="96" loading="lazy" style="width:140px;height:96px;object-fit:cover;border-radius:14px;border:2px solid #cbd5e1;flex-shrink:0;" />
+                  <img src="${escapeAttr(cat.image || categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="140" height="96" loading="lazy" style="width:140px;height:96px;object-fit:cover;border-radius:14px;border:2px solid #cbd5e1;flex-shrink:0;" />
                   <div>
                     <span class="sector-region-pill">${escapeHtml(cat.shortTitle)}</span>
                     <h2>${escapeHtml(cat.title)}</h2>
@@ -271,7 +278,7 @@ export async function renderProductsPage(container, navigate) {
         description: cat.description,
         specs: (cat.subcategories || []).map((s) => `${s.name}: ${s.desc}`),
         packaging: cat.packaging,
-        image: categoryImages[idx % categoryImages.length]
+        image: cat.image || categoryImages[idx % categoryImages.length]
       }, { mode });
     });
   });
@@ -295,7 +302,7 @@ export async function renderProductsPage(container, navigate) {
         description: sub.desc,
         specs: sub.specs || [],
         packaging: cat.packaging,
-        image: categoryImages[catIdx % categoryImages.length]
+        image: cat.image || categoryImages[catIdx % categoryImages.length]
       }, { mode });
     });
   });

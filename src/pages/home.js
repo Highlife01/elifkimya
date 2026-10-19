@@ -18,20 +18,6 @@ import { openChemicalProductModal } from '../components/product-order-modal.js';
 const HERO_SLIDES = [
   {
     id: '01',
-    image: '/assets/hero-chemical.jpg',
-    tag: 'ENDÜSTRİYEL PROSES KİMYASALLARI & ÜRETİM',
-    shortNav: 'ENDÜSTRİYEL PROSES KİMYASALLARI & ÜRETİM',
-    title: 'Ağır Sanayi ve Üretim Hatları İçin Spesifikasyon Odaklı Kimyasallar',
-    subtitle:
-      'Demir-çelik haddehaneleri, deterjan sülfonasyon, kağıt, cam ve mikronize kalsit tesisleri için parti bazlı COA ve SDS/GBF güvenceli toptan kimyasal tedariki.',
-    highlights: [
-      'Parti Bazlı COA & SDS/GBF',
-      '30 kg Bidon / 1000 kg IBC / Tanker',
-      'Adana & Çukurova 2–6 Saat Sevk'
-    ]
-  },
-  {
-    id: '02',
     image: '/assets/hero-cooling-towers.jpg',
     tag: 'SOĞUTMA KULESİ & KAZAN SUYU ŞARTLANDIRMA',
     shortNav: 'AĞIR HİZMET SOĞUTMA & KAZAN ŞARTLANDIRMA',
@@ -42,6 +28,20 @@ const HERO_SLIDES = [
       'PBTC / HEDP / Azol İnhibitörleri',
       'DBNPA & İzotiyazolin Biyositler',
       'DEHA Oksijen Tutucu & Nötralize Amin'
+    ]
+  },
+  {
+    id: '02',
+    image: '/assets/hero-wastewater.jpg',
+    tag: 'ATIK SU ARITMA, GERİ KAZANIM & KOAGÜLANTLAR',
+    shortNav: 'ATIK SU ARITMA & FLOKÜLANT POLİMERLER',
+    title: 'Yüksek Molekül Ağırlıklı Polielektrolitler, Koagülantlar & Sıfır Atık',
+    subtitle:
+      'Haddehane tufal çukurları, tekstil arıtmaları ve çamur susuzlaştırma dekantörleri için PAC (%17–%30), Demir III Klorür ve Anyonik/Katyonik Poliakrilamid çözümleri.',
+    highlights: [
+      '< 30 sn Hızlı Flok Çökme Süresi',
+      'Yerinde 6’lı Jar-Test Optimizasyonu',
+      '25 kg Torba / 1000 kg IBC / Dökme'
     ]
   },
   {
@@ -60,34 +60,6 @@ const HERO_SLIDES = [
   },
   {
     id: '04',
-    image: '/assets/hero-wastewater.jpg',
-    tag: 'ATIK SU ARITMA, GERİ KAZANIM & KOAGÜLANTLAR',
-    shortNav: 'ATIK SU ARITMA & FLOKÜLANT POLİMERLER',
-    title: 'Yüksek Molekül Ağırlıklı Polielektrolitler, Koagülantlar & Sıfır Atık',
-    subtitle:
-      'Haddehane tufal çukurları, tekstil arıtmaları ve çamur susuzlaştırma dekantörleri için PAC (%17–%30), Demir III Klorür ve Anyonik/Katyonik Poliakrilamid çözümleri.',
-    highlights: [
-      '< 30 sn Hızlı Flok Çökme Süresi',
-      'Yerinde 6’lı Jar-Test Optimizasyonu',
-      '25 kg Torba / 1000 kg IBC / Dökme'
-    ]
-  },
-  {
-    id: '05',
-    image: '/assets/hero-logistics.jpg',
-    tag: 'ADR LİSANSLI LOJİSTİK, 81 İL & İHRACAT AĞI',
-    shortNav: 'ADR LOJİSTİK & 81 İL / İHRACAT SEVKİYAT',
-    title: 'Çukurova Merkez Depodan Türkiye Geneli ve İhracata Kesintisiz Tedarik',
-    subtitle:
-      'Adana Hacı Sabancı OSB, Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde sanayi bölgelerine aynı gün sevkiyat; Mersin Limanı üzerinden FOB/CIF ihracat.',
-    highlights: [
-      'Adana Merkez Depo Stok Güvencesi',
-      'ADR Sertifikalı Tanker & Filo',
-      'TR / EN İhracat Dokümantasyonu'
-    ]
-  },
-  {
-    id: '06',
     image: '/assets/hero-medipure-edi.jpg',
     tag: 'MEDIPURE® SU SAFLAŞTIRMA • SAF SU & ULTRA SAF SU EDI SİSTEMLER',
     shortNav: 'MEDIPURE SAF SU & ULTRA SAF SU EDI SİSTEMLER',
@@ -99,46 +71,38 @@ const HERO_SLIDES = [
       'Saf Su & Elektrodeiyonizasyon (EDI) Sistemler',
       'Laboratuvardan Endüstriye 163 Model'
     ]
+  },
+  {
+    id: '05',
+    image: '/assets/hero-horiba-lab.jpg',
+    tag: 'LABORATUVAR KİMYASALLARI & HORIBA STANDART ÇÖZELTİLERİ',
+    shortNav: 'LABORATUVAR & HORIBA STANDART ÇÖZELTİLER',
+    title: 'HORIBA Su Kalitesi Ölçüm ve Standart Kalibrasyon Çözeltileri',
+    subtitle:
+      'Laboratuvar ve proses su kalitesi analizleri için NIST izlenebilir HORIBA pH tampon çözeltileri (pH 4.01 / 7.00 / 10.01), iletkenlik standartları (84 µS/cm – 111.8 mS/cm), iyon (ISE), ORP ve 3.33 M KCl elektrot bakım solüsyonları.',
+    highlights: [
+      'HORIBA pH & İletkenlik (EC) Standartları',
+      'LAQUAtwin İyon (ISE) & ORP Çözeltileri',
+      '3.33 M KCl İç Dolgu & Elektrot Bakım'
+    ]
+  },
+  {
+    id: '06',
+    image: '/assets/hero-chemical.jpg',
+    tag: 'SODYUM HİPOKLORİT & KLOR • KOSTİK SODA & ALKALİLER',
+    shortNav: 'SODYUM HİPOKLORİT & KOSTİK SODA',
+    title: 'Sodyum Hipoklorit & Klor, Kostik Soda & Alkaliler ve Proses Kimyasalları',
+    subtitle:
+      'Su dezenfeksiyonu, CIP yıkama, nötralizasyon ve ağır sanayi üretim hatları için %15–16 aktif klorlu Sodyum Hipoklorit (NaOCl), %48 sıvı / %99 payet Kostik Soda (NaOH) ve teknik asit tedariki.',
+    highlights: [
+      'NaOCl %15–16 & NaOH %48 / %99',
+      '30 kg Bidon / 1000 kg IBC / Tanker',
+      'Parti Bazlı COA & SDS/GBF'
+    ]
   }
 ];
 
 const HOME_CATEGORY_CARDS = [
-  {
-    id: 'sodyum-hipoklorit-ve-baz-kimyasallar',
-    title: 'Sodyum Hipoklorit & Klor',
-    emoji: '🧪',
-    specPill: '%15–16 Aktif Klor • Dökme / IBC',
-    desc: 'Su dezenfeksiyonu, tekstil ağartma ve endüstriyel arıtma için yüksek stabiliteli sıvı sodyum hipoklorit (NaOCl).',
-    image: '/assets/cat-hypochlorite.jpg',
-    href: '/urunler#sogutma-kulesi-kimyasallari'
-  },
-  {
-    id: 'kostik-soda-ve-alkaliler',
-    title: 'Kostik Soda & Alkaliler',
-    emoji: '⚗️',
-    specPill: 'NaOH %48 Sıvı & %99 Payet',
-    desc: 'Nötralizasyon, CIP yıkama, sabun/deterjan ve proses pH kontrolü için membran kalitesinde sıvı ve payet kostik.',
-    image: '/assets/cat-caustic.jpg',
-    href: '/urunler#endustriyel-bakim-ve-proses-kimyasallari'
-  },
-  {
-    id: 'endustriyel-asitler-ve-pickling',
-    title: 'Endüstriyel Asitler & İnhibitör',
-    emoji: '🔥',
-    specPill: 'HCl %32 • H₂SO₄ %98 • Pickling',
-    desc: 'Demir-çelik asitleme (pickling) hatları, reçine rejenerasyonu ve pH dengeleme için teknik asitler ve asit inhibitörleri.',
-    image: '/assets/cat-acids.jpg',
-    href: '/urunler#endustriyel-bakim-ve-proses-kimyasallari'
-  },
-  {
-    id: 'koagulant-ve-flokulantlar',
-    title: 'Koagülant & Polielektrolitler',
-    emoji: '💧',
-    specPill: 'PAC %17/%30 • A-PAM / C-PAM',
-    desc: 'Atıksu arıtma, tufal çukuru ve çamur susuzlaştırma için PAC, Demir III Klorür ve Anyonik/Katyonik Poliakrilamid.',
-    image: '/assets/cat-coagulants.jpg',
-    href: '/urunler#atik-su-aritma-kimyasallari'
-  },
   {
     id: 'sogutma-kulesi-sartlandirma',
     title: 'Soğutma Kulesi Kimyasalları',
@@ -158,6 +122,15 @@ const HOME_CATEGORY_CARDS = [
     href: '/urunler#kazan-suyu-kimyasallari'
   },
   {
+    id: 'koagulant-ve-flokulantlar',
+    title: 'Koagülant & Polielektrolitler',
+    emoji: '💧',
+    specPill: 'PAC %17/%30 • A-PAM / C-PAM',
+    desc: 'Atıksu arıtma, tufal çukuru ve çamur susuzlaştırma için PAC, Demir III Klorür ve Anyonik/Katyonik Poliakrilamid.',
+    image: '/assets/cat-coagulants.jpg',
+    href: '/urunler#atik-su-aritma-kimyasallari'
+  },
+  {
     id: 'ro-membran-ve-antiskalant',
     title: 'RO Antiskalant & CIP Kimyasalları',
     emoji: '🛡️',
@@ -168,43 +141,43 @@ const HOME_CATEGORY_CARDS = [
   },
   {
     id: 'endustriyel-su-aritma-ve-edi',
-    title: 'RO, UF & EDI Su Arıtma Sistemleri',
+    title: 'Medipure Saf Su & RO/EDI Sistemleri',
     emoji: '⚙️',
-    specPill: '1–250 m³/h RO • 18.2 MΩ·cm EDI',
-    desc: 'Ham su analizine göre projelendirilen endüstriyel Ters Ozmoz (RO), Ultrafiltrasyon (UF), Yumuşatma ve EDI üniteleri.',
-    image: '/assets/cat-water-systems.jpg',
-    href: '/sistemler'
+    specPill: '18.2 MΩ·cm EDI • 163 Model Medipure',
+    desc: 'Medipure Tip-1/Tip-2 ultra saf su cihazları, Elektrodeiyonizasyon (EDI) ve endüstriyel Ters Ozmoz (RO) üniteleri.',
+    image: '/assets/hero-medipure-edi.jpg',
+    href: '/sistemler#medipure-katalog'
+  },
+  {
+    id: 'laboratuvar-kimyasallari-ve-horiba-cozeltileri',
+    title: 'Laboratuvar & HORIBA Standart Çözeltileri',
+    emoji: '🔬',
+    specPill: 'HORIBA pH • EC • İyon (ISE) • KCl',
+    desc: 'HORIBA su kalitesi ölçerler için NIST izlenebilir pH tampon, iletkenlik, iyon (ISE), ORP ve 3.33 M KCl elektrot bakım çözeltileri.',
+    image: '/assets/hero-horiba-lab.jpg',
+    href: '/urunler#laboratuvar-kimyasallari-ve-horiba-cozeltileri'
+  },
+  {
+    id: 'sodyum-hipoklorit-ve-baz-kimyasallar',
+    title: 'Sodyum Hipoklorit & Klor',
+    emoji: '🧪',
+    specPill: '%15–16 Aktif Klor • Dökme / IBC',
+    desc: 'Su dezenfeksiyonu, tekstil ağartma ve endüstriyel arıtma için yüksek stabiliteli sıvı sodyum hipoklorit (NaOCl).',
+    image: '/assets/cat-hypochlorite.jpg',
+    href: '/urunler#fabrika-ve-proses-kimyasallari'
+  },
+  {
+    id: 'kostik-soda-ve-alkaliler',
+    title: 'Kostik Soda & Alkaliler',
+    emoji: '⚗️',
+    specPill: 'NaOH %48 Sıvı & %99 Payet',
+    desc: 'Nötralizasyon, CIP yıkama, sabun/deterjan ve proses pH kontrolü için membran kalitesinde sıvı ve payet kostik.',
+    image: '/assets/cat-caustic.jpg',
+    href: '/urunler#fabrika-ve-proses-kimyasallari'
   }
 ];
 
 const FEATURED_PRODUCTS = [
-  {
-    title: 'Sodyum Hipoklorit (%15–16 Aktif Klor)',
-    badgeEmoji: '🧪',
-    badgeText: 'Dezenfeksiyon & Ağartma',
-    materialSpec: 'NaOCl %15-16 • Yoğunluk: 1.22–1.25 g/cm³',
-    desc: 'İçme ve proses suyu klorlaması, soğutma kulesi şok dezenfeksiyonu, tekstil ağartma ve atıksu oksidasyonu için taze üretim sıvı klor.',
-    moq: '60 kg Bidon / 1200 kg IBC / Tanker',
-    image: '/assets/cat-hypochlorite.jpg'
-  },
-  {
-    title: 'Polialüminyum Klorür (PAC %17 Sıvı / %30 Toz)',
-    badgeEmoji: '💧',
-    badgeText: 'Atıksu & Ham Su Koagülantı',
-    materialSpec: 'Al₂O₃ %17 / %30 • Yüksek Baziklik',
-    desc: 'Endüstriyel atıksu arıtma, kağıt üretimi ve nehir/kuyu suyu ön arıtmasında düşük çamur hacmi ve hızlı flokülasyon sağlayan koagülant.',
-    moq: '25 kg Torba / 1200 kg IBC / Tanker',
-    image: '/assets/cat-coagulants.jpg'
-  },
-  {
-    title: 'Yüksek Silis RO Antiskalant (Dendrimer / Fosfonat)',
-    badgeEmoji: '🛡️',
-    badgeText: 'Ters Ozmoz Membran Koruyucu',
-    materialSpec: '240 ppm SiO₂ Toleransı • 2–4 ppm Dozaj',
-    desc: 'Kuyu sularında yüksek silis, kalsiyum karbonat, baryum ve stronsiyum sülfat çökmesini önleyerek RO membran ömrünü uzatan antiskalant.',
-    moq: '30 kg UN Bidon / 1000 kg IBC',
-    image: '/assets/cat-ro-membrane.jpg'
-  },
   {
     title: 'Soğutma Kulesi Korozyon & Kışır İnhibitörü (PBTC/HEDP)',
     badgeEmoji: '❄️',
@@ -224,13 +197,40 @@ const FEATURED_PRODUCTS = [
     image: '/assets/cat-boiler.jpg'
   },
   {
+    title: 'Polialüminyum Klorür (PAC %17 Sıvı / %30 Toz)',
+    badgeEmoji: '💧',
+    badgeText: 'Atıksu & Ham Su Koagülantı',
+    materialSpec: 'Al₂O₃ %17 / %30 • Yüksek Baziklik',
+    desc: 'Endüstriyel atıksu arıtma, kağıt üretimi ve nehir/kuyu suyu ön arıtmasında düşük çamur hacmi ve hızlı flokülasyon sağlayan koagülant.',
+    moq: '25 kg Torba / 1200 kg IBC / Tanker',
+    image: '/assets/cat-coagulants.jpg'
+  },
+  {
     title: 'Anyonik & Katyonik Polielektrolit (Flokülant Polimer)',
-    badgeEmoji: '🔬',
+    badgeEmoji: '♻️',
     badgeText: 'Flokülant & Çamur Susuzlaştırma',
     materialSpec: 'MW: 16–24 Milyon Dalton • Toz & Emülsiyon',
     desc: 'Haddehane tufal çukurları, maden/kalsit tikinerleri ve dekantör/belt-pres çamur susuzlaştırma üniteleri için yüksek molekül ağırlıklı polimer.',
     moq: '25 kg Kraft Torba / Palet',
     image: '/assets/hero-wastewater.jpg'
+  },
+  {
+    title: 'HORIBA pH Tampon, İletkenlik (EC) & İyon Standart Çözeltileri',
+    badgeEmoji: '🔬',
+    badgeText: 'Laboratuvar & Kalibrasyon Çözeltileri',
+    materialSpec: 'NIST İzlenebilir pH 4.01/7.00/10.01 • 84 µS/cm – 111.8 mS/cm • 3.33 M KCl',
+    desc: 'HORIBA masaüstü, taşınabilir ve LAQUAtwin su kalitesi cihazları için orijinal pH tampon, iletkenlik, iyon (ISE), ORP ve elektrot bakım çözeltileri.',
+    moq: '14 mL×6 Kit / 250 mL & 500 mL Orijinal Şişe',
+    image: '/assets/hero-horiba-lab.jpg'
+  },
+  {
+    title: 'Sodyum Hipoklorit (%15–16 Aktif Klor)',
+    badgeEmoji: '🧪',
+    badgeText: 'Dezenfeksiyon & Ağartma',
+    materialSpec: 'NaOCl %15-16 • Yoğunluk: 1.22–1.25 g/cm³',
+    desc: 'İçme ve proses suyu klorlaması, soğutma kulesi şok dezenfeksiyonu, tekstil ağartma ve atıksu oksidasyonu için taze üretim sıvı klor.',
+    moq: '60 kg Bidon / 1200 kg IBC / Tanker',
+    image: '/assets/cat-hypochlorite.jpg'
   }
 ];
 
@@ -273,19 +273,19 @@ const SECTORS_LIST = [
 ];
 
 const MARQUEE_ITEMS = [
-  'Medipure® Su Saflaştırma & Ultra Saf Su EDI (18.25 MΩ·cm)',
-  'Sodyum Hipoklorit (%15–16)',
-  'Kostik Soda (NaOH %48 / %99)',
-  'Hidroklorik & Sülfürik Asit',
-  'Polialüminyum Klorür (PAC %17 / %30)',
-  'Anyonik & Katyonik Polielektrolit',
   'Soğutma Kulesi PBTC/HEDP İnhibitörü',
   'DBNPA & İzotiyazolin Biyosit',
   'Buhar Kazanı DEHA Oksijen Tutucu',
+  'Polialüminyum Klorür (PAC %17 / %30)',
+  'Anyonik & Katyonik Polielektrolit',
   'Ters Ozmoz (RO) Antiskalant & CIP',
   '1–250 m³/h RO & EDI Saf Su Sistemleri',
+  'Medipure® Su Saflaştırma & Ultra Saf Su EDI (18.25 MΩ·cm)',
+  'HORIBA pH Tampon, İletkenlik (EC) & İyon Standart Çözeltileri',
   'Jeotermal Kireç, Silika ve Korozyon',
   'PLC / SCADA Otomasyon & Dozaj Panoları',
+  'Sodyum Hipoklorit (%15–16)',
+  'Kostik Soda (NaOH %48 / %99)',
   'Adana AOSB • Mersin • İskenderun • Gaziantep • Kayseri • 81 İl Sevkiyat'
 ];
 

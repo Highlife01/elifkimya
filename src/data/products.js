@@ -12,6 +12,7 @@ export const productCategories = [
     tag: 'Sirkülasyon & Isı Transferi',
     badge: 'Yüksek Performans',
     icon: 'droplets',
+    image: '/assets/cat-cooling.jpg',
     subcategories: [
       {
         name: 'Korozyon İnhibitörleri (Organik & İnorganik)',
@@ -103,196 +104,6 @@ export const productCategories = [
     ]
   },
   {
-    id: 'jeotermal-su-sartlandirma',
-    code: '07',
-    title: 'Jeotermal Su Şartlandırma',
-    shortDesc: 'Jeotermal kuyu, eşanjör, sera ve bölgesel ısıtma hatlarında kireç, silika ve korozyon kontrolü. Dozaj, akışkan analizi görülmeden yazılmaz.',
-    tag: 'Jeotermal & Yüksek Sıcaklık',
-    badge: 'Analiz Şartlı',
-    icon: 'flame',
-    subcategories: [
-      {
-        name: 'Jeotermal Kireç ve Silika İnhibitörleri',
-        slug: 'jeotermal-kirec-silika',
-        activeChemical: 'Yüksek sıcaklık kararlı fosfonat ve polimer karışımları',
-        desc: 'Karbonat ve silika birikimine karşı kuyu çıkışı, separatör ve eşanjör hatlarında kullanılan inhibitörler. Sıcaklık bandı ve dozaj, brine analiziyle belirlenir.',
-        specs: [
-          'Uygulama: kuyu başı, yüzey hattı ve eşanjör',
-          'Hedef birikim: kalsiyum karbonat, silika ve metal silikat',
-          'Dozaj akışkan analizi olmadan sabitlenmez',
-          'Ambalaj: 30 kg bidon, 1000 kg IBC'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Jeotermal Korozyon İnhibitörleri',
-        slug: 'jeotermal-korozyon',
-        activeChemical: 'Film yapıcı ve azol destekli korozyon programı',
-        desc: 'Tuzlu ve çözünmüş gaz içeren jeotermal akışkanlarda karbon çelik hat ve eşanjör metal kaybını sınırlayan inhibitörler. Kireç programıyla birlikte kurulur.',
-        specs: [
-          'Karbon çelik yüzey hatları ve ısı eşanjörleri',
-          'Kireç inhibitörü ile birlikte programlanır',
-          'Korozyon kuponu ile saha doğrulaması'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Jeotermal Hat ve Eşanjör Temizleyiciler',
-        slug: 'jeotermal-hat-temizleme',
-        activeChemical: 'İnhibitörlü karbonat ve silikat çözücü',
-        desc: 'Karbonat ve silikat birikimini duruşta veya kontrollü çevrimde çözen temizleyiciler. Online veya offline uygulama, birikim tipine göre seçilir.',
-        specs: [
-          'Karbonat ve silikat birikimi',
-          'Duruşta veya kontrollü çevrimde uygulama',
-          'Temizlik sonrası nötralizasyon'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'H₂S Koku ve Mikrobiyolojik Yardımcılar',
-        slug: 'jeotermal-koku-biyosit',
-        activeChemical: 'Koku bastırıcı ve oksitleyici olmayan biyosit',
-        desc: 'Jeotermal soğutma ve tutma hatlarında hidrojen sülfür kokusu ile inhibitör stoklarındaki bakteri üremesine karşı yardımcı kimyasallar.',
-        specs: [
-          'H₂S kokusunun sahada bastırılması',
-          'İnhibitör stok çözeltilerinde biyolojik koruma',
-          'Açık soğutma destek devreleriyle birlikte kurulabilir'
-        ],
-        tdsReady: true
-      }
-    ]
-  },
-  {
-    id: 'endustriyel-su-aritma-sistemleri',
-    code: '02',
-    title: 'Endüstriyel Su Arıtma Sistemleri',
-    shortDesc: 'Fabrikaların proses suyu ihtiyacına yönelik anahtar teslim mekanik, kimyasal ve membran filtrasyon mühendislik sistemleri.',
-    tag: 'Mühendislik & Ekipman',
-    badge: 'Anahtar Teslim',
-    icon: 'cpu',
-    subcategories: [
-      {
-        name: 'Reverse Osmosis (RO) Sistemleri',
-        slug: 'reverse-osmosis',
-        activeChemical: 'TFC Poliamid Membran, PLC Otomasyon, CIP Ünitesi',
-        desc: 'Kuyu suyu, şebeke ve acı suları %99.5 tuz giderme verimiyle yüksek saflıkta proses suyuna dönüştüren endüstriyel ters ozmoz üniteleri.',
-        specs: [
-          'Kapasite: 1 - 250 m³/saat modüler dizayn',
-          'Enerji Geri Kazanım Cihazları (ERD) Entegre',
-          'Otomatik CIP Kimyasal Yıkama İstasyonu',
-          'PLC Dokunmatik Ekran & SCADA Bağlantısı'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Kum ve Aktif Karbon Filtrasyonu',
-        slug: 'kum-ve-aktif-karbon-filtrasyonu',
-        activeChemical: 'Kuvars Kumu, Antrasit, Yüksek İyotlu Hindistan Cevizi Aktif Karbon',
-        desc: 'Askıda katı maddeleri, bulanıklığı, serbest kloru ve organik kokuyu gidererek RO membranlarını ve yumuşatma reçinelerini koruyan çok katmanlı filtreler.',
-        specs: [
-          'FRP veya Epoksi Kaplı Paslanmaz Karbon Çelik Gövde',
-          'Otomatik Pnömatik/Elektrik Aktüatörlü Valfler',
-          'SDI < 3.0 Çıkış Güvencesi'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Endüstriyel Su Yumuşatma Sistemleri',
-        slug: 'su-yumusatma-sistemleri',
-        activeChemical: 'Gıda Derecesi Kuvvetli Asidik Katyonik Jel Reçine',
-        desc: 'Kalsiyum ve magnezyum iyonlarını sodyum ile yer değiştirerek sıfır sertlikte (0°dH) kazan besi ve proses suyu sağlayan tandem (kesintisiz) sistemler.',
-        specs: [
-          'Kesintisiz Tandem (Dubleks) Çalışma Prensibi',
-          'Debi veya Sertlik Sensör Kontrollü Otomatik Rejenerasyon',
-          'PE Çözelti Tuz Tankı ve Emiş Düzeneği Dahil'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Ultrafiltrasyon (UF) Sistemleri',
-        slug: 'ultrafiltrasyon',
-        activeChemical: 'PVDF İçi Boş Elyaf (Hollow Fiber) Membran (0.02 µm)',
-        desc: 'Askıda katı maddeleri, kolloidal silikayı, bakteri ve virüsleri kimyasalsız ayıran ileri ön arıtma teknolojisi.',
-        specs: [
-          'SDI < 2.0 Çıkış Değeri (RO Membran Ömrünü 2 Kat Artırır)',
-          'Ters Yıkama ve CEB (Kimyasal Destekli Yıkama) Otomasyonu',
-          'Kompakt Paslanmaz Çelik Şase'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Deiyonizasyon (Demineralizasyon) Kolonları',
-        slug: 'deiyonizasyon-sistemleri',
-        activeChemical: 'Kuvvetli Asidik Katyonik & Kuvvetli Bazik Anyonik Reçine',
-        desc: 'Katyonik ve anyonik reçine kolonları üzerinden iletkenliği < 1 µS/cm seviyesine düşüren klasik asit/kostik rejenerasyonlu sistemler.',
-        specs: [
-          'Asit (HCl) ve Kostik (NaOH) Dozaj İstasyonu Entegre',
-          'Dijital İletkenlik Monitörü & Otomatik Yıkama Valfi',
-          'Dayanıklı Lastik/Kauçuk Kaplı Çelik Kolonlar'
-        ],
-        tdsReady: true
-      }
-    ]
-  },
-  {
-    id: 'saf-su-ve-ultra-saf-su-sistemleri',
-    code: '03',
-    title: 'Saf Su ve Ultra Saf Su Sistemleri',
-    shortDesc: 'Laboratuvar, medikal ve endüstriyel hatlar için Medipure saf su cihaz kataloğu ve yüksek saflıkta su sistemleri. Model listesi Su Arıtma sayfasındadır.',
-    tag: 'Laboratuvar & Yüksek Saflık',
-    badge: 'Medipure & Analitik Standart',
-    icon: 'activity',
-    subcategories: [
-      {
-        name: 'Laboratuvar Saf Su Sistemleri (Tip I, II, III)',
-        slug: 'laboratuvar-saf-su-sistemleri',
-        activeChemical: '185/254 nm Çift Dalga Boylu UV, 0.05 µm Ultrafiltre, Nükleer Reçine',
-        desc: 'HPLC, GC-MS, ICP-MS ve hücre kültürü çalışmaları için Tip I (Ultra Saf), Tip II (Analitik) ve Tip III saflık standartlarını sağlayan tezgah üstü cihazlar.',
-        specs: [
-          'Direnç: 18.2 MΩ·cm @ 25°C',
-          'TOC (Toplam Organik Karbon): < 2 ppb',
-          'Endotoksin: < 0.001 EU/ml, Bakteri: < 0.01 CFU/ml'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Endüstriyel EDI (Elektro-deiyonizasyon) Sistemleri',
-        slug: 'edi-sistemleri',
-        activeChemical: 'İyon Değiştirici Membran Paketleri, DC Elektrik Alanı',
-        desc: 'Kimyasal rejenerasyona ihtiyaç duymadan, elektrik akımıyla sürekli saf su üreten, sıfır asit/kostik atıklı çevre dostu teknoloji.',
-        specs: [
-          'Çıkış İletkenliği: < 0.06 - 0.1 µS/cm',
-          'Silika Giderimi: > %99.5',
-          'Rejenerasyon Kimyasalı Sıfır — Kesintisiz 7/24 Üretim'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Endüstriyel Saf Su Üretim Tesisleri',
-        slug: 'endustriyel-saf-su-uretimi',
-        activeChemical: 'Çift Geçişli RO (Double Pass) + EDI + Degazör',
-        desc: 'Cam yıkama, solar panel, akü ve kimyasal sentez tesisleri için saatte onlarca ton yüksek saflıkta su üreten merkezi tesisler.',
-        specs: [
-          'Kapasite: 5 - 100 m³/saat',
-          'Hijyenik 316L Paslanmaz Çelik Borulama & Orbital Kaynak',
-          'Sürekli Online TOC ve İletkenlik Doğrulaması'
-        ],
-        tdsReady: true
-      },
-      {
-        name: 'Saf Su Cihazları ve Sarf Malzemeleri',
-        slug: 'saf-su-sarf-malzemeleri',
-        activeChemical: 'Nükleer Sınıf Mixed-Bed Reçine, DOW/DuPont Membranlar',
-        desc: 'Karışık yatak reçineleri, UV lambalar, 0.2 mikron steril kapsül filtreler ve NIST izlenebilir kalibrasyon solüsyonları.',
-        specs: [
-          'Orijinal Yedek Parça Garantisi',
-          'Hızlı Kargo & Yerinde Teknik Servis Desteği'
-        ],
-        tdsReady: true
-      }
-    ]
-  },
-  {
     id: 'kazan-suyu-kimyasallari',
     code: '04',
     title: 'Kazan Suyu Kimyasalları',
@@ -300,6 +111,7 @@ export const productCategories = [
     tag: 'Buhar & Termik Güvenlik',
     badge: 'Enerji Tasarrufu',
     icon: 'flame',
+    image: '/assets/cat-boiler.jpg',
     subcategories: [
       {
         name: 'Oksijen Tutucular (Uçucu & İnorganik)',
@@ -358,6 +170,7 @@ export const productCategories = [
     tag: 'Çevre & Deşarj Standartları',
     badge: 'Deşarj Uyumluluğu',
     icon: 'refresh-cw',
+    image: '/assets/cat-coagulants.jpg',
     subcategories: [
       {
         name: 'Koagülantlar (İnorganik & Organik)',
@@ -445,13 +258,296 @@ export const productCategories = [
     ]
   },
   {
+    id: 'endustriyel-su-aritma-sistemleri',
+    code: '02',
+    title: 'Endüstriyel Su Arıtma Sistemleri',
+    shortDesc: 'Fabrikaların proses suyu ihtiyacına yönelik anahtar teslim mekanik, kimyasal ve membran filtrasyon mühendislik sistemleri.',
+    tag: 'Mühendislik & Ekipman',
+    badge: 'Anahtar Teslim',
+    icon: 'cpu',
+    image: '/assets/cat-water-systems.jpg',
+    subcategories: [
+      {
+        name: 'Reverse Osmosis (RO) Sistemleri',
+        slug: 'reverse-osmosis',
+        activeChemical: 'TFC Poliamid Membran, PLC Otomasyon, CIP Ünitesi',
+        desc: 'Kuyu suyu, şebeke ve acı suları %99.5 tuz giderme verimiyle yüksek saflıkta proses suyuna dönüştüren endüstriyel ters ozmoz üniteleri.',
+        specs: [
+          'Kapasite: 1 - 250 m³/saat modüler dizayn',
+          'Enerji Geri Kazanım Cihazları (ERD) Entegre',
+          'Otomatik CIP Kimyasal Yıkama İstasyonu',
+          'PLC Dokunmatik Ekran & SCADA Bağlantısı'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Kum ve Aktif Karbon Filtrasyonu',
+        slug: 'kum-ve-aktif-karbon-filtrasyonu',
+        activeChemical: 'Kuvars Kumu, Antrasit, Yüksek İyotlu Hindistan Cevizi Aktif Karbon',
+        desc: 'Askıda katı maddeleri, bulanıklığı, serbest kloru ve organik kokuyu gidererek RO membranlarını ve yumuşatma reçinelerini koruyan çok katmanlı filtreler.',
+        specs: [
+          'FRP veya Epoksi Kaplı Paslanmaz Karbon Çelik Gövde',
+          'Otomatik Pnömatik/Elektrik Aktüatörlü Valfler',
+          'SDI < 3.0 Çıkış Güvencesi'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Endüstriyel Su Yumuşatma Sistemleri',
+        slug: 'su-yumusatma-sistemleri',
+        activeChemical: 'Gıda Derecesi Kuvvetli Asidik Katyonik Jel Reçine',
+        desc: 'Kalsiyum ve magnezyum iyonlarını sodyum ile yer değiştirerek sıfır sertlikte (0°dH) kazan besi ve proses suyu sağlayan tandem (kesintisiz) sistemler.',
+        specs: [
+          'Kesintisiz Tandem (Dubleks) Çalışma Prensibi',
+          'Debi veya Sertlik Sensör Kontrollü Otomatik Rejenerasyon',
+          'PE Çözelti Tuz Tankı ve Emiş Düzeneği Dahil'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Ultrafiltrasyon (UF) Sistemleri',
+        slug: 'ultrafiltrasyon',
+        activeChemical: 'PVDF İçi Boş Elyaf (Hollow Fiber) Membran (0.02 µm)',
+        desc: 'Askıda katı maddeleri, kolloidal silikayı, bakteri ve virüsleri kimyasalsız ayıran ileri ön arıtma teknolojisi.',
+        specs: [
+          'SDI < 2.0 Çıkış Değeri (RO Membran Ömrünü 2 Kat Artırır)',
+          'Ters Yıkama ve CEB (Kimyasal Destekli Yıkama) Otomasyonu',
+          'Kompakt Paslanmaz Çelik Şase'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Deiyonizasyon (Demineralizasyon) Kolonları',
+        slug: 'deiyonizasyon-sistemleri',
+        activeChemical: 'Kuvvetli Asidik Katyonik & Kuvvetli Bazik Anyonik Reçine',
+        desc: 'Katyonik ve anyonik reçine kolonları üzerinden iletkenliği < 1 µS/cm seviyesine düşüren klasik asit/kostik rejenerasyonlu sistemler.',
+        specs: [
+          'Asit (HCl) ve Kostik (NaOH) Dozaj İstasyonu Entegre',
+          'Dijital İletkenlik Monitörü & Otomatik Yıkama Valfi',
+          'Dayanıklı Lastik/Kauçuk Kaplı Çelik Kolonlar'
+        ],
+        tdsReady: true
+      }
+    ]
+  },
+  {
+    id: 'saf-su-ve-ultra-saf-su-sistemleri',
+    code: '03',
+    title: 'Saf Su ve Ultra Saf Su Sistemleri (Medipure)',
+    shortDesc: 'Laboratuvar, medikal ve endüstriyel hatlar için Medipure saf su cihaz kataloğu ve yüksek saflıkta EDI su sistemleri. Model listesi Su Arıtma sayfasındadır.',
+    tag: 'Medipure & Yüksek Saflık',
+    badge: 'Medipure & Analitik Standart',
+    icon: 'activity',
+    image: '/assets/hero-medipure-edi.jpg',
+    subcategories: [
+      {
+        name: 'Laboratuvar Saf Su Sistemleri (Tip I, II, III)',
+        slug: 'laboratuvar-saf-su-sistemleri',
+        activeChemical: '185/254 nm Çift Dalga Boylu UV, 0.05 µm Ultrafiltre, Nükleer Reçine',
+        desc: 'HPLC, GC-MS, ICP-MS ve hücre kültürü çalışmaları için Tip I (Ultra Saf), Tip II (Analitik) ve Tip III saflık standartlarını sağlayan tezgah üstü cihazlar.',
+        specs: [
+          'Direnç: 18.2 MΩ·cm @ 25°C',
+          'TOC (Toplam Organik Karbon): < 2 ppb',
+          'Endotoksin: < 0.001 EU/ml, Bakteri: < 0.01 CFU/ml'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Endüstriyel EDI (Elektro-deiyonizasyon) Sistemleri',
+        slug: 'edi-sistemleri',
+        activeChemical: 'İyon Değiştirici Membran Paketleri, DC Elektrik Alanı',
+        desc: 'Kimyasal rejenerasyona ihtiyaç duymadan, elektrik akımıyla sürekli saf su üreten, sıfır asit/kostik atıklı çevre dostu teknoloji.',
+        specs: [
+          'Çıkış İletkenliği: < 0.06 - 0.1 µS/cm',
+          'Silika Giderimi: > %99.5',
+          'Rejenerasyon Kimyasalı Sıfır — Kesintisiz 7/24 Üretim'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Endüstriyel Saf Su Üretim Tesisleri',
+        slug: 'endustriyel-saf-su-uretimi',
+        activeChemical: 'Çift Geçişli RO (Double Pass) + EDI + Degazör',
+        desc: 'Cam yıkama, solar panel, akü ve kimyasal sentez tesisleri için saatte onlarca ton yüksek saflıkta su üreten merkezi tesisler.',
+        specs: [
+          'Kapasite: 5 - 100 m³/saat',
+          'Hijyenik 316L Paslanmaz Çelik Borulama & Orbital Kaynak',
+          'Sürekli Online TOC ve İletkenlik Doğrulaması'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Saf Su Cihazları ve Sarf Malzemeleri',
+        slug: 'saf-su-sarf-malzemeleri',
+        activeChemical: 'Nükleer Sınıf Mixed-Bed Reçine, DOW/DuPont Membranlar',
+        desc: 'Karışık yatak reçineleri, UV lambalar, 0.2 mikron steril kapsül filtreler ve NIST izlenebilir kalibrasyon solüsyonları.',
+        specs: [
+          'Orijinal Yedek Parça Garantisi',
+          'Hızlı Kargo & Yerinde Teknik Servis Desteği'
+        ],
+        tdsReady: true
+      }
+    ]
+  },
+  {
+    id: 'laboratuvar-kimyasallari-ve-horiba-cozeltileri',
+    code: '08',
+    title: 'Laboratuvar Kimyasalları & HORIBA Standart Çözeltileri',
+    shortDesc: 'HORIBA su kalitesi ölçüm cihazları için NIST izlenebilir pH tampon, iletkenlik (EC), iyon (ISE), ORP ve elektrot bakım çözeltileri ile analitik laboratuvar kimyasalları.',
+    tag: 'HORIBA & Analitik Laboratuvar',
+    badge: 'NIST İzlenebilir Standart',
+    icon: 'activity',
+    image: '/assets/hero-horiba-lab.jpg',
+    packaging: '14 mL Tekli Paket / 50–250–500 mL Orijinal HORIBA Şişe / Kit',
+    subcategories: [
+      {
+        name: 'HORIBA pH Standart Tampon Çözeltileri (USA & NIST Serisi)',
+        slug: 'horiba-ph-tampon-cozeltileri',
+        activeChemical: 'NIST İzlenebilir pH 1.68 / 4.01 / 6.86 / 7.00 / 9.18 / 10.01 / 12.46 Standart Çözeltiler',
+        desc: 'Masaüstü, taşınabilir ve LAQUAtwin cep tipi pH metrelerin yüksek hassasiyetli kalibrasyonu için ±0.01 pH (@25°C) doğrulukta orijinal HORIBA pH tampon solüsyonları (Model 500-2, 500-4, 500-686, 500-7, 500-9, 500-10, 500-12 ve Y014/Y017/Y019 serisi).',
+        specs: [
+          'USA Tampon Serisi: pH 4.01 (500-4), pH 7.00 (500-7), pH 10.01 (500-10) (±0.01 pH @ 25°C)',
+          'NIST Tampon Serisi: pH 1.68, pH 4.01, pH 6.86 (500-686), pH 9.18 (500-9), pH 12.46',
+          'LAQUAtwin Cep Serisi: pH 4.01 (Y014) & pH 7.00 (Y017) 14 mL×6 şişe kalibrasyon kitleri',
+          'Ambalaj: 14 mL×6 Kit, 250 mL ve 500 mL FDA/NIST izlenebilir HDPE şişe'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'HORIBA İletkenlik (EC) ve TDS Standart Çözeltileri',
+        slug: 'horiba-iletkenlik-standart-cozeltileri',
+        activeChemical: 'Potasyum Klorür (KCl) Standartları: 84 µS/cm, 1413 µS/cm, 12.88 mS/cm, 111.8 mS/cm',
+        desc: 'Saf su, ters ozmoz (RO), kazan besi suyu, soğutma kulesi ve atıksu iletkenlik/TDS ölçerlerin kalibrasyonu için NIST izlenebilir HORIBA elektriksel iletkenlik standart çözeltileri (Model 500-21, 500-22, 500-23, 500-24 ve LAQUAtwin Y071L/M/H).',
+        specs: [
+          'Düşük İletkenlik Standardı: 84 µS/cm @ 25°C (Model 500-21 — Saf Su & RO Çıkışı)',
+          'Standart İletkenlik: 1413 µS/cm @ 25°C (Model 500-22 / Y071L) & 12.88 mS/cm (Model 500-23 / Y071M)',
+          'Yüksek İletkenlik Standardı: 111.8 mS/cm @ 25°C (Model 500-24 — Deniz Suyu & Konsantre Brine)',
+          'Ambalaj: 14 mL×6 LAQUAtwin paket ve 250 mL / 500 mL laboratuvar şişesi'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'HORIBA İyon Seçici Elektrot (ISE) & LAQUAtwin Standart Çözeltileri',
+        slug: 'horiba-iyon-standart-cozeltileri',
+        activeChemical: 'Kalsiyum (Ca²⁺), Nitrat (NO₃⁻), Potasyum (K⁺), Sodyum (Na⁺), Florür (F⁻), Klorür (Cl⁻), Amonyak & Tuzluluk',
+        desc: 'HORIBA LAQUAtwin cep tipi iyon ölçerler ve laboratuvar iyon seçici elektrotları (ISE) için 150 ppm ve 2000 ppm standart kalibrasyon çözeltileri, 100/1000 ppm laboratuvar standartları ve İyonik Kuvvet Ayarlayıcı (ISA) reaktifler.',
+        specs: [
+          'LAQUAtwin İyon Standartları: 150 ppm & 2000 ppm (Na⁺ Y022, K⁺ Y031, NO₃⁻ Y041, Ca²⁺ Y051)',
+          'Tuzluluk (Salinity) Standartları: %0.5 (5 ppt) ve %5.0 (50 ppt) NaCl kalibrasyon solüsyonları (Y021)',
+          'Laboratuvar ISE Standartları: F⁻, Cl⁻, NH₄⁺, Ca²⁺, K⁺, NO₃⁻ (100 mg/L & 1000 mg/L) + ISA çözeltileri',
+          'Ambalaj: 14 mL×6 şişe LAQUAtwin seti ve 250 mL / 500 mL şişe'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'HORIBA ORP (Redoks) Standart Çözeltileri ve Toz Reaktifler',
+        slug: 'horiba-orp-standart-cozeltileri',
+        activeChemical: 'Kinhidron Bazlı 89 mV / 258 mV ORP Standart Tozları (160-51 / 160-22) ve 229 mV ORP Çözeltisi (Y058)',
+        desc: 'Klorlama, dezenfeksiyon, atıksu oksidasyon ve yüzme havuzu/soğutma kulesi ORP (mV) sensörlerinin doğruluk kontrolü ve kalibrasyonu için orijinal HORIBA ORP standartları.',
+        specs: [
+          'ORP Standart Toz Seti: pH 4 (+258 mV @ 25°C, Model 160-22) ve pH 7 (+89 mV @ 25°C, Model 160-51)',
+          'Hazır ORP Kalibrasyon Çözeltisi: 229 mV @ 25°C (Model Y058 — 14 mL×6 şişe)',
+          'Ambalaj: 250 mL çözelti için 10 paket toz reaktif veya 14 mL×6 hazır şişe'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'HORIBA Elektrot İç Dolgu (3.33 M KCl) ve Temizleme / Bakım Çözeltileri',
+        slug: 'horiba-elektrot-ic-dolgu-ve-temizleme',
+        activeChemical: '3.33 M Potasyum Klorür (Model 300), Elektrot Temizleme Solüsyonları (Model 220 / 230 / 250)',
+        desc: 'Doldurulabilir cam pH ve ORP elektrotları için orijinal 3.33 M KCl referans iç dolgu çözeltisi ile protein, yağ, inorganik kireç ve metal oksit kirlenmelerini gideren HORIBA elektrot temizleme ve saklama solüsyonları.',
+        specs: [
+          'Referans Elektrot İç Dolgu: 3.33 M KCl Çözeltisi (Model 300 — 50 mL / 250 mL) & Jel KCl (Model 310)',
+          'Elektrot Temizleme: Model 220 (İnorganik Leke), Model 230 (Genel), Model 250 (Protein & Biyolojik Kalıntı)',
+          'Elektrot tepki süresini hızlandırır, ölçüm sapmalarını önler ve prob ömrünü uzatır',
+          'Ambalaj: 50 mL×2, 100 mL ve 250 mL orijinal HORIBA şişe'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Analitik Laboratuvar Kimyasalları, Reaktifler ve Titrasyon Çözeltileri',
+        slug: 'analitik-laboratuvar-kimyasallari-ve-reaktifler',
+        activeChemical: 'EDTA Titrasyon Çözeltileri, Sertlik / Alkalinite İndikatörleri, DPD Klor Reaktifleri, Analitik Asit/Bazlar',
+        desc: 'Su ve atıksu kalite kontrol laboratuvarları için toplam sertlik, M/P alkalinite, klorür, sülfit, fosfat, silika, demir ve serbest/toplam klor (DPD) analiz reaktifleri ile volümetrik titrasyon çözeltileri.',
+        specs: [
+          'Saha Test Kitleri: Toplam Sertlik, Alkalinite, Klorür, Sülfit, DEHA ve Fosfonat damla/titrasyon kitleri',
+          'Spektrofotometrik Reaktifler: KOİ (COD) tüpleri, toplam azot, toplam fosfor, silika ve demir reaktifleri',
+          'Ambalaj: 100 mL – 1000 mL analitik şişe ve saha çantası yedek reaktif setleri'
+        ],
+        tdsReady: true
+      }
+    ]
+  },
+  {
+    id: 'jeotermal-su-sartlandirma',
+    code: '07',
+    title: 'Jeotermal Su Şartlandırma',
+    shortDesc: 'Jeotermal kuyu, eşanjör, sera ve bölgesel ısıtma hatlarında kireç, silika ve korozyon kontrolü. Dozaj, akışkan analizi görülmeden yazılmaz.',
+    tag: 'Jeotermal & Yüksek Sıcaklık',
+    badge: 'Analiz Şartlı',
+    icon: 'flame',
+    image: '/assets/cat-ro-membrane.jpg',
+    subcategories: [
+      {
+        name: 'Jeotermal Kireç ve Silika İnhibitörleri',
+        slug: 'jeotermal-kirec-silika',
+        activeChemical: 'Yüksek sıcaklık kararlı fosfonat ve polimer karışımları',
+        desc: 'Karbonat ve silika birikimine karşı kuyu çıkışı, separatör ve eşanjör hatlarında kullanılan inhibitörler. Sıcaklık bandı ve dozaj, brine analiziyle belirlenir.',
+        specs: [
+          'Uygulama: kuyu başı, yüzey hattı ve eşanjör',
+          'Hedef birikim: kalsiyum karbonat, silika ve metal silikat',
+          'Dozaj akışkan analizi olmadan sabitlenmez',
+          'Ambalaj: 30 kg bidon, 1000 kg IBC'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Jeotermal Korozyon İnhibitörleri',
+        slug: 'jeotermal-korozyon',
+        activeChemical: 'Film yapıcı ve azol destekli korozyon programı',
+        desc: 'Tuzlu ve çözünmüş gaz içeren jeotermal akışkanlarda karbon çelik hat ve eşanjör metal kaybını sınırlayan inhibitörler. Kireç programıyla birlikte kurulur.',
+        specs: [
+          'Karbon çelik yüzey hatları ve ısı eşanjörleri',
+          'Kireç inhibitörü ile birlikte programlanır',
+          'Korozyon kuponu ile saha doğrulaması'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'Jeotermal Hat ve Eşanjör Temizleyiciler',
+        slug: 'jeotermal-hat-temizleme',
+        activeChemical: 'İnhibitörlü karbonat ve silikat çözücü',
+        desc: 'Karbonat ve silikat birikimini duruşta veya kontrollü çevrimde çözen temizleyiciler. Online veya offline uygulama, birikim tipine göre seçilir.',
+        specs: [
+          'Karbonat ve silikat birikimi',
+          'Duruşta veya kontrollü çevrimde uygulama',
+          'Temizlik sonrası nötralizasyon'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'H₂S Koku ve Mikrobiyolojik Yardımcılar',
+        slug: 'jeotermal-koku-biyosit',
+        activeChemical: 'Koku bastırıcı ve oksitleyici olmayan biyosit',
+        desc: 'Jeotermal soğutma ve tutma hatlarında hidrojen sülfür kokusu ile inhibitör stoklarındaki bakteri üremesine karşı yardımcı kimyasallar.',
+        specs: [
+          'H₂S kokusunun sahada bastırılması',
+          'İnhibitör stok çözeltilerinde biyolojik koruma',
+          'Açık soğutma destek devreleriyle birlikte kurulabilir'
+        ],
+        tdsReady: true
+      }
+    ]
+  },
+  {
     id: 'fabrika-ve-proses-kimyasallari',
     code: '06',
-    title: 'Fabrika ve Proses Kimyasalları',
-    shortDesc: 'Ağır sanayi, kağıt fabrikaları, deterjan sülfonasyon hatları, Şişecam cam hatları, haddaneler ve kalsit mikronizasyon tesislerine özel proses kimyasalları.',
-    tag: 'Proses & Ağır Sanayi Formülasyonları',
+    title: 'Fabrika, Proses ve Baz Kimyasalları (Sodyum Hipoklorit & Kostik)',
+    shortDesc: 'Ağır sanayi, kağıt fabrikaları, deterjan sülfonasyon hatları, Şişecam cam hatları, haddehaneler, kalsit tesisleri ile Sodyum Hipoklorit ve Kostik Soda tedariki.',
+    tag: 'Proses & Baz Kimyasallar',
     badge: 'Tesis & Sektör Spesifik',
     icon: 'shield-check',
+    image: '/assets/cat-hypochlorite.jpg',
     subcategories: [
       {
         name: 'Kağıt Fabrikası Proses Kimyasalları',
@@ -543,6 +639,18 @@ export const productCategories = [
         tdsReady: true
       },
       {
+        name: 'Sodyum Hipoklorit (%15–16) & Kostik Soda (%48 Sıvı / %99 Payet)',
+        slug: 'sodyum-hipoklorit-ve-kostik-soda',
+        activeChemical: 'NaOCl (%15-16 Aktif Klor), NaOH (%48 Membran Sıvı / %99 Payet), Teknik HCl & H₂SO₄',
+        desc: 'Su dezenfeksiyonu, tekstil ağartma, CIP yıkama ve atıksu pH nötralizasyonu için yüksek saflıkta sıvı sodyum hipoklorit, sıvı/payet kostik soda ve teknik asitler.',
+        specs: [
+          'Sodyum Hipoklorit: %15–16 aktif klor, taze üretim, düşük ağır metal',
+          'Kostik Soda: %48 membran kalitesi sıvı ve %99 payet/boncuk NaOH',
+          'Ambalaj: 25 kg Torba, 30–60 kg Bidon, 1000–1500 kg IBC ve ADR Dökme Tanker'
+        ],
+        tdsReady: true
+      },
+      {
         name: 'Özel Kimyasal Sentez & Fason Formülasyon',
         slug: 'ozel-kimyasal-sentez-ve-tedarik',
         activeChemical: 'Tesise Özel AR-GE Reçeteleri, Fason Üretim, Konsinye Tedarik',
@@ -581,6 +689,33 @@ export const solutionLines = [
     href: '/urunler#sogutma-kulesi-kimyasallari'
   },
   {
+    id: 'atiksu',
+    title: 'Atıksu ve Çamur',
+    badge: 'PAC • FeCl₃ • Dekantör C-PAM',
+    image: '/assets/cat-coagulants.jpg',
+    summary: 'Koagülant, polimer, renk giderimi, emülsiyon kırma ve çamur susuzlaştırma.',
+    points: ['PAC ve demir-III klorür', 'Toz ve emülsiyon polimer', 'Emülsiyon kırıcı', 'Dekantör C-PAM'],
+    href: '/urunler#atik-su-aritma-kimyasallari'
+  },
+  {
+    id: 'ham-su',
+    title: 'Medipure Su Saflaştırma: Saf Su & Ultra Saf Su EDI',
+    badge: '18.25 MΩ·cm • EDI • 163 Model',
+    image: '/assets/hero-medipure-edi.jpg',
+    summary: 'Medipure su saflaştırma cihazları, çift geçişli RO, Elektrodeiyonizasyon (EDI) ve Tip-1/Tip-2 ultra saf su sistemleri.',
+    points: ['Saf Su & Ultra Saf Su (18.25 MΩ·cm)', 'Elektrodeiyonizasyon (EDI) sistemler', 'Deiyonize, medikal ve mobil cihazlar', '163 model Medipure GEN-6 kataloğu'],
+    href: '/sistemler#medipure-katalog'
+  },
+  {
+    id: 'horiba-laboratuvar',
+    title: 'Laboratuvar Kimyasalları & HORIBA Standart Çözeltileri',
+    badge: 'HORIBA pH • EC • İyon (ISE) • ORP',
+    image: '/assets/hero-horiba-lab.jpg',
+    summary: 'HORIBA su kalitesi ölçüm cihazları için NIST izlenebilir pH tampon, iletkenlik, iyon, ORP ve elektrot bakım çözeltileri ile analitik reaktifler.',
+    points: ['HORIBA pH 4.01 / 7.00 / 10.01 tamponlar', '84 µS/cm – 111.8 mS/cm EC standartları', 'LAQUAtwin & ISE iyon/tuzluluk çözeltileri', '3.33 M KCl iç dolgu & elektrot temizleme'],
+    href: '/urunler#laboratuvar-kimyasallari-ve-horiba-cozeltileri'
+  },
+  {
     id: 'jeotermal',
     title: 'Jeotermal Şartlandırma',
     badge: 'Kuyu • Eşanjör • Silika',
@@ -606,33 +741,6 @@ export const solutionLines = [
     summary: 'Kalsit yaş öğütme dispersantı ve maden tikiner / filtre pres flokülantı.',
     points: ['Sodyum poliakrilat dispersant', 'Tikiner A-PAM', 'Filtre pres kek verimi', 'Çöktürme jar-testi'],
     href: '/urunler#fabrika-ve-proses-kimyasallari'
-  },
-  {
-    id: 'atiksu',
-    title: 'Atıksu ve Çamur',
-    badge: 'PAC • FeCl₃ • Dekantör C-PAM',
-    image: '/assets/cat-coagulants.jpg',
-    summary: 'Koagülant, polimer, renk giderimi, emülsiyon kırma ve çamur susuzlaştırma.',
-    points: ['PAC ve demir-III klorür', 'Toz ve emülsiyon polimer', 'Emülsiyon kırıcı', 'Dekantör C-PAM'],
-    href: '/urunler#atik-su-aritma-kimyasallari'
-  },
-  {
-    id: 'ham-su',
-    title: 'Medipure Su Saflaştırma: Saf Su & Ultra Saf Su EDI',
-    badge: '18.25 MΩ·cm • EDI • 163 Model',
-    image: '/assets/hero-medipure-edi.jpg',
-    summary: 'Medipure su saflaştırma cihazları, çift geçişli RO, Elektrodeiyonizasyon (EDI) ve Tip-1/Tip-2 ultra saf su sistemleri.',
-    points: ['Saf Su & Ultra Saf Su (18.25 MΩ·cm)', 'Elektrodeiyonizasyon (EDI) sistemler', 'Deiyonize, medikal ve mobil cihazlar', '163 model Medipure GEN-6 kataloğu'],
-    href: '/sistemler#medipure-katalog'
-  },
-  {
-    id: 'koku-kopuk',
-    title: 'Koku, Köpük ve Emülsiyon',
-    badge: 'Antifoam • Emülsiyon Kırıcı',
-    image: '/assets/hero-wastewater.jpg',
-    summary: 'H₂S koku, havalandırma köpüğü ve yağ emülsiyonu için ayrı ürün seçimi.',
-    points: ['H₂S koku giderici', 'Atıksu köpük kesici', 'Emülsiyon kırıcı', 'Kağıt silikonsuz antifoam'],
-    href: '/urunler#atik-su-aritma-kimyasallari'
   },
   {
     id: 'saha',
