@@ -116,7 +116,7 @@ export const ROLE_LABELS = {
   customer: 'Müşteri (Portal)'
 };
 
-const BOOTSTRAP_ADMINS = new Set(['cebrailkara@gmail.com', 'cebokar@gmail.com', 'info@elifcevrekimya.com.tr']);
+const BOOTSTRAP_ADMINS = new Set(['cebrailkara@gmail.com', 'cebokar@gmail.com', 'info@elifcevrekimya.com.tr', 'info@elifkimya.com.tr']);
 
 export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
@@ -208,8 +208,9 @@ export async function writeAuditLog(action, collectionName, targetId, detailsObj
 export async function loginWithEmail(email, password) {
   if (!auth) throw new Error('Firebase Authentication yapılandırılmamış.');
   const normalizedEmail = email.trim().toLowerCase();
+  const cleanPassword = String(password || '').trim();
   try {
-    const cred = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+    const cred = await signInWithEmailAndPassword(auth, normalizedEmail, cleanPassword);
     const profile = await ensureUserProfile(cred.user);
     return { user: cred.user, profile };
   } catch (err) {
@@ -217,9 +218,19 @@ export async function loginWithEmail(email, password) {
       BOOTSTRAP_ADMINS.has(normalizedEmail) &&
       (err?.code === 'auth/user-not-found' || err?.code === 'auth/invalid-credential')
     ) {
-      const created = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
-      const profile = await ensureUserProfile(created.user);
-      return { user: created.user, profile };
+      try {
+        const created = await createUserWithEmailAndPassword(auth, normalizedEmail, cleanPassword);
+        const profile = await ensureUserProfile(created.user);
+        return { user: created.user, profile };
+      } catch (createErr) {
+        if (createErr?.code === 'auth/email-already-in-use') {
+          throw new Error('Girdiğiniz şifre hatalı. Lütfen şifrenizi kontrol edip tekrar deneyin.');
+        }
+        throw createErr;
+      }
+    }
+    if (err?.code === 'auth/invalid-credential' || err?.code === 'auth/wrong-password' || err?.code === 'auth/user-not-found') {
+      throw new Error('E-posta adresi veya şifre hatalı.');
     }
     throw err;
   }
