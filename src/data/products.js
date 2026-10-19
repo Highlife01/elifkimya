@@ -44,12 +44,12 @@ export const productCategories = [
         name: 'Biyositler ve Mikrobiyolojik Kontrol',
         slug: 'biyositler-ve-dezenfektanlar',
         activeChemical: 'DBNPA (%20), İzotiyazolin (CMIT/MIT %1.5-3), Glutaraldehit, Stabilize Brom',
-        desc: 'Legionella pneumophila, yosun, mantar, anaerobik kükürt bakterileri ve biyofilm oluşumuna karşı hızlı penetrasyon sağlayan oksitleyici ve oksitleyici olmayan biyositler.',
+        desc: 'Legionella pneumophila riski, yosun, mantar, anaerobik kükürt bakterileri ve biyofilm oluşumunun kontrolüne yardımcı olan oksitleyici ve oksitleyici olmayan biyosit programları.',
         specs: [
-          'DBNPA Hızlı Şok Dozajı: 30-50 ppm (2-4 saatte %99.9 eliminasyon)',
-          'CMIT/MIT Sürekli Koruma: 15-25 ppm',
+          'DBNPA Şok Dozajı: 30-50 ppm (Su analizi, pH ve temas süresine bağlı mikrobiyolojik kontrol)',
+          'CMIT/MIT Sürekli Koruma: 15-25 ppm (Sistem hacmi ve yarılanma ömrüne göre)',
           'Biyofilm Dağıtıcı Yüzey Aktifler Entegre',
-          'Biyolojik Parçalanabilirlik: Tam uyumlu'
+          'Dozaj ve biyosit seçimi kule su analizi ile belirlenir'
         ],
         tdsReady: true
       },
@@ -59,8 +59,8 @@ export const productCategories = [
         activeChemical: 'Yüksek Anyonik Poliakrilat, Non-iyonik Yüzey Aktifler',
         desc: 'Sistemde biriken silt, kil, demir oksit ve ölü biyokütleyi askıda tutarak blöf hattı üzerinden sistemden uzaklaştıran çamur dağıtıcılar.',
         specs: [
-          'Askıda Katı Kontrolü: 1000+ ppm tolerans',
-          'Depozit Dağıtma Verimi: %95+',
+          'Askıda Katı Kontrolü: Besleme suyu bulanıklığına göre optimize dozaj',
+          'Depozit Dağıtma: Eşanjör ve dolgu yüzeylerinde çamur tutunmasını sınırlar',
           'Ambalaj: 30 kg Bidon, 1000 kg IBC'
         ],
         tdsReady: true
@@ -73,7 +73,7 @@ export const productCategories = [
         specs: [
           'Otomatik Dozaj Pompaları ve pH Probları Uyumlu',
           'Konsantre Formül, Düşük Tüketim',
-          'ADR Sertifikalı Güvenli Sevkiyat'
+          'UN / ADR Mevzuatına Uygun Ambalaj ve Sevkiyat'
         ],
         tdsReady: true
       },
@@ -119,9 +119,9 @@ export const productCategories = [
         activeChemical: 'DEHA (Dietilhidroksilamin), Karbonhidrazid, Katalizli Sodyum Sülfit',
         desc: 'Kazan besi suyundaki çözünmüş oksijeni bağlayarak çukurlaşma (pitting) korozyonunu önleyen, magnetit koruyucu tabaka oluşturan oksijen tutucular.',
         specs: [
-          'Tepkime Süresi: Anlık oksijen eliminasyonu (< 5 ppb kalıntı)',
-          'DEHA: Katı madde bırakmaz, buharla taşınarak kondensi korur',
-          'FDA / USDA Gıda Uygunluk Seçenekleri'
+          'Degazör sıcaklığı ve besi suyu çözünmüş oksijen seviyesine göre dozlanır',
+          'DEHA: Katı madde bırakmaz, buharla taşınarak kondens hattını destekler',
+          'Proses tipine göre uçucu veya inorganik sülfit bazlı program seçimi'
         ],
         tdsReady: true
       },
@@ -129,11 +129,11 @@ export const productCategories = [
         name: 'Korozyon ve Kışır Önleyiciler (All-in-One)',
         slug: 'korozyon-ve-tortu-onleyiciler',
         activeChemical: 'Polikarboksilat, Organik Fosfonat, Sodyum Polifosfat',
-        desc: 'Kazan boruları üzerinde ısı transferini engelleyen kireç tabakasını önleyen, 1 mm kışırın yarattığı %8-12 yakıt kaybını ortadan kaldıran şartlandırıcılar.',
+        desc: 'Kazan boruları üzerinde ısı transferini düşüren kireç ve silikat birikimini sınırlandıran (literatürde ~1 mm kışır tabakasında besi suyu ve kışır kompozisyonuna bağlı olarak %5–10 mertebesinde görülebilen yakıt kayıplarını önlemeye yardımcı) şartlandırıcılar.',
         specs: [
-          'Basınç Aralığı: 1 - 65 bar buhar kazanları',
-          'Blöf Sıklığını %30-40 Azaltarak Enerji ve Su Tasarrufu',
-          'TS EN 12952 / 12953 Standartlarına Tam Uyum'
+          'Basınç Aralığı: Alçak ve orta basınçlı endüstriyel buhar kazanları',
+          'Besleme suyu sertlik ve silis analizine göre blöf ve dozaj optimizasyonu',
+          'TS EN 12952 / 12953 kazan besleme suyu rehber değerleriyle uyumlu program'
         ],
         tdsReady: true
       },
@@ -141,11 +141,11 @@ export const productCategories = [
         name: 'Kondens Hattı Koruma Kimyasalları',
         slug: 'kondens-hatti-koruma',
         activeChemical: 'Nötralize Edici Uçucu Aminler (Morfolin, Sikloheksilamin), Film Yapıcı Oktadesilamin',
-        desc: 'Kondens hatlarındaki karbonik asit korozyonunu engelleyen, dönüş suyunun demir oranını düşürerek kazana çamur taşınmasını önleyen amin karışımları.',
+        desc: 'Kondens hatlarındaki karbonik asit korozyonunu sınırlandıran, dönüş suyunun demir taşınımını azaltarak kazana korozyon ürünü girmesini önlemeye yardımcı amin karışımları.',
         specs: [
-          'Buharla Birlikte Taşınır, Tüm Kondens Şebekesini Korur',
-          'Kondens pH Seviyesi: 8.5 - 9.2 aralığında sabit tutulur',
-          'Boru Delinmelerini ve Hat Yenileme Maliyetlerini Sıfırlar'
+          'Buharla Birlikte Taşınır, Kondens Dönüş Hattında pH Dengelemesi Sağlar',
+          'Hedef Kondens pH Aralığı: 8.3 - 9.0 (Besi suyu bikarbonat alkalinitesine bağlı)',
+          'Kondens dönüş oranı ve hat uzunluğuna göre dağılım oranı seçilir'
         ],
         tdsReady: true
       },
@@ -153,10 +153,10 @@ export const productCategories = [
         name: 'Kazan Suyu Köpük Önleyiciler & Çamur Şartlandırıcılar',
         slug: 'kazan-sartlandirma-urunleri',
         activeChemical: 'Polieter Bazlı Antifoam, Sentetik Polimerik Çamur Dispersantı',
-        desc: 'Kazan suyunun aniden köpürüp buhar hattına su taşımasını (priming/carryover) engelleyen ve çamuru akışkan tutarak blöfle atılmasını sağlayan formüller.',
+        desc: 'Kazan suyunun köpürüp buhar hattına su taşımasını (priming/carryover) azaltan ve çamuru akışkan tutarak dip blöfle uzaklaştırılmasını destekleyen formüller.',
         specs: [
-          'Buhar Saflığını Korur, Türbin ve Vana Aşınmasını Önler',
-          'Gıda Kodeksine Uygun Konsantre Formül'
+          'Buhar Kalitesini Destekler, Taşınım Kaynaklı Vana/Eşanjör Kirlenmesini Azaltır',
+          'Dozaj kazan suyu TDS ve alkalinite değerlerine göre belirlenir'
         ],
         tdsReady: true
       }
@@ -175,24 +175,24 @@ export const productCategories = [
       {
         name: 'Koagülantlar (İnorganik & Organik)',
         slug: 'koagulantlar',
-        activeChemical: 'Poli Alüminyum Klorür (PAC %30), Demir III Klorür (%40), Alüminyum Sülfat',
-        desc: 'Atık sudaki askıda katı maddeleri (AKM) ve kolloidleri nötralize ederek hızlı mikro-flok oluşumu sağlayan yüksek konsantrasyonlu koagülantlar.',
+        activeChemical: 'Poli Alüminyum Klorür (PAC %17/%30), Demir III Klorür (%40), Alüminyum Sülfat',
+        desc: 'Atık sudaki askıda katı maddeleri (AKM) ve kolloidleri nötralize ederek mikro-flok oluşumu sağlayan koagülantlar. Optimum dozaj ham atıksu jar-testi ile belirlenir.',
         specs: [
-          'PAC: Geniş pH toleransı (5.5 - 9.0), düşük çamur üretimi',
-          'Demir III Klorür: Fosfat ve H2S koku gideriminde maksimum verim',
-          'Ambalaj: 30 kg Bidon, 1000 kg IBC, 25 Ton Dökme Tanker'
+          'PAC: Geniş çalışma pH aralığı (5.5 - 8.5), hızlı floklaşma',
+          'Demir III Klorür: Fosfat çöktürme ve H₂S kontrolünde yüksek etkinlik',
+          'Ambalaj: 30 kg Bidon, 1000 kg IBC, Dökme Tanker'
         ],
         tdsReady: true
       },
       {
         name: 'Anyonik Polielektrolitler (A-PAM)',
         slug: 'anyonik-polimerler',
-        activeChemical: 'Anyonik Poliakrilamid (MW: 16 - 24 Milyon Dalton, İntrinsik Viskozite > 16 dl/g)',
-        desc: 'Maden, demir-çelik haddehane tufal çukurları, kum yıkama ve kimyasal arıtma lamelli çökelticilerinde anında dev flok oluşturan toz ve emülsiyon polimerler.',
+        activeChemical: 'Anyonik Poliakrilamid (Farklı Molekül Ağırlığı ve Anyonik Yük Dereceleri)',
+        desc: 'Maden, demir-çelik haddehane tufal çukurları, kum yıkama ve kimyasal arıtma çökelticilerinde hızlı faz ayrımı sağlayan toz ve emülsiyon flokülantlar.',
         specs: [
-          'Molekül Ağırlığı: Ultra yüksek 24M Dalton',
-          'Çökme Hızı: < 30 saniye içinde berrak faz ayrımı',
-          'Tüketim: 0.8 - 2.5 ppm ultra düşük dozaj'
+          'Seçim: Atıksu pH, TDS ve askıda katı yapısına göre jar-test ile belirlenir',
+          'Uygulama: Lamelli çökeltici, tikiner ve DAF üniteleri',
+          'Tipik Dozaj Aralığı: 1 - 5 ppm (%0.1 hazırlanmış çözelti üzerinden)'
         ],
         tdsReady: true
       },
@@ -200,11 +200,11 @@ export const productCategories = [
         name: 'Katyonik Polielektrolitler (C-PAM)',
         slug: 'katyonik-polimerler',
         activeChemical: 'Katyonik Poliakrilamid (Yük Yoğunluğu: %20 - %80, Toz ve Emülsiyon)',
-        desc: 'Filtre pres, belt pres ve dekantör santrifüjlerde biyolojik ve kimyasal çamurların susuzlaştırılmasını sağlayan yüksek katyonik yüklü polimerler.',
+        desc: 'Filtre pres, belt pres ve dekantör santrifüjlerde biyolojik ve kimyasal çamurların susuzlaştırılmasını sağlayan katyonik polimerler.',
         specs: [
-          'Kek Kuruluğu Artışı: %25 - 38 kuru madde oranı',
-          'Çamur Bertaraf Maliyetinde %40 Tasarruf',
-          'Berrak Süzüntü (Filtrat) Kalitesi'
+          'Kek Kuruluğu: Çamur uçucu katı oranına ve ekipman tipine göre optimize edilir',
+          'Doğru yük seçimi için sahada çamur numunesiyle jar-test / büret testi yapılır',
+          'Ambalaj: 25 kg Kraft Torba veya Emülsiyon Bidon/IBC'
         ],
         tdsReady: true
       },
@@ -212,22 +212,22 @@ export const productCategories = [
         name: 'Renk Giderici Polimerler & Ağır Metal Çöktürücüler',
         slug: 'renk-ve-agir-metal-giderimi',
         activeChemical: 'Dicyandiamide-Formaldehit Reçinesi, Sodyum Dimetilditiyokarbamat (DTC)',
-        desc: 'Tekstil boyahane atık sularında reaktif ve dispers azo boyalarını parçalayan; kaplama sularındaki serbest ve kompleks ağır metalleri (Cr, Ni, Zn, Cu) bağlayıp çöktüren ürünler.',
+        desc: 'Tekstil boyahane atık sularında reaktif/dispers boyaların koagülasyonuna ve kaplama sularındaki çözünmüş ağır metallerin (Cr, Ni, Zn, Cu) çöktürülmesine yönelik özel kimyasallar.',
         specs: [
-          'Renk Giderme Verimi: %98+ (Pt-Co standartlarında berraklık)',
-          'Ağır Metal Sınırı: < 0.1 mg/L deşarj garantisi',
-          'Şelatlı Metallere Karşı Üstün Bağlama Kapasitesi'
+          'Renk Giderimi: Boyarmadde tipine ve pH rejimine bağlı olarak jar-test ile dozlanır',
+          'Ağır Metal Çöktürme: Şelatlı metallerde ön pH ayarı ve koagülant desteğiyle uygulanır',
+          'Çıkış deşarj değerleri ham atıksu karakteristiği ve arıtma ünitesi tasarımına bağlıdır'
         ],
         tdsReady: true
       },
       {
         name: 'Koku Gidericiler & Biyolojik Arıtma Besinleri',
         slug: 'koku-ve-besin-kimyasallari',
-        activeChemical: 'Kalsiyum Nitrat Çözeltisi, Üre, Diamonyum Fosfat (DAP), Enzimler',
-        desc: 'Atık su terfi merkezleri ve çamur havuzlarında H2S koku kontrolü sağlayan nitrat bazlı ürünler ile biyolojik arıtmada KOİ/N/P dengesini kuran besin çözeltileri.',
+        activeChemical: 'Kalsiyum Nitrat Çözeltisi, Üre, Diamonyum Fosfat (DAP), Mikrobesinler',
+        desc: 'Atık su terfi merkezleri ve çamur havuzlarında H₂S koku oluşumunu baskılayan ürünler ile biyolojik arıtmada C:N:P dengesini destekleyen besin çözeltileri.',
         specs: [
-          'H2S Gazını Kaynağında Yok Eder, Korozyonu Önler',
-          'Bakteri Popülasyonunu Canlandırır, Çamur İndeksini Düşürür'
+          'Septik koşullarda H₂S oluşumunu sınırlamaya yardımcı olur',
+          'Biyolojik arıtmada giriş KOİ/Azot/Fosfor analizine göre dozlanır'
         ],
         tdsReady: true
       },
@@ -271,12 +271,12 @@ export const productCategories = [
         name: 'Reverse Osmosis (RO) Sistemleri',
         slug: 'reverse-osmosis',
         activeChemical: 'TFC Poliamid Membran, PLC Otomasyon, CIP Ünitesi',
-        desc: 'Kuyu suyu, şebeke ve acı suları %99.5 tuz giderme verimiyle yüksek saflıkta proses suyuna dönüştüren endüstriyel ters ozmoz üniteleri.',
+        desc: 'Kuyu suyu, şebeke ve acı suları yüksek tuz giderme verimiyle proses suyuna dönüştüren endüstriyel ters ozmoz üniteleri. Kapasite ve membran dizilimi ham su analizine göre projelendirilir.',
         specs: [
-          'Kapasite: 1 - 250 m³/saat modüler dizayn',
-          'Enerji Geri Kazanım Cihazları (ERD) Entegre',
-          'Otomatik CIP Kimyasal Yıkama İstasyonu',
-          'PLC Dokunmatik Ekran & SCADA Bağlantısı'
+          'Kapasite: 1 - 250 m³/saat modüler dizayn (Su analizine bağlı)',
+          'Opsiyonel Enerji Geri Kazanım ve Antiskalant Dozaj Entegrasyonu',
+          'CIP Kimyasal Yıkama Hattı & İletkenlik/Basınç İzleme',
+          'PLC Kontrol Panosu & Uzaktan İzleme Opsiyonu'
         ],
         tdsReady: true
       },
@@ -284,11 +284,11 @@ export const productCategories = [
         name: 'Kum ve Aktif Karbon Filtrasyonu',
         slug: 'kum-ve-aktif-karbon-filtrasyonu',
         activeChemical: 'Kuvars Kumu, Antrasit, Yüksek İyotlu Hindistan Cevizi Aktif Karbon',
-        desc: 'Askıda katı maddeleri, bulanıklığı, serbest kloru ve organik kokuyu gidererek RO membranlarını ve yumuşatma reçinelerini koruyan çok katmanlı filtreler.',
+        desc: 'Askıda katı maddeleri, bulanıklığı, serbest kloru ve organik kokuyu azaltarak RO membranlarını ve yumuşatma reçinelerini koruyan çok katmanlı filtreler.',
         specs: [
-          'FRP veya Epoksi Kaplı Paslanmaz Karbon Çelik Gövde',
-          'Otomatik Pnömatik/Elektrik Aktüatörlü Valfler',
-          'SDI < 3.0 Çıkış Güvencesi'
+          'FRP veya Epoksi Kaplı Karbon Çelik Gövde',
+          'Otomatik Pnömatik/Elektrik Aktüatörlü veya Çok Yollu Valfler',
+          'Tasarım Hedefi: Ham su bulanıklığı (<5 NTU) ve uygun filtrasyon hızında SDI < 3.0 ön arıtma hazırlığı'
         ],
         tdsReady: true
       },
@@ -296,10 +296,10 @@ export const productCategories = [
         name: 'Endüstriyel Su Yumuşatma Sistemleri',
         slug: 'su-yumusatma-sistemleri',
         activeChemical: 'Gıda Derecesi Kuvvetli Asidik Katyonik Jel Reçine',
-        desc: 'Kalsiyum ve magnezyum iyonlarını sodyum ile yer değiştirerek sıfır sertlikte (0°dH) kazan besi ve proses suyu sağlayan tandem (kesintisiz) sistemler.',
+        desc: 'Kalsiyum ve magnezyum iyonlarını sodyum ile yer değiştirerek düşük sertlikte kazan besi ve proses suyu sağlayan tandem veya tekli sistemler.',
         specs: [
-          'Kesintisiz Tandem (Dubleks) Çalışma Prensibi',
-          'Debi veya Sertlik Sensör Kontrollü Otomatik Rejenerasyon',
+          'Tandem (Dubleks) veya Zaman/Debi Kontrollü Çalışma Prensibi',
+          'Giriş sertliğine göre reçine hacmi ve tuz rejenerasyon hesabı',
           'PE Çözelti Tuz Tankı ve Emiş Düzeneği Dahil'
         ],
         tdsReady: true
@@ -308,11 +308,11 @@ export const productCategories = [
         name: 'Ultrafiltrasyon (UF) Sistemleri',
         slug: 'ultrafiltrasyon',
         activeChemical: 'PVDF İçi Boş Elyaf (Hollow Fiber) Membran (0.02 µm)',
-        desc: 'Askıda katı maddeleri, kolloidal silikayı, bakteri ve virüsleri kimyasalsız ayıran ileri ön arıtma teknolojisi.',
+        desc: 'Askıda katı maddeleri, kolloidal partikülleri ve bulanıklığı membran filtrasyonu ile ayıran ileri ön arıtma teknolojisi.',
         specs: [
-          'SDI < 2.0 Çıkış Değeri (RO Membran Ömrünü 2 Kat Artırır)',
+          'Tasarım Hedefi: Uygun ön eleme ve CEB yıkama rejiminde SDI < 2.0 RO besleme suyu kalitesi',
           'Ters Yıkama ve CEB (Kimyasal Destekli Yıkama) Otomasyonu',
-          'Kompakt Paslanmaz Çelik Şase'
+          'Kompakt Paslanmaz Çelik veya Epoksi Kaplı Şase'
         ],
         tdsReady: true
       },
@@ -320,11 +320,11 @@ export const productCategories = [
         name: 'Deiyonizasyon (Demineralizasyon) Kolonları',
         slug: 'deiyonizasyon-sistemleri',
         activeChemical: 'Kuvvetli Asidik Katyonik & Kuvvetli Bazik Anyonik Reçine',
-        desc: 'Katyonik ve anyonik reçine kolonları üzerinden iletkenliği < 1 µS/cm seviyesine düşüren klasik asit/kostik rejenerasyonlu sistemler.',
+        desc: 'Katyonik ve anyonik reçine kolonları üzerinden düşük iletkenlikli demineralize su üreten asit/kostik rejenerasyonlu sistemler.',
         specs: [
-          'Asit (HCl) ve Kostik (NaOH) Dozaj İstasyonu Entegre',
+          'Asit (HCl) ve Kostik (NaOH) Rejenerasyon İstasyonu',
           'Dijital İletkenlik Monitörü & Otomatik Yıkama Valfi',
-          'Dayanıklı Lastik/Kauçuk Kaplı Çelik Kolonlar'
+          'Epoksi/Kauçuk Kaplı Çelik veya FRP Kolon Seçenekleri'
         ],
         tdsReady: true
       }
@@ -343,12 +343,12 @@ export const productCategories = [
       {
         name: 'Laboratuvar Saf Su Sistemleri (Tip I, II, III)',
         slug: 'laboratuvar-saf-su-sistemleri',
-        activeChemical: '185/254 nm Çift Dalga Boylu UV, 0.05 µm Ultrafiltre, Nükleer Reçine',
-        desc: 'HPLC, GC-MS, ICP-MS ve hücre kültürü çalışmaları için Tip I (Ultra Saf), Tip II (Analitik) ve Tip III saflık standartlarını sağlayan tezgah üstü cihazlar.',
+        activeChemical: '185/254 nm Çift Dalga Boylu UV, 0.05 µm Ultrafiltre, Nükleer Sınıf Reçine',
+        desc: 'HPLC, GC-MS, ICP-MS ve genel laboratuvar çalışmaları için Tip I (Ultra Saf), Tip II ve Tip III su saflık hedeflerine yönelik tezgah üstü ve kabinli Medipure cihazlar.',
         specs: [
-          'Direnç: 18.2 MΩ·cm @ 25°C',
-          'TOC (Toplam Organik Karbon): < 2 ppb',
-          'Endotoksin: < 0.001 EU/ml, Bakteri: < 0.01 CFU/ml'
+          'Ultra Saf Seri Hedef Direnç: 18.2 MΩ·cm @ 25°C (Besleme suyu ve kartuş durumuna bağlı)',
+          'Kapasite Seçenekleri: 5 lt/saat – 120 lt/saat laboratuvar modelleri',
+          'Online İletkenlik/Direnç İzleme Ekranı'
         ],
         tdsReady: true
       },
@@ -356,11 +356,11 @@ export const productCategories = [
         name: 'Endüstriyel EDI (Elektro-deiyonizasyon) Sistemleri',
         slug: 'edi-sistemleri',
         activeChemical: 'İyon Değiştirici Membran Paketleri, DC Elektrik Alanı',
-        desc: 'Kimyasal rejenerasyona ihtiyaç duymadan, elektrik akımıyla sürekli saf su üreten, sıfır asit/kostik atıklı çevre dostu teknoloji.',
+        desc: 'Çift geçişli RO çıkış suyunu asit/kostik rejenerasyonuna ihtiyaç duymadan sürekli yüksek saflıkta suya dönüştüren elektrodeiyonizasyon sistemleri.',
         specs: [
-          'Çıkış İletkenliği: < 0.06 - 0.1 µS/cm',
-          'Silika Giderimi: > %99.5',
-          'Rejenerasyon Kimyasalı Sıfır — Kesintisiz 7/24 Üretim'
+          'Hedef Çıkış İletkenliği: < 0.06 - 0.1 µS/cm (RO permeat besleme suyu şartlarına bağlı)',
+          'Yüksek Çözünmüş Silis (SiO₂) Giderimi',
+          'Kimyasal Rejenerasyon Atığı Olmadan Sürekli Operasyon'
         ],
         tdsReady: true
       },
@@ -368,22 +368,22 @@ export const productCategories = [
         name: 'Endüstriyel Saf Su Üretim Tesisleri',
         slug: 'endustriyel-saf-su-uretimi',
         activeChemical: 'Çift Geçişli RO (Double Pass) + EDI + Degazör',
-        desc: 'Cam yıkama, solar panel, akü ve kimyasal sentez tesisleri için saatte onlarca ton yüksek saflıkta su üreten merkezi tesisler.',
+        desc: 'Cam yıkama, solar panel, akü ve kimyasal üretim tesisleri için ham su analizine göre projelendirilen merkezi saf su tesisleri.',
         specs: [
-          'Kapasite: 5 - 100 m³/saat',
-          'Hijyenik 316L Paslanmaz Çelik Borulama & Orbital Kaynak',
-          'Sürekli Online TOC ve İletkenlik Doğrulaması'
+          'Kapasite: 0.25 - 100 m³/saat proje bazlı tasarım',
+          'Paslanmaz Çelik veya UPVC/PVDF Hat Seçenekleri',
+          'Online İletkenlik ve Basınç İzleme Otomasyonu'
         ],
         tdsReady: true
       },
       {
         name: 'Saf Su Cihazları ve Sarf Malzemeleri',
         slug: 'saf-su-sarf-malzemeleri',
-        activeChemical: 'Nükleer Sınıf Mixed-Bed Reçine, DOW/DuPont Membranlar',
-        desc: 'Karışık yatak reçineleri, UV lambalar, 0.2 mikron steril kapsül filtreler ve NIST izlenebilir kalibrasyon solüsyonları.',
+        activeChemical: 'Mixed-Bed Reçine, RO Membranları, Kartuş Filtreler ve UV Lambalar',
+        desc: 'Saf su cihazları için karışık yatak (mixed-bed) reçineleri, UV lambalar, kapsül filtreler ve kalibrasyon çözeltileri tedariki.',
         specs: [
-          'Orijinal Yedek Parça Garantisi',
-          'Hızlı Kargo & Yerinde Teknik Servis Desteği'
+          'Uyumlu Membran, Reçine ve Kartuş Sarf Malzeme Tedariki',
+          'Bölgesel Kargo & Saha Bakım/Servis Desteği'
         ],
         tdsReady: true
       }
@@ -720,11 +720,11 @@ export const productCategories = [
         name: 'Özel Kimyasal Sentez & Fason Formülasyon',
         slug: 'ozel-kimyasal-sentez-ve-tedarik',
         activeChemical: 'Tesise Özel AR-GE Reçeteleri, Fason Üretim, Konsinye Tedarik',
-        desc: 'Fabrikanızın sahadaki su analizine, proses sıcaklığına ve metalurjisine göre AR-GE laboratuvarımızda formüle edilen, teknik analiz raporu ve güvenlik bilgi formuyla teslim edilen özel ürünler.',
+        desc: 'Fabrikanızın sahadaki su analizine, proses sıcaklığına ve metalurjisine göre formüle edilen, teknik bülten ve güvenlik bilgi formuyla teslim edilen özel ürünler.',
         specs: [
           'Jar-Test ve Korozyon Kuponu Testleriyle Doğrulanmış Reçeteler',
-          'Konsinye Stok ve IoT Seviye Takip Opsiyonu',
-          'ISO 9001 / 14001 / 45001 Belgeli Üretim Güvencesi'
+          'Konsinye Stok ve Seviye Takip Opsiyonu',
+          'Saha Su Analizi ve Jar-Test Doğrulamalı Reçete Uygulaması'
         ],
         tdsReady: true
       }
@@ -743,10 +743,22 @@ const CATEGORY_SHORT_TITLES = {
   'fabrika-ve-proses-kimyasallari': 'Hipoklorit, Kostik & Proses'
 };
 
+const CATEGORY_SUPPLY_ROLES = {
+  'sogutma-kulesi-kimyasallari': 'Formülasyon, Özel Karışım & Saha Şartlandırma Mühendisliği',
+  'kazan-suyu-kimyasallari': 'Formülasyon, Özel Karışım & Saha Şartlandırma Mühendisliği',
+  'atik-su-aritma-kimyasallari': 'Endüstriyel Kimyasal Tedariki & Saha Jar-Test Uygulaması',
+  'endustriyel-su-aritma-sistemleri': 'Sistem Tasarımı, Proje Entegrasyonu & Saha Devreye Alma',
+  'saf-su-ve-ultra-saf-su-sistemleri': 'Medipure Cihaz Tedariki, Proje Entegrasyonu & Teknik Servis',
+  'laboratuvar-kimyasallari-ve-horiba-cozeltileri': 'Bağımsız Kurumsal Katalog & Cihaz Tedariki (Yetkili distribütörlük iddiası taşımaz)',
+  'jeotermal-su-sartlandirma': 'Analiz Şartlı Özel Formülasyon & Saha Mühendislik Uygulaması',
+  'fabrika-ve-proses-kimyasallari': 'Baz Kimyasal Dağıtımı, Proses Formülasyonu & ADR Lojistik'
+};
+
 // Kategori kartlarını hem eski hem yeni şemayla tam uyumlu hale getir
 productCategories.forEach((cat) => {
   cat.slug = cat.slug || cat.id;
   cat.shortTitle = CATEGORY_SHORT_TITLES[cat.id] || cat.shortTitle || cat.tag || cat.title;
+  cat.supplyRole = CATEGORY_SUPPLY_ROLES[cat.id] || 'Kurumsal Kimyasal Tedarik & Saha Mühendisliği';
   cat.description = cat.description || cat.shortDesc || '';
   cat.packaging = cat.packaging || '25-30 kg Bidon / 1000 kg IBC / Dökme Tanker';
   cat.subProducts = (cat.subcategories || []).map((s) => ({
@@ -865,7 +877,9 @@ export const fieldServices = [
 
 export const companyInfo = {
   name: 'Elif Çevre Kimya',
-  legalName: 'Elif Çevre Kimya — Endüstriyel Kimyasallar, Çevre Teknolojileri ve Su Arıtma Sistemleri',
+  legalName: 'Elif Çevre Kimya',
+  descriptor: 'Endüstriyel Kimyasallar, Çevre Teknolojileri ve Su Arıtma Sistemleri',
+  registrationNote: 'Resmi fatura unvanı, vergi dairesi, VKN ve MERSİS bilgileri kurumsal proforma/teklif evrakında paylaşılır.',
   tagline: 'Endüstriyel Kimyasal Satışları, Çevre Arıtma Kimyasalları ve Su Arıtma Sistemleri Mühendisliği',
   website: 'https://www.elifcevrekimya.com.tr',
   domainDisplay: 'www.elifcevrekimya.com.tr',
@@ -874,33 +888,33 @@ export const companyInfo = {
   whatsappNumber: '905464992342',
   whatsappUrl: 'https://wa.me/905464992342',
   email: 'info@elifcevrekimya.com.tr',
-  salesEmail: 'satis@elifcevrekimya.com.tr',
+  salesEmail: 'info@elifcevrekimya.com.tr',
   address: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
   mapsUrl: 'https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&ved=1t:8290&ictx=111',
   city: 'Adana',
-  workingHours: 'Pazartesi – Cumartesi: 08:00 – 18:30'
+  workingHours: 'Pazartesi – Cumartesi: 08:00 – 18:30 (Mesai dışı taleplere ilk iş günü sabahı dönüş yapılır)'
 };
 
 export const heroStats = [
   {
-    value: '6 Mega Sektör',
-    label: 'Proses Formülasyon Matrisi',
-    detail: 'Demir-Çelik, Deterjan, Kağıt, Cam, Kalsit ve Galvaniz'
+    value: '8 Ürün Grubu',
+    label: 'Proses & Arıtma Kapsamı',
+    detail: 'Kule, Kazan, Atıksu, RO/EDI, Medipure, HORIBA/Lab, Jeotermal ve Baz Kimyasallar'
   },
   {
-    value: '2 – 6 Saat',
-    label: 'Çukurova & OSB Sevkiyatı',
-    detail: 'Adana, Mersin, Osmaniye, İskenderun, Kayseri, Niğde'
+    value: 'Pzt–Cmt Sevk',
+    label: 'Çukurova & OSB Lojistiği',
+    detail: 'Stok/sipariş onayı sonrası iş günlerinde Adana 90–120 dk, Mersin/İskenderun 2–4 saat sevk'
   },
   {
-    value: '%99.5+',
-    label: 'RO & EDI Saf Su Verimi',
-    detail: '< 0.1 µS/cm iletkenlik ve yüksek silis giderimi'
+    value: 'Analiz Şartlı',
+    label: 'RO, EDI & Dozaj Tasarımı',
+    detail: 'Kapasite, membran dizilimi ve kimyasal dozaj besleme suyu analizine göre belirlenir'
   },
   {
-    value: '%100 Doğrulanmış',
-    label: 'SDS / TDS / COA Belgeleri',
-    detail: 'Parti bazlı analiz ve yerinde Jar-Test doğrulaması'
+    value: 'Talep Bazlı',
+    label: 'SDS / TDS / COA Paylaşımı',
+    detail: 'Teklif ve sipariş adımında güncel parti/revizyon belgeleri ile yerinde Jar-Test desteği'
   }
 ];
 
@@ -909,8 +923,8 @@ export const waterTreatmentSystems = [
     id: 'endustriyel-ro',
     code: 'SYS-RO',
     title: 'Endüstriyel Ters Ozmoz (Reverse Osmosis) Sistemleri',
-    capacityRange: '1 – 250 m³/saat',
-    summary: 'Kuyu suyu, nehir suyu ve şebeke sularında yüksek tuzluluk ve iletkenliği %99.5’e varan oranda gideren, PLC/SCADA otomasyonlu ağır hizmet RO üniteleri.',
+    capacityRange: '1 – 250 m³/saat (Ham su analizine göre projelendirilir)',
+    summary: 'Kuyu suyu, nehir suyu ve şebeke sularında yüksek tuzluluk ve iletkenliği besleme suyu karakteristiğine bağlı olarak yüksek verimle azaltan, PLC/SCADA otomasyonlu ağır hizmet RO üniteleri.',
     features: [
       'Düşük enerjili TFC poliamid membran dizilimi ve antiskalant dozaj otomasyonu',
       'AISI 304/316 paslanmaz çelik yüksek basınç kollektörleri ve şase',
@@ -923,12 +937,12 @@ export const waterTreatmentSystems = [
     id: 'edi-ultra-saf-su',
     code: 'SYS-EDI',
     title: 'EDI (Elektrodeiyonizasyon) & Çift Kademe Ultra Saf Su Sistemleri',
-    capacityRange: '0.5 – 100 m³/saat (< 0.06 µS/cm)',
-    summary: 'Asit ve kostik rejenerasyonuna ihtiyaç duymadan, elektrik alanıyla kesintisiz 18.2 MΩ·cm / <0.1 µS/cm ultra saf su üreten çevre dostu sistemler.',
+    capacityRange: '0.5 – 100 m³/saat (Hedef < 0.06 – 0.1 µS/cm)',
+    summary: 'Asit ve kostik rejenerasyonuna ihtiyaç duymadan, çift geçişli RO permeat suyunu elektrik alanıyla yüksek saflıkta suya dönüştüren elektrodeiyonizasyon sistemleri.',
     features: [
       'Çift geçişli RO (Double Pass) + Membran Degazör + EDI konfigürasyonu',
-      'Asit/kostik atığı olmadan 7/24 kesintisiz yüksek saflık',
-      '> %99.5 çözünmüş silis (SiO₂) ve bor giderimi',
+      'Asit/kostik rejenerasyon atığı olmadan sürekli çalışma',
+      'RO ön arıtma performansına bağlı yüksek çözünmüş silis (SiO₂) ve bor giderimi',
       'Cam yıkama (ayna/low-E), yüksek basınçlı türbin kazanları ve laboratuvarlar'
     ],
     useCases: 'Düzcam/ayna yıkama hatları, yüksek basınçlı buhar kazanları, ilaç ve elektronik sanayi'
@@ -938,20 +952,20 @@ export const waterTreatmentSystems = [
     code: 'SYS-UF',
     title: 'Ultrafiltrasyon (UF) ve İleri Ön Arıtma Sistemleri',
     capacityRange: '5 – 300 m³/saat (0.02 Mikron)',
-    summary: 'Yüzey suları ve kuyu sularındaki bulanıklık, askıda katı madde, kolloidal silis ve bakterileri 0.02 mikron PVDF membranlarla filtreleyen tam otomatik sistemler.',
+    summary: 'Yüzey suları ve kuyu sularındaki bulanıklık, askıda katı madde ve kolloidal partikülleri 0.02 mikron PVDF membranlarla filtreleyen otomatik ön arıtma sistemleri.',
     features: [
-      'RO membranları öncesinde SDI < 2.0 garantisi',
+      'RO membranları öncesinde besleme suyu ve CEB rejimine bağlı SDI < 2.0 tasarım hedefi',
       'Otomatik ters yıkama (Backwash) ve kimyasal destekli yıkama (CEB)',
       'Düşük kimyasal ve enerji sarfiyatı'
     ],
-    useCases: 'Nehir/baraj suyu arıtımı, atıksu geri kazanım (ZLD) ön arıtması, içme ve proses suyu'
+    useCases: 'Nehir/baraj suyu arıtımı, atıksu geri kazanım ön arıtması, içme ve proses suyu'
   },
   {
     id: 'yumusatma-demineralizasyon',
     code: 'SYS-SOFT',
     title: 'Otomatik Su Yumuşatma ve Demineralizasyon Sistemleri',
     capacityRange: '2 – 200 m³/saat',
-    summary: 'Kalsiyum ve magnezyum sertliğini sıfırlayan tandem reçineli yumuşatma üniteleri ile katyonik-anyonik deiyonizasyon kolonları.',
+    summary: 'Kalsiyum ve magnezyum sertliğini gideren tandem reçineli yumuşatma üniteleri ile katyonik-anyonik deiyonizasyon kolonları.',
     features: [
       'Debi ve sertlik sensörü kontrollü tandem (kesintisiz) çalışma',
       'FRP veya epoksi kaplı karbon çelik tank seçenekleri',
@@ -964,7 +978,7 @@ export const waterTreatmentSystems = [
     code: 'SYS-FILT',
     title: 'Multimedya Kum, Aktif Karbon ve Demir-Mangan Filtrasyonu',
     capacityRange: '2 – 250 m³/saat',
-    summary: 'Ham sudaki askıda katı madde, serbest klor, organik madde, renk, koku ile çözünmüş demir ve manganı gideren otomatik filtrasyon bataryaları.',
+    summary: 'Ham sudaki askıda katı madde, serbest klor, organik madde, renk, koku ile çözünmüş demir ve manganı azaltan otomatik filtrasyon bataryaları.',
     features: [
       'Kademeli kuvars kumu, antrasit, yüksek iyotlu aktif karbon ve katalitik medya',
       'Pnömatik veya elektrik aktüatörlü yüzey borulamalı otomatik vanalar',
@@ -977,7 +991,7 @@ export const waterTreatmentSystems = [
     code: 'SYS-DOSE',
     title: 'Otomatik Kimyasal Dozaj, Blöf ve Kule/Kazan Kontrol Üniteleri',
     capacityRange: 'PLC & Sensör Kontrollü',
-    summary: 'Soğutma kuleleri ve buhar kazanlarında iletkenlik, pH, ORP ve korozyon hızını anlık ölçerek otomatik blöf ve kimyasal dozajı yapan akıllı kontrol panoları.',
+    summary: 'Soğutma kuleleri ve buhar kazanlarında iletkenlik, pH, ORP ve korozyon eğilimini anlık ölçerek otomatik blöf ve kimyasal dozajı yapan kontrol panoları.',
     features: [
       'Toroidal (indüktif) iletkenlik sensörü ile kirlilikten etkilenmeyen blöf kontrolü',
       'Oransal (4-20 mA / Pulse) diyaframlı dozaj pompaları ve seviye şamandıralı PE tanklar',
@@ -994,8 +1008,8 @@ export const sectorsData = [
     id: 'demir-celik',
     title: 'Demir-Çelik, Haddehane ve Boru/Galvaniz Sanayi',
     region: 'İskenderun, Payas, Osmaniye, Adana, Kayseri',
-    summary: 'Tufal çukuru ultra yüksek molekül ağırlıklı A-PAM polimerleri, HCl asitleme inhibitörleri, kristalizatör kapalı devre inhibitörleri ve yağ emülsiyon kırıcılar.',
-    keyChemicals: ['Anyonik PAM (IV>16)', 'Mannich Asit İnhibitörü', 'Molibdat/Azol İnhibitörü', 'PoliDADMAC Demülsifiyer']
+    summary: 'Tufal çukuru yüksek molekül ağırlıklı A-PAM polimerleri, HCl asitleme inhibitörleri, kristalizatör kapalı devre inhibitörleri ve yağ emülsiyon kırıcılar.',
+    keyChemicals: ['Anyonik PAM', 'Mannich Asit İnhibitörü', 'Molibdat/Azol İnhibitörü', 'PoliDADMAC Demülsifiyer']
   },
   {
     id: 'deterjan-kimya',
@@ -1029,7 +1043,7 @@ export const sectorsData = [
     id: 'tekstil-gida-enerji',
     title: 'Tekstil Boyahane, Gıda ve Enerji Santralleri',
     region: 'Adana AOSB, Tarsus, Kayseri, Kahramanmaraş',
-    summary: 'Sıfır sertlikte yumuşatma ve RO proses suyu tesisleri, buhar kazanı DEHA oksijen tutucuları, tekstil renk giderici koagülantlar ve kule biyositleri.',
+    summary: 'Düşük sertlikte yumuşatma ve RO proses suyu tesisleri, buhar kazanı DEHA oksijen tutucuları, tekstil renk giderici koagülantlar ve kule biyositleri.',
     keyChemicals: ['DEHA Oksijen Tutucu', 'Renk Giderici Polimer', 'RO Antiskalant & CIP', 'Kule Biyosit & Dispersant']
   },
   {
@@ -1043,40 +1057,40 @@ export const sectorsData = [
 
 export const serviceRegions = [
   {
-    region: 'Adana Merkez & Hacı Sabancı OSB (AOSB)',
-    badge: 'Merkez Üs — Aynı Gün Teslimat',
-    details: 'Adana Hacı Sabancı OSB, Seyhan, Yüreğir ve Ceyhan enerji/endüstri bölgesindeki fabrikalara 2 saat içinde acil kimyasal sevkiyatı, yerinde su analizi ve RO/EDI teknik servisi.',
-    highlights: ['Adana AOSB', 'Ceyhan Endüstri Bölgesi', '2 Saatte Saha Müdahalesi', 'Konsinye IBC Stok']
+    region: 'Adana Merkez Ofis & Depo (Seyhan) + Hacı Sabancı OSB (AOSB)',
+    badge: 'Tek Fiziksel Merkez & Depo — Stoktan Sevk',
+    details: 'Fiziksel merkez ve depomuz Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana adresindedir. Sipariş ve stok onayı sonrası mesai saatleri içinde Adana AOSB, Seyhan, Yüreğir ve Ceyhan sanayi tesislerine 90–120 dakikada acil sevkiyat ve saha ziyareti sağlanır.',
+    highlights: ['Tek Fiziksel Depo: Seyhan/Adana', 'Adana AOSB & Ceyhan', 'Stok Onaylı 90–120 dk Sevk', 'Yerinde Su Analizi & Servis']
   },
   {
-    region: 'Mersin-Tarsus OSB (MTOSB), Serbest Bölge & Liman',
-    badge: '2–3 Saat Lojistik Koridoru',
-    details: 'Mersin-Tarsus OSB, Cam ve Soda tesisleri, Mersin Serbest Bölgesi ve Liman koridorundaki fabrikalara günlük düzenli ADR’li sevkiyat ve periyodik su şartlandırma kontrolü.',
-    highlights: ['Mersin MTOSB', 'Tarsus OSB', 'Mersin Serbest Bölge', 'Cam & Gıda Sanayi']
+    region: 'Mersin-Tarsus OSB (MTOSB), Serbest Bölge & Liman Koridoru',
+    badge: 'Mobil Saha & Sevkiyat Koridoru (Şube Değildir)',
+    details: 'Adana merkez depomuzdan çıkışla Mersin-Tarsus OSB, cam/soda tesisleri ve Serbest Bölge hattına iş günlerinde stok/sipariş onayı sonrası 2–3 saatlik lojistik koridoru üzerinden sevkiyat ve mobil mühendislik hizmeti verilir (fiziksel şube değildir).',
+    highlights: ['Mersin MTOSB & Tarsus OSB', 'Adana Merkez Çıkışlı 2–3 Saat Sevk', 'Mobil Saha Mühendisliği', 'Cam & Gıda Sanayi']
   },
   {
-    region: 'İskenderun, Payas, Dörtyol & Osmaniye Demir-Çelik Hattı',
-    badge: 'Ağır Sanayi Özel Sevkiyat',
-    details: 'Türkiye çelik üretiminin kalbi olan Osmaniye OSB, Payas ve İskenderun haddehane/çelikhane tesislerine dökme tanker, IBC ve 25 kg paletli polimer/inhibitör tedariki.',
-    highlights: ['Osmaniye OSB', 'İskenderun & Payas', 'Haddehane Tufal & Pickling', 'Dökme Tanker Sevkiyat']
+    region: 'İskenderun, Payas, Dörtyol & Osmaniye Demir-Çelik Koridoru',
+    badge: 'Mobil Saha & Sevkiyat Koridoru (Şube Değildir)',
+    details: 'Adana merkez depomuzdan Osmaniye OSB, Payas ve İskenderun haddehane/çelikhane tesislerine iş günlerinde sipariş/stok onayı sonrası 2–4 saatlik koridor üzerinden IBC, paletli polimer ve anlaşmalı tanker sevkiyatı yapılır (fiziksel şube değildir).',
+    highlights: ['Osmaniye OSB & Payas/İskenderun', 'Adana Merkez Çıkışlı 2–4 Saat Sevk', 'Haddehane Tufal & Pickling', 'Mobil Jar-Test Ekibi']
   },
   {
     region: 'Niğde Mikronize Kalsit & Kayseri OSB Sanayi Koridoru',
-    badge: 'İç Anadolu Güney Aksı',
-    details: 'Niğde OSB ve Bor bölgesindeki mikronize kalsit madenleri ile Kayseri OSB ve Mimarsinan OSB’deki boru, profil, galvaniz, tekstil ve mobilya tesislerine hızlı sevkiyat.',
-    highlights: ['Niğde OSB (Kalsit)', 'Kayseri OSB', 'Boru & Galvaniz Hatları', '4–5 Saatte Teslimat']
+    badge: 'Mobil Saha & Sevkiyat Koridoru (Şube Değildir)',
+    details: 'Adana merkez depomuzdan Niğde OSB mikronize kalsit tesisleri ile Kayseri OSB ve Mimarsinan OSB fabrikalarına planlı iş günü sevkiyatı ve periyodik mobil saha ziyareti gerçekleştirilir (fiziksel şube değildir).',
+    highlights: ['Niğde OSB (Kalsit)', 'Kayseri OSB', 'Adana Çıkışlı Planlı Sevkiyat', 'Mobil Saha Mühendisliği']
   },
   {
-    region: 'Gaziantep, Kahramanmaraş & Güneydoğu Sanayi Havzası',
-    badge: 'Bölgesel Dağıtım Ağı',
-    details: 'Gaziantep Başpınar OSB ve Kahramanmaraş tekstil, kağıt ve gıda tesislerine düzenli su şartlandırma kimyasalları, atıksu polimerleri ve RO membran sistemleri.',
-    highlights: ['Gaziantep Başpınar OSB', 'Kahramanmaraş Tekstil & Kağıt', 'Atıksu Renk Giderimi', 'Periyodik Bakım']
+    region: 'Gaziantep, Kahramanmaraş & Güneydoğu Sanayi Koridoru',
+    badge: 'Mobil Saha & Sevkiyat Koridoru (Şube Değildir)',
+    details: 'Adana merkez depomuzdan Gaziantep Başpınar OSB ve Kahramanmaraş tekstil, kağıt ve gıda tesislerine iş günlerinde aynı gün / 24 saat planlı sevkiyat ve mobil teknik servis sağlanır (fiziksel şube değildir).',
+    highlights: ['Gaziantep Başpınar OSB', 'Kahramanmaraş Tekstil & Kağıt', 'Aynı Gün / 24 Saat Planlı Sevk', 'Periyodik Saha Kontrolü']
   },
   {
-    region: '81 İl Türkiye Geneli & Uluslararası İhracat',
-    badge: 'Ulusal & İhracat Lojistiği',
-    details: 'Mersin ve İskenderun limanlarına yakınlığımızla Orta Doğu, Kuzey Afrika, Türk Cumhuriyetleri ve Balkanlar’a IMO/ADR belgeli konteyner ihracatı ve 81 ile sevkiyat.',
-    highlights: ['81 İle Ambar & Filo Sevk', 'Mersin Limanı FOB/CIF İhracat', 'TR/EN SDS & COA Belgeleri', 'Teknik Destek']
+    region: '81 İl Türkiye Geneli & Uluslararası İhracat Lojistiği',
+    badge: 'Adana Merkez Çıkışlı Ulusal & İhracat Sevk',
+    details: 'Adana merkez depomuzdan 81 ile anlaşmalı ambar/filo sevkiyatı ve Mersin/İskenderun limanları üzerinden ihracat teslimatı yapılır. ADR kapsamı, ürünün UN tehlike sınıfına ve taşıma miktarına göre uygulanır.',
+    highlights: ['81 İle Ambar & Filo Sevk', 'Mersin Limanı İhracat Çıkışı', 'UN Sınıfına Göre ADR Uyum', 'Talep Bazlı SDS & COA']
   }
 ];
 
@@ -1087,23 +1101,23 @@ export const faqItems = [
   },
   {
     question: 'Sıvı kimyasallarda kg ile litre arasında nasıl dönüşüm yapıyorsunuz?',
-    answer: 'Elif Kimya mühendislik kuralları gereği, ürünün Teknik Bilgi Formunda (TDS) doğrulanmış özgül ağırlık (yoğunluk, g/cm³ veya kg/L) değeri bulunmadan kg ile litre arasında dönüşüm yapılmaz. Örneğin %48 sıvı kostik (~1.50 kg/L) ile %32 hidroklorik asit (~1.16 kg/L) farklı yoğunluklara sahiptir.'
+    answer: 'Elif Çevre Kimya mühendislik kuralları gereği, ürünün Teknik Bilgi Formunda (TDS) doğrulanmış özgül ağırlık (yoğunluk, g/cm³ veya kg/L) değeri bulunmadan kg ile litre arasında dönüşüm yapılmaz. Örneğin %48 sıvı kostik (~1.50 kg/L) ile %32 hidroklorik asit (~1.16 kg/L) farklı yoğunluklara sahiptir.'
   },
   {
-    question: 'Tesisimizde kimyasal değişikliği öncesinde ücretsiz Jar-Test veya su analizi yapıyor musunuz?',
-    answer: 'Evet. Adana, Mersin, Osmaniye, Hatay, Niğde ve Kayseri başta olmak üzere sanayi tesislerinize mobil laboratuvarımızla gelerek kendi atıksuyunuz, tufal suyunuz veya kule/kazan suyunuz üzerinde canlı Jar-Test ve LSI korozyon etüdü gerçekleştiriyor, raporu yönetiminize sunuyoruz.'
+    question: 'Tesisimizde kimyasal değişikliği öncesinde Jar-Test veya su analizi yapıyor musunuz?',
+    answer: 'Evet. Adana merkezimizden hareket eden saha mühendislerimizle Adana, Mersin, Osmaniye, Hatay, Gaziantep, Niğde ve Kayseri koridorundaki sanayi tesislerinde kendi atıksuyunuz veya kule/kazan suyunuz üzerinde yerinde Jar-Test ve LSI korozyon etüdü gerçekleştiriyoruz.'
   },
   {
-    question: 'Ürünlerinizle birlikte SDS (GBF), TDS ve Parti Analiz Sertifikası (COA) veriliyor mu?',
-    answer: 'Evet. Teslim edilen her parti kimyasal ürünümüz için güncel mevzuata uygun Güvenlik Bilgi Formu (SDS/GBF), Teknik Bilgi Formu (TDS) ve üretim partisine ait Analiz Sertifikası (COA) paylaşılmaktadır.'
+    question: 'Ürünlerinizle birlikte SDS (GBF), TDS ve Parti Analiz Sertifikası (COA) nasıl paylaşılıyor?',
+    answer: 'Formülasyon ve ticari gizlilik ile güncel revizyon takibi nedeniyle kamuya açık toplu belge indirme listesi tutulmamaktadır. Teklif ve sipariş adımında her ürün için güncel revizyonlu Güvenlik Bilgi Formu (SDS/GBF), Teknik Bilgi Formu (TDS) ve sevkiyat partisine ait Analiz Sertifikası (COA) doğrudan alıcı kurumla paylaşılır.'
   },
   {
-    question: 'Su arıtma sistemlerinde (RO, EDI, Yumuşatma) periyodik bakım ve membran CIP yıkama hizmetiniz var mı?',
-    answer: 'Evet. Kurulumunu yaptığımız veya fabrikanızda mevcut olan Ters Ozmoz (RO), EDI, Ultrafiltrasyon ve Yumuşatma sistemleri için periyodik bakım sözleşmesi, membran CIP kimyasal yıkama, reçine/kum/karbon medya değişimi ve yedek parça desteği sağlıyoruz.'
+    question: 'Geri arama ve sevkiyat süreleriniz hangi koşullarda geçerlidir?',
+    answer: 'Resmi çalışma saatlerimiz Pazartesi–Cumartesi 08:00–18:30’dur. Mesai saatleri içinde gelen telefon/form taleplerine 30 dakika içinde ön geri dönüş yapılır; mesai dışı taleplere ilk iş günü sabahı dönüş sağlanır. Belirtilen 90–120 dk (Adana) ve 2–4 saat (Mersin/İskenderun) süreleri, stokta hazır ürünler için sipariş/stok onayı sonrası iş günlerinde geçerli sevkiyat süreleridir.'
   },
   {
-    question: 'Medipure saf su cihazı kataloğunda kaç model var ve fiyat nasıl verilir?',
-    answer: 'Katalogda laboratuvar, medikal, deiyonize, mobil ve endüstri gruplarında 163 Medipure modeli vardır. Kapasite lt/saat, ton/saat veya ton/gün olarak yazılır. Sitedeki EUR tutar Medipure liste fiyatıdır; Adana teslimat teklifi kur ve sevkiyata göre ayrıca verilir.'
+    question: 'Medipure saf su cihazı kataloğunda kaç model var ve fiyat kapsamı nedir?',
+    answer: 'Katalogda laboratuvar, medikal, deiyonize, mobil ve endüstri gruplarında 163 Medipure modeli yer alır. Kartlardaki EUR tutarları KDV, nakliye, ön arıtma ve saha montajı hariç gösterge liste fiyatlarıdır; besleme suyu analizi, güncel kur, stok ve 2 yıl cihaz garantisi (sarf malzemeler hariç) resmi teklifte netleştirilir.'
   },
   {
     question: 'Jeotermal kireç ve silika inhibitörü dozajını nasıl belirliyorsunuz?',
@@ -1114,18 +1128,18 @@ export const faqItems = [
 export const geoKnowledgeArticles = [
   {
     title: 'Haddehane Tufal Çukurlarında Anyonik Poliakrilamid (A-PAM) Seçimi ve Sıcaklık Etkisi',
-    content: 'Sıcak haddeleme hatlarında 60°C üzerindeki tufal sularında standart polimerler hidrolize olarak flokülasyon gücünü kaybeder. İntrinsik viskozitesi >16 dl/g olan yüksek molekül ağırlıklı A-PAM kopolimerleri, demir oksit (Fe₂O₃/Fe₃O₄) partiküllerini <10 mg/L AKM seviyesine indirerek yüksek basınçlı descaling nozullarını korur.',
-    metrics: ['İntrinsik Viskozite > 16 dl/g', 'Çıkış AKM < 10 mg/L', '0.8 – 2.5 ppm Dozaj']
+    content: 'Sıcak haddeleme hatlarında yüksek sıcaklıktaki tufal sularında polimer seçimi, askıda katı yükü ve pH değerine göre yerinde jar-test ile yapılır. Yüksek molekül ağırlıklı A-PAM kopolimerleri, demir oksit (Fe₂O₃/Fe₃O₄) partiküllerinin çökeltilmesini hızlandırarak descaling nozullarını ve sirkülasyon pompalarını korumaya yardımcı olur.',
+    metrics: ['Jar-Test ile Polimer Seçimi', 'Yüksek Sıcaklık Dayanımı', '1 – 5 ppm Tipik Dozaj']
   },
   {
-    title: 'Buhar Kazanlarında Kireç ve Silikat Taşının Doğalgaz Tüketimine Etkisi',
-    content: 'Kazan duman boruları veya su boruları üzerinde oluşan 1 mm kalınlığındaki kalsiyum karbonat tabakası yakıt tüketimini %4–5 artırırken, düşük ısı iletkenliğine sahip silikatlı kışır tabakası %8–12 arasında fazladan doğalgaz yakılmasına yol açar. Doğru RO ön arıtması ve fosfonat/terpolimer şartlandırması bu kaybı sıfırlar.',
-    metrics: ['1 mm Kireç = %5–8 Ek Yakıt', 'DEHA ile < 5 ppb O₂', 'EN 12952 Uyumlu']
+    title: 'Buhar Kazanlarında Kireç ve Silikat Taşının Yakıt Tüketimine Etkisi',
+    content: 'Kazan duman boruları veya su boruları üzerinde oluşan kireç ve silikat tabakası ısı transfer direncini artırır; literatürde ~1 mm kalınlığındaki kışırın kışır kompozisyonuna (karbonat veya silikat ağırlıklı olmasına) bağlı olarak %4 ile %10 arasında ek yakıt kaybına yol açabildiği belirtilir. Uygun yumuşatma/RO ön arıtması ve fosfonat-polimer şartlandırması bu birikimi sınırlar.',
+    metrics: ['Kışır Tipine Göre %4–10 Ek Yakıt Riski', 'Oksijen ve pH Kontrolü', 'TS EN 12952 Rehber Uyumu']
   },
   {
     title: 'Ters Ozmoz (RO) Membranlarında Silis ve Kalsiyum Sülfat Tıkanmasını Önleme',
-    content: 'Kuyu sularında yüksek silis (>40 ppm) ve yüksek sertlik bulunan Çukurova ve İç Anadolu tesislerinde, standart hekzametafosfat (SHMP) kullanımı membranlarda geri dönüşsüz tıkanmaya neden olur. Dendrimerik ve fosfonat bazlı özel RO antiskalantları 240 ppm silis seviyesine kadar çökeltisiz çalışmayı mümkün kılar.',
-    metrics: ['240 ppm Silis Toleransı', 'Geri Kazanım %75–82', '2–4 ppm Dozaj']
+    content: 'Kuyu sularında yüksek silis ve sertlik bulunan tesislerde antiskalant seçimi ham su analizine ve hedef geri kazanım (recovery) oranına göre projeksiyon yazılımıyla yapılır. Uygun sıcaklık ve pH koşullarında özel fosfonat/polimer antiskalantlar konsantre (brine) hattında 200–240 ppm mertebesine kadar silis doygunluğunu kontrol altında tutmaya yardımcı olur.',
+    metrics: ['Su Analizine Göre Projeksiyon', 'Konsantre Hattı Silis Kontrolü', '2–5 ppm Tipik Dozaj']
   },
   {
     title: 'Jeotermal Hatlarında Kireç ve Silika Programı Neden Analiz İster',
@@ -1134,8 +1148,8 @@ export const geoKnowledgeArticles = [
   },
   {
     title: 'Laboratuvar ve Endüstriyel Saf Su Cihazı Nasıl Seçilir',
-    content: 'Medipure kataloğunda 163 model, 15 kategoride durur: laboratuvar saf su, ultra saf su, biyokimya, mikrobiyoloji, sterilizasyon, medikal, deiyonize, distile, elektrodeiyonizasyon, mobil saf su, mobil ultra saf su, endüstri, metal kaplama, kozmetik ve ters ozmoz. Kapasite cihaz kodunun yanında yazılıdır. EUR liste fiyatı vitrin fiyatıdır; teslimat teklifi Elif Kimya tarafından verilir.',
-    metrics: ['163 Model', '15 Kategori', 'EUR Liste + Ayrı Teklif']
+    content: 'Medipure kataloğunda 163 model, 15 kategoride sunulur: laboratuvar saf su, ultra saf su, biyokimya, mikrobiyoloji, sterilizasyon, medikal, deiyonize, distile, elektrodeiyonizasyon, mobil saf su, mobil ultra saf su, endüstri, metal kaplama, kozmetik ve ters ozmoz. Kartlardaki EUR liste fiyatı KDV/nakliye/montaj hariç gösterge fiyattır; kesin teklif besleme suyu analizi ve kurulum kapsamına göre Elif Çevre Kimya tarafından verilir.',
+    metrics: ['163 Model', '15 Kategori', 'KDV/Montaj Hariç Gösterge EUR Liste']
   }
 ];
 
@@ -1146,8 +1160,8 @@ export const pageSEO = {
     canonical: 'https://www.elifcevrekimya.com.tr/'
   },
   '/urunler': {
-    title: 'Endüstriyel & Çevre Kimyasalları | Soğutma Kulesi, Kazan, Jeotermal, PAC | Elif Çevre Kimya',
-    description: 'Soğutma kulesi, kapalı devre, kazan, jeotermal kireç inhibitörü, RO antiskalant, PAC, polielektrolit, sodyum hipoklorit, kostik soda, emülsiyon kırıcı ve köpük kesici kataloğu.',
+    title: 'Endüstriyel & Çevre Kimyasalları | Soğutma Kulesi, Kazan, HORIBA & Lab | Elif Çevre Kimya',
+    description: 'Soğutma kulesi, kapalı devre, kazan, jeotermal kireç inhibitörü, RO antiskalant, PAC, polielektrolit, HORIBA su analiz cihazları/çözeltileri, laboratuvar kimyasalları, sodyum hipoklorit ve kostik soda kataloğu.',
     canonical: 'https://www.elifcevrekimya.com.tr/urunler'
   },
   '/sistemler': {
@@ -1161,24 +1175,25 @@ export const pageSEO = {
     canonical: 'https://www.elifcevrekimya.com.tr/sektorler'
   },
   '/hizmet-bolgeleri': {
-    title: 'Adana, Mersin, İskenderun, Gaziantep, Kayseri OSB Kimyasal Sevkiyat | Elif Çevre Kimya',
-    description: 'Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana merkezinden Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde sanayi hatlarına ADR standartlarında kimyasal sevkiyat.',
+    title: 'Adana Merkez Depo & Çukurova / OSB Kimyasal Sevkiyat Koridorları | Elif Çevre Kimya',
+    description: 'Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana fiziksel merkez ve depomuzdan Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri ve Niğde sanayi koridorlarına kimyasal sevkiyat ve mobil mühendislik.',
     canonical: 'https://www.elifcevrekimya.com.tr/hizmet-bolgeleri'
   },
   '/teknik-bilgi': {
-    title: 'Teknik Belge Merkezi (SDS / GBF, TDS, COA) ve Mühendislik Rehberi | Elif Çevre Kimya',
-    description: 'Kimyasal ürünlerimize ait doğrulanmış Güvenlik Bilgi Formları (SDS/GBF), Teknik Bilgi Formları (TDS), Analiz Sertifikaları (COA) ve çevre/su mühendisliği makaleleri.',
+    title: 'Teknik Belge Talebi (SDS / GBF, TDS, COA) ve Mühendislik Rehberi | Elif Çevre Kimya',
+    description: 'Sipariş ve teklif bazlı Güvenlik Bilgi Formu (SDS/GBF), Teknik Bilgi Formu (TDS), Analiz Sertifikası (COA) talep merkezi ve su/çevre mühendisliği saha ön değerlendirme rehberleri.',
     canonical: 'https://www.elifcevrekimya.com.tr/teknik-bilgi'
   },
   '/teklif-al': {
-    title: 'Kurumsal Teklif, Canlı Jar-Test ve Su Analizi Başvurusu | Elif Çevre Kimya',
-    description: 'Fabrikanız için endüstriyel ve çevre kimyasalları fiyat teklifi, yerinde 6’lı Jar-Test, ücretsiz korozyon/LSI risk etüdü ve su arıtma sistemi projelendirme talebi oluşturun.',
+    title: 'Kurumsal Sipariş & Teklif Talebi, Jar-Test ve Su Analizi Başvurusu | Elif Çevre Kimya',
+    description: 'Fabrikanız için endüstriyel kimyasal ve laboratuvar ürünleri sipariş/teklif talebi, yerinde Jar-Test, korozyon/LSI etüdü ve su arıtma sistemi projelendirme başvurusu.',
     canonical: 'https://www.elifcevrekimya.com.tr/teklif-al'
   },
   '/iletisim': {
     title: 'İletişim & Adana Merkez Depo (Ova Mah. Şakirpaşa Cd. No:269) | Elif Çevre Kimya',
-    description: 'Elif Çevre Kimya Adana merkez ofis ve depo (Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana). İletişim: info@elifcevrekimya.com.tr ve satis@elifcevrekimya.com.tr.',
+    description: 'Elif Çevre Kimya tek fiziksel merkez ofis ve depo: Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana. Telefon & WhatsApp: 0546 499 23 42, E-posta: info@elifcevrekimya.com.tr.',
     canonical: 'https://www.elifcevrekimya.com.tr/iletisim'
   }
 };
+
 

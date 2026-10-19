@@ -10,6 +10,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAst } from 'rollup/parseAst';
 import { buildPublicRoutes, renderCrawlableDocument, renderPublicLanding, renderNotFoundPage } from '../src/pages/seo-landings.js';
+import { allMedipureProducts } from '../src/data/medipure-catalog.js';
+import { LAB_CHEMICAL_GROUPS, LAB_CHEMICAL_PRODUCTS } from '../src/data/lab-chemicals-locale.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'src/data/translation-source.json');
@@ -21,6 +23,7 @@ const publicFiles = [
   'src/components/footer.js',
   'src/components/medipure-catalog.js',
   'src/components/lab-chemicals-catalog.js',
+  'src/components/product-order-modal.js',
   'src/components/notification.js',
   'src/utils/seo-geo.js',
   ...fs.readdirSync(path.join(root, 'src/data'))
@@ -184,6 +187,23 @@ extractHtml(renderNotFoundPage(), 'rendered-not-found');
 // Shared status text from the original prerender shell is also public copy.
 add('Sayfa bulunamadı | Elif Kimya', 'prerender-404');
 add('Bu adres Elif Kimya sitesinde yok.', 'prerender-404');
+
+// Collect Medipure card-visible summaries & quality specs and Lab/HORIBA card strings
+for (const product of allMedipureProducts()) {
+  if (product.summary) add(product.summary, 'medipure-cards');
+  const qualitySpec = (product.specs || []).find((s) => /kalite|iletkenlik|direnç/i.test(s.label))?.value;
+  if (qualitySpec) add(qualitySpec, 'medipure-cards');
+}
+for (const group of LAB_CHEMICAL_GROUPS) {
+  add(group.title, 'lab-catalog-cards');
+  add(group.shortTitle, 'lab-catalog-cards');
+  add(group.summary, 'lab-catalog-cards');
+}
+for (const item of LAB_CHEMICAL_PRODUCTS) {
+  add(item.name, 'lab-catalog-cards');
+  add(item.summary, 'lab-catalog-cards');
+  add(item.packaging, 'lab-catalog-cards');
+}
 
 const inventory = [...strings].sort();
 const serialized = `${JSON.stringify(inventory, null, 2)}\n`;

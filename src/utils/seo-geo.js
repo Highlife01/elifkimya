@@ -231,10 +231,10 @@ export const WATER_CHEMICAL_LIFECYCLE = [
     id: 'dogal-su-ve-on-aritma',
     title: 'Doğal Su Kaynakları & Ön Arıtma',
     subtitle: 'Kuyu, Nehir ve Şebeke Sularının Proses Hazırlığı',
-    summary: 'Ham sudaki askıda katı madde (AKM), bulanıklık, demir-mangan, organik yük ve serbest klorun çok katmanlı filtrasyon ve ön şartlandırma kimyasallarıyla giderilmesi.',
+    summary: 'Ham sudaki askıda katı madde (AKM), bulanıklık, demir-mangan, organik yük ve serbest klorun çok katmanlı filtrasyon ve ön şartlandırma kimyasallarıyla azaltılması.',
     activeChemicals: ['Sodyum Hipoklorit (%15)', 'PAC Koagülant', 'Kuvars Kumu & Antrasit', 'Aktif Karbon & Katyonik Reçine'],
     systems: ['Multimedya Kum Filtreleri', 'Demir-Mangan Giderme Üniteleri', 'Endüstriyel Tandem Su Yumuşatma', 'Otomatik Klor Dozaj Sistemleri'],
-    metrics: ['SDI < 3.0 Çıkış Garantisi', '0 °dH Sertlik Kontrolü', '%98+ AKM Giderimi'],
+    metrics: ['SDI < 3.0 Tasarım Hedefi (Ham Suya Bağlı)', 'Yumuşatma ile Sertlik Kontrolü', 'Analize Bağlı Bulanıklık & AKM Azaltımı'],
     ctaHref: '/sistemler'
   },
   {
@@ -242,10 +242,10 @@ export const WATER_CHEMICAL_LIFECYCLE = [
     id: 'ters-osmoz-ve-saf-su',
     title: 'Ters Osmoz (RO) & Ultra Saf Su (EDI)',
     subtitle: 'Yüksek Saflıkta Proses ve Kazan Besi Suyu Üretimi',
-    summary: 'Yüksek silisli ve sert kuyu sularının membran tıkanması olmadan yüksek geri kazanım oranıyla saflaştırılması; enerji ve elektronik/cam sanayi için <0.1 µS/cm ultra saf su üretimi.',
-    activeChemicals: ['Fosfonat / Dendrimer RO Antiskalant', 'Asidik & Bazik Membran CIP Yıkama', 'SBS Klor Giderici', 'DBNPA Membran Biyositi'],
+    summary: 'Kuyu ve şebeke sularının ham su analizine uygun antiskalant ve membran dizilimiyle saflaştırılması; enerji ve elektronik/cam sanayi için düşük iletkenlikli saf su üretimi.',
+    activeChemicals: ['Fosfonat / Polimer RO Antiskalant', 'Asidik & Bazik Membran CIP Yıkama', 'SBS Klor Giderici', 'DBNPA Membran Biyositi'],
     systems: ['Endüstriyel Tek/Çift Geçişli RO', 'Ultrafiltrasyon (UF) Ön Arıtma', 'Elektrodeiyonizasyon (EDI) Üniteleri', 'PLC / SCADA Otomasyon Panoları'],
-    metrics: ['240 ppm Silis Toleransı', '18.2 MΩ·cm Ultra Saf Su', '%75–85 Su Geri Kazanımı'],
+    metrics: ['Su Analizine Göre Silis Projeksiyonu', 'Hedef < 0.1 µS/cm / 18.2 MΩ·cm', 'Besleme Suyuna Göre Geri Kazanım'],
     ctaHref: '/sistemler#medipure-katalog'
   },
   {
@@ -253,10 +253,10 @@ export const WATER_CHEMICAL_LIFECYCLE = [
     id: 'proses-kule-ve-kazan',
     title: 'Proses, Soğutma Kulesi & Buhar Kazanı',
     subtitle: 'Isı Transferi, Korozyon, Kışır ve Mikrobiyolojik Koruma',
-    summary: 'Açık/kapalı soğutma devreleri, buhar kazanları ve haddehane/reaktör ceketlerinde kireç taşını, oksijen çukurlaşmasını (pitting) ve Legionella/biyofilm oluşumunu sıfırlayan şartlandırma.',
+    summary: 'Açık/kapalı soğutma devreleri, buhar kazanları ve haddehane/reaktör ceketlerinde kireç taşını, oksijen korozyonunu ve mikrobiyolojik/biyofilm oluşumunu kontrol altında tutan şartlandırma.',
     activeChemicals: ['PBTC / HEDP / TTA İnhibitörleri', 'DEHA Uçucu Oksijen Tutucu', 'Nötralize Edici Kondens Aminleri', 'DBNPA & CMIT/MIT Biyositler'],
-    systems: ['Otomatik İletkenlik & pH Blöf Panoları', 'Oransal Kimyasal Dozaj İstasyonları', 'Korozyon Kuponu & LSI İzleme Raporu', '65 Bar Yüksek Basınç Kazan Programı'],
-    metrics: ['%8–12 Yakıt Tasarrufu', '< 5 ppb Çözünmüş Oksijen', 'COC 4–7 Döngü Artışı'],
+    systems: ['Otomatik İletkenlik & pH Blöf Panoları', 'Oransal Kimyasal Dozaj İstasyonları', 'Korozyon Kuponu & LSI İzleme Raporu', 'TS EN 12952 Rehber Uyumlu Kazan Programı'],
+    metrics: ['Kışır Kaynaklı Isı Kaybı Önleme', 'Degazör + Oksijen Tutucu Kontrolü', 'LSI Analizine Göre COC Optimizasyonu'],
     ctaHref: '/urunler'
   },
   {
@@ -264,21 +264,21 @@ export const WATER_CHEMICAL_LIFECYCLE = [
     id: 'atik-su-aritma-ve-camur',
     title: 'Atık Su Arıtma & Çamur Susuzlaştırma',
     subtitle: 'Kimyasal Flokülasyon, Renk Giderimi ve Dekantör Verimi',
-    summary: 'Kimyasal ve biyolojik atıksu arıtma tesislerinde hızlı faz ayrımı, ağır metal/fosfat çökeltimi, tekstil renk giderimi ve dekantör/belt-pres çamur kek kuruluğunun maksimize edilmesi.',
+    summary: 'Kimyasal ve biyolojik atıksu arıtma tesislerinde yerinde jar-test ile belirlenen koagülant ve polimer dozajıyla faz ayrımı, renk/metal çökeltimi ve çamur susuzlaştırma.',
     activeChemicals: ['PAC (%17-%30) & Demir III Klorür (%40)', 'Anyonik Polielektrolit (A-PAM)', 'Katyonik Polielektrolit (C-PAM)', 'Köpük Kesiciler (Antifoam)'],
     systems: ['Otomatik Polimer Hazırlama & Dozaj Ünitesi', 'Yerinde 6’lı Jar-Test Optimizasyonu', 'Tufal Çukuru & Lamelli Çökeltici Dozajı', 'Biyolojik Arıtma Mikrobesin Desteği'],
-    metrics: ['< 30 sn Flok Çökme Hızı', '%25–35 Çamur Kek Kuruluğu', '%15–30 Polimer Tasarrufu'],
+    metrics: ['Jar-Test ile Optimum Flokülasyon', 'Çamur Yapısına Göre Kek Kuruluğu', 'Dozaj ve Polimer Seçim Optimizasyonu'],
     ctaHref: '/teklif-al?type=water'
   },
   {
     step: '05',
     id: 'desarj-ve-geri-kazanim',
-    title: 'Deşarj, Sıfır Atık & Su Geri Kazanımı',
-    subtitle: 'Sürdürülebilirlik, Karbon Ayak İzi Azaltımı ve ZLD',
-    summary: 'Arıtılmış atıksuyun UF + RO membran teknolojileri ve ileri oksidasyon ile yeniden proses suyuna dönüştürülmesi; su maliyetlerini ve çevresel deşarj yükünü minimize eden 360° mühendislik.',
-    activeChemicals: ['İleri Oksidasyon & Dezenfektanlar', 'Geri Kazanım RO Antiskalantları', 'Biyofilm Önleyici Şartlandırıcılar', 'Koku & H₂S Gidericiler'],
-    systems: ['Atıksu Geri Kazanım UF + RO Tesisleri', 'Online Debi, pH, AKM & KOİ İzleme', '360° Mühendislik & Karbon Azaltım Raporu', 'Periyodik Bakım & SLA Servis Yönetimi'],
-    metrics: ['%60–85 Proses Suyu Geri Kazanımı', 'Çevre Mevzuatına %100 Uyum', 'Düşük Karbon & Su Ayak İzi'],
+    title: 'Deşarj Uyumu & Su Geri Kazanım Etüdü',
+    subtitle: 'Arıtılmış Suyun Yeniden Kullanım Fizibilitesi',
+    summary: 'Arıtılmış atıksuyun karakteristiğine bağlı olarak UF + RO membran teknolojileriyle yeniden proses suyuna kazandırılması için mühendislik etüdü ve ekipman/kimyasal projelendirmesi.',
+    activeChemicals: ['Dezenfektan & Oksidasyon Kimyasalları', 'Geri Kazanım RO Antiskalantları', 'Biyofilm Önleyici Şartlandırıcılar', 'Koku & H₂S Kontrol Ürünleri'],
+    systems: ['Atıksu Geri Kazanım UF + RO Sistemleri', 'Online Debi, pH ve İletkenlik İzleme', 'Su Analizi & Geri Kazanım Fizibilitesi', 'Periyodik Bakım & Servis Desteği'],
+    metrics: ['Analize Dayalı Geri Kazanım Etüdü', 'Deşarj Standartlarına Uyum Desteği', 'Proses Suyu Geri Kazanım Mühendisliği'],
     ctaHref: '/teklif-al?type=project'
   }
 ];
@@ -295,13 +295,13 @@ export const ENGINEERING_360_TABS = {
         code: '01',
         title: 'Endüstriyel Su Arıtma & Membran Teknolojileri',
         desc: 'Kuyu, nehir ve şebeke sularından proses kalitesinde su üreten Ters Osmoz (RO), Ultrafiltrasyon (UF), EDI ve demineralizasyon tesisleri.',
-        specs: '1 – 250 m³/saat Kapasite • Paslanmaz Şase',
+        specs: '1 – 250 m³/saat Kapasite • Analize Göre Tasarım',
         href: '/sistemler'
       },
       {
         code: '02',
         title: 'Soğutma Kulesi & Buhar Kazanı Şartlandırma',
-        desc: 'Isı eşanjörleri, soğutma kuleleri ve yüksek basınçlı buhar kazanlarında kışır, korozyon ve biyofilm riskini ortadan kaldıran özel formülasyonlar.',
+        desc: 'Isı eşanjörleri, soğutma kuleleri ve buhar kazanlarında kışır, korozyon ve biyofilm riskini kontrol altında tutan özel formülasyonlar.',
         specs: 'LSI Korozyon Etüdü • Otomatik Blöf & Dozaj',
         href: '/urunler'
       },
@@ -309,14 +309,14 @@ export const ENGINEERING_360_TABS = {
         code: '03',
         title: 'Atık Su Arıtma, Polimer & Su Geri Kazanımı',
         desc: 'Koagülant (PAC, FeCl₃), Anyonik/Katyonik Polielektrolit tedariki, yerinde Jar-Test optimizasyonu ve atıksu geri kazanım mühendisliği.',
-        specs: 'Yerinde 6’lı Jar-Test • Sıfır Atık Hedefi',
+        specs: 'Yerinde 6’lı Jar-Test • Proses Geri Kazanım Etüdü',
         href: '/teklif-al?type=water'
       },
       {
         code: '04',
         title: 'Dökme Baz Kimyasallar, Asit & Alkali Lojistiği',
-        desc: 'Sodyum Hipoklorit, Kostik Soda, HCl, H₂SO₄ ve proses kimyasallarının ADR sertifikalı tanker, IBC ve paletli ambalajlarla kesintisiz sevkiyatı.',
-        specs: 'Çukurova 2–4 Saat Sevk • Parti Bazlı COA/SDS',
+        desc: 'Sodyum Hipoklorit, Kostik Soda, HCl, H₂SO₄ ve proses kimyasallarının UN/ADR mevzuatına uygun tanker, IBC ve paletli ambalajlarla sevkiyatı.',
+        specs: 'Stok Onaylı İş Günü Sevk • Talep Bazlı SDS/COA',
         href: '/teklif-al'
       }
     ]
@@ -328,7 +328,7 @@ export const ENGINEERING_360_TABS = {
       {
         code: '01',
         title: 'Projelendirme, Su Analizi & 360° Mühendislik',
-        desc: 'Tesisinizin ham su ve proses karakteristiğine göre P&ID akış şemalarının çizimi, kütle dengesi hesabı ve doğru ekipman/kimyasal seçimi.',
+        desc: 'Tesisinizin ham su ve proses karakteristiğine göre akış şemalarının oluşturulması, kütle dengesi hesabı ve doğru ekipman/kimyasal seçimi.',
         specs: 'Doğrulanmış Su Analizi • Kapasite Hesabı',
         href: '/teklif-al?type=project'
       },
@@ -342,7 +342,7 @@ export const ENGINEERING_360_TABS = {
       {
         code: '03',
         title: 'PLC / SCADA Otomasyon & Online Sensör İzleme',
-        desc: 'pH, ORP, İletkenlik (µS/cm), Bulanıklık ve serbest klor sensörleriyle kimyasal tüketimini ve su kalitesini 7/24 ölçülebilir ve izlenebilir kılan otomasyon.',
+        desc: 'pH, ORP, İletkenlik (µS/cm), Bulanıklık ve serbest klor sensörleriyle kimyasal tüketimini ve su kalitesini sürekli ölçülebilir ve izlenebilir kılan otomasyon.',
         specs: 'Online Sensör Entegrasyonu • Uzaktan İzleme',
         href: '/sistemler'
       },
@@ -350,7 +350,7 @@ export const ENGINEERING_360_TABS = {
         code: '04',
         title: 'Saha Montajı, Devreye Alma & Membran CIP Servisi',
         desc: 'Anahtar teslim mekanik/elektrik saha montajı, RO membran CIP kimyasal yıkama, reçine/kum/aktif karbon medya değişimi ve periyodik bakım.',
-        specs: 'Yerinde Teknik Servis • SLA Bakım Sözleşmesi',
+        specs: 'Yerinde Teknik Servis • Periyodik Bakım Planı',
         href: '/iletisim'
       }
     ]
@@ -472,8 +472,8 @@ export function buildPageStructuredData(seo) {
       '@type': ['Organization', 'LocalBusiness'],
       '@id': organizationId,
       name: 'Elif Çevre Kimya',
-      alternateName: ['Elif Kimya', 'Elif Çevre ve Endüstriyel Kimya'],
-      legalName: 'Elif Çevre Kimya Sanayi ve Ticaret',
+      alternateName: ['Elif Kimya', 'Elif Çevre Kimya — Endüstriyel Kimyasallar, Çevre Teknolojileri ve Su Arıtma Sistemleri'],
+      legalName: 'Elif Çevre Kimya',
       url: SITE + '/',
       sameAs: [SITE, 'https://elifkimya.web.app'],
       logo: SITE + '/logo.svg',
@@ -484,7 +484,7 @@ export function buildPageStructuredData(seo) {
       contactPoint: [{
         '@type': 'ContactPoint',
         telephone: '+905464992342',
-        email: 'satis@elifcevrekimya.com.tr',
+        email: 'info@elifcevrekimya.com.tr',
         contactType: 'sales',
         areaServed: 'TR',
         availableLanguage: ['Turkish', 'English']

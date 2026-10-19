@@ -151,14 +151,17 @@ export function openMedipureProductModal(productOrCode, { mode = 'detail' } = {}
               />
               <div class="mt-4 w-full grid grid-cols-2 gap-2 text-center">
                 <div class="rounded-xl border border-slate-200 bg-white p-2.5">
-                  <p class="text-[10px] font-bold uppercase text-slate-500">Kapasite</p>
+                  <p class="text-[10px] font-bold uppercase text-slate-500">Nominal Kapasite</p>
                   <p class="font-display text-sm font-black text-slate-900">${escapeHtml(product.capacity)}</p>
                 </div>
                 <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-2.5">
-                  <p class="text-[10px] font-bold uppercase text-emerald-700">Medipure Liste</p>
+                  <p class="text-[10px] font-bold uppercase text-emerald-700">Gösterge Liste (KDV Hariç)</p>
                   <p class="font-display text-base font-black text-emerald-950">${escapeHtml(product.listPriceEur)} €</p>
                 </div>
               </div>
+              <p class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 text-center">
+                💡 KDV, nakliye ve saha montajı hariçtir • Güncel kur, stok ve 2 yıl cihaz garantisi (sarf hariç) teklifte netleşir
+              </p>
             </div>
 
             <div class="lg:col-span-7 space-y-4">
@@ -224,24 +227,24 @@ export function openMedipureProductModal(productOrCode, { mode = 'detail' } = {}
             </div>
           </div>
 
-          <!-- Hızlı Sipariş Ver Formu -->
+          <!-- Hızlı Sipariş & Teklif Talebi Formu -->
           <div id="modal-order-form-section" class="rounded-3xl border-2 border-emerald-500 bg-emerald-50/50 p-5 sm:p-6">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
               <div>
-                <span class="inline-block rounded-full bg-emerald-700 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-white">Canlı Sipariş Hattı</span>
+                <span class="inline-block rounded-full bg-emerald-700 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-white">Kurumsal Sipariş &amp; Teklif Talebi</span>
                 <h3 class="mt-1 font-display text-xl font-black text-slate-900">🛒 ${escapeHtml(product.code)} ${escapeHtml(product.name)} — Sipariş Ver</h3>
-                <p class="text-xs text-slate-600">Formu gönderdiğinizde siparişiniz anında Elif Çevre Kimya Yönetim Paneli (Dashboard) Sipariş ekranına düşer.</p>
+                <p class="text-xs text-slate-600">Talebiniz Yönetim Paneli (Dashboard) ekranına iletilir; besleme suyu analizi, güncel kur, stok/termin, KDV, nakliye ve montaj kapsamı teyit edilerek resmi proforma teklif sunulur.</p>
               </div>
               <div class="text-right">
-                <span class="text-[11px] font-bold text-slate-500 block">Liste Fiyatı</span>
+                <span class="text-[11px] font-bold text-slate-500 block">Gösterge Liste (KDV/Nakliye/Montaj Hariç)</span>
                 <strong class="font-display text-lg font-black text-emerald-900">${escapeHtml(product.listPriceEur)} €</strong>
               </div>
             </div>
 
             <form id="modal-medipure-order-form" class="grid gap-3.5 sm:grid-cols-2">
               <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Sipariş Edilen Cihaz &amp; Model</label>
-                <input type="text" name="productLabel" readonly value="${escapeAttr(`${product.code} — ${product.name} (${product.capacity}) | Liste: ${product.listPriceEur} EUR`)}" class="w-full rounded-xl border border-slate-300 bg-slate-100 px-3.5 py-2.5 text-xs font-bold text-slate-800" />
+                <label class="block text-xs font-bold text-slate-700 mb-1">Talep Edilen Cihaz &amp; Model</label>
+                <input type="text" name="productLabel" readonly value="${escapeAttr(`${product.code} — ${product.name} (${product.capacity}) | Gösterge Liste: ${product.listPriceEur} EUR (KDV/Nakliye/Montaj Hariç)`)}" class="w-full rounded-xl border border-slate-300 bg-slate-100 px-3.5 py-2.5 text-xs font-bold text-slate-800" />
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Firma / Kurum / Laboratuvar Adı *</label>
@@ -276,10 +279,20 @@ export function openMedipureProductModal(productOrCode, { mode = 'detail' } = {}
                 <label class="block text-xs font-bold text-slate-700 mb-1">Sipariş &amp; Teknik Notunuz (Besleme suyu tipi, teslim tarihi vb.)</label>
                 <textarea name="notes" rows="2" placeholder="Varsa şebeke/kuyu suyu iletkenliği, istenen opsiyonel modüller veya fatura/teslimat notunuzu yazabilirsiniz..." class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900"></textarea>
               </div>
+              <div class="sm:col-span-2 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-700">
+                <label class="flex items-start gap-2.5 cursor-pointer font-semibold">
+                  <input type="checkbox" name="kvkkConsent" required class="mt-0.5 h-4 w-4 accent-emerald-600" />
+                  <span>6698 sayılı KVKK kapsamında iletişim ve firma verilerimin kurumsal sipariş/teklif hazırlığı amacıyla işlenmesini kabul ediyorum. *</span>
+                </label>
+                <details class="mt-1.5 pl-6 text-[11px] text-slate-600">
+                  <summary class="cursor-pointer font-bold text-emerald-800 hover:underline">KVKK Aydınlatma Özeti</summary>
+                  <p class="mt-1 leading-relaxed">Veri Sorumlusu: Elif Çevre Kimya (Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana, info@elifcevrekimya.com.tr). İletilen ad, firma, telefon, e-posta ve talep verileri yalnızca B2B tekliflendirme, teknik doğrulama ve sevkiyat iletişimi amacıyla KVKK m.5/2-c ve m.5/2-f hukuki sebeplerine dayanılarak işlenir; üçüncü taraf reklam ağlarıyla paylaşılmaz.</p>
+                </details>
+              </div>
               <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3 pt-1">
-                <span class="text-xs text-slate-600">🔒 Siparişiniz doğrudan <strong>elifkimya</strong> veritabanına kaydedilir ve yönetim paneline düşer.</span>
+                <span class="text-xs text-slate-600">🔒 Talebiniz doğrudan <strong>elifkimya</strong> veritabanına kaydedilir ve resmi proforma teklif ile teyit edilir.</span>
                 <button type="submit" id="modal-order-submit-btn" class="rounded-xl bg-emerald-700 px-6 py-3 text-sm font-extrabold text-white shadow-md hover:bg-emerald-800 transition">
-                  ✅ Siparişi Onayla ve Gönder
+                  ✅ Sipariş &amp; Teklif Talebini Gönder
                 </button>
               </div>
               <div id="modal-order-feedback" class="sm:col-span-2" hidden></div>
@@ -313,7 +326,7 @@ export function openMedipureProductModal(productOrCode, { mode = 'detail' } = {}
     try {
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sipariş Kaydediliyor...';
+        submitBtn.textContent = 'Talep Kaydediliyor...';
       }
       await submitPublicCrmForm({
         companyName,
@@ -323,16 +336,16 @@ export function openMedipureProductModal(productOrCode, { mode = 'detail' } = {}
         cityCountry,
         formChannel: 'order_form',
         requestType: 'order_request',
-        subject: `[MEDIPURE SİPARİŞ] ${product.code} ${product.name} (${product.capacity})`,
+        subject: `[MEDIPURE SİPARİŞ/TEKLİF] ${product.code} ${product.name} (${product.capacity})`,
         relatedProductOrSystem: `${product.code} — ${product.name} (${product.capacity})`,
-        packagingInfo: `${deliveryOption} • Liste: ${product.listPriceEur} EUR`,
+        packagingInfo: `${deliveryOption} • Gösterge Liste: ${product.listPriceEur} EUR`,
         description: [
-          `[MEDIPURE SU SAFLAŞTIRMA CİHAZ SİPARİŞİ]`,
+          `[MEDIPURE SU SAFLAŞTIRMA CİHAZ SİPARİŞ & TEKLİF TALEBİ]`,
           `Model Kodu: ${product.code}`,
           `Cihaz Adı: ${product.name}`,
           `Kategori: ${product.categoryTitle || '-'}`,
           `Kapasite: ${product.capacity}`,
-          `Medipure Liste Fiyatı: ${product.listPriceEur} EUR`,
+          `Gösterge Liste Fiyatı (KDV/Nakliye/Montaj Hariç): ${product.listPriceEur} EUR`,
           `Kurulum / Paket Tercihi: ${deliveryOption}`,
           `Teslimat Şehri: ${cityCountry}`,
           `Müşteri Notu: ${notes || 'Belirtilmedi'}`
@@ -340,12 +353,12 @@ export function openMedipureProductModal(productOrCode, { mode = 'detail' } = {}
         sourcePage: window.location.pathname
       });
 
-      showNotification(`${product.code} siparişiniz alındı ve yönetim paneline (Dashboard) iletildi.`, 'success');
+      showNotification(`${product.code} sipariş ve teklif talebiniz alındı, yönetim paneline iletildi.`, 'success');
       if (feedback) {
         feedback.hidden = false;
         renderSafeHtml(feedback, `
           <div class="rounded-2xl border border-emerald-300 bg-emerald-100 px-4 py-3 text-xs font-bold text-emerald-950">
-            ✅ <strong>${escapeHtml(product.code)} — ${escapeHtml(product.name)}</strong> siparişiniz sunucuya doğrulandı ve Yönetim Paneli (Dashboard) Sipariş Ekranına düştü. Satış mühendislerimiz en kısa sürede sizinle iletişime geçecektir.
+            ✅ <strong>${escapeHtml(product.code)} — ${escapeHtml(product.name)}</strong> sipariş ve teklif talebiniz sunucuya doğrulandı. Satış mühendislerimiz stok, güncel kur ve teslimat kapsamını teyit ederek resmi teklifinizi iletecektir.
           </div>
         `);
       }
@@ -355,7 +368,7 @@ export function openMedipureProductModal(productOrCode, { mode = 'detail' } = {}
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '✅ Siparişi Onayla ve Gönder';
+        submitBtn.textContent = '✅ Sipariş & Teklif Talebini Gönder';
       }
     }
   });
@@ -366,7 +379,7 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
   const host = ensureModalHost();
 
   const waClean = String(companyInfo.whatsappNumber || '905464992342').replace(/[^0-9]/g, '');
-  const waText = `Merhaba Elif Çevre Kimya, "${chem.title}" kimyasal ürünü için sipariş ve teknik bilgi (COA/SDS) almak istiyorum.`;
+  const waText = `Merhaba Elif Çevre Kimya, "${chem.title}" ürünü için kurumsal sipariş/teklif ve güncel SDS/TDS/COA bilgisi almak istiyorum.`;
   const waUrl = `https://wa.me/${waClean}?text=${encodeURIComponent(waText)}`;
 
   const html = `
@@ -380,7 +393,7 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
           </div>
           <div class="flex items-center gap-2">
             <button type="button" data-scroll-order class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-extrabold text-white shadow-sm hover:bg-emerald-700 transition">
-              🛒 Hemen Sipariş Ver
+              🛒 Sipariş Ver
             </button>
             <button type="button" data-modal-close class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold" aria-label="Kapat">
               ✕
@@ -397,16 +410,16 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
                 alt="${escapeAttr(chem.title)}"
                 width="600"
                 height="420"
-                class="h-56 w-full object-cover"
+                class="h-56 w-full object-contain bg-white p-3"
               />
               <div class="p-4 bg-slate-50 border-t border-slate-200 space-y-2">
                 <div>
-                  <span class="text-[10px] font-bold uppercase text-slate-500 block">Ambalaj &amp; Sevk Seçenekleri</span>
+                  <span class="text-[10px] font-bold uppercase text-slate-500 block">Ambalaj &amp; Birim Yapısı</span>
                   <strong class="text-xs font-extrabold text-slate-900">${escapeHtml(chem.packaging)}</strong>
                 </div>
                 <div>
-                  <span class="text-[10px] font-bold uppercase text-emerald-700 block">Kalite &amp; Belgelendirme</span>
-                  <strong class="text-xs font-extrabold text-emerald-900">Parti Bazlı COA • Türkçe SDS/GBF • ADR Sevk</strong>
+                  <span class="text-[10px] font-bold uppercase text-emerald-700 block">Teknik Dokümantasyon &amp; Sevk</span>
+                  <strong class="text-xs font-extrabold text-emerald-900">Teklif/Sipariş Adımında Güncel SDS, TDS ve Mevcutsa Lot COA Paylaşımı</strong>
                 </div>
               </div>
             </div>
@@ -420,7 +433,7 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
               </div>
 
               <div class="rounded-xl border border-emerald-200 bg-emerald-50/70 px-4 py-3">
-                <span class="text-[11px] font-black uppercase tracking-wider text-emerald-800 block">Aktif Etken Madde / Teknik Spesifikasyon</span>
+                <span class="text-[11px] font-black uppercase tracking-wider text-emerald-800 block">Etken Madde / Katalog &amp; CAS Spesifikasyonu</span>
                 <p class="mt-0.5 font-mono text-xs font-bold text-slate-900">${escapeHtml(chem.activeChemical)}</p>
               </div>
 
@@ -431,7 +444,7 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
 
               ${chem.specs && chem.specs.length ? `
                 <div class="rounded-2xl border border-slate-200 bg-white p-4">
-                  <h3 class="text-xs font-black uppercase tracking-wider text-slate-900 mb-2">⚙️ Teknik Parametreler ve Uygulama Notları</h3>
+                  <h3 class="text-xs font-black uppercase tracking-wider text-slate-900 mb-2">⚙️ Doğrulanmış Katalog ve Uygulama Bilgileri</h3>
                   <ul class="space-y-1.5 text-xs font-semibold text-slate-700 list-disc pl-5">
                     ${chem.specs.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}
                   </ul>
@@ -440,7 +453,7 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
 
               <div class="flex flex-wrap gap-2.5 pt-1">
                 <button type="button" data-scroll-order class="rounded-xl bg-emerald-600 px-5 py-3 text-xs font-extrabold text-white shadow-sm hover:bg-emerald-700 transition">
-                  🛒 Kimyasal Siparişi Ver
+                  🛒 Sipariş Ver (Teklif &amp; Stok Teyidi)
                 </button>
                 <a href="${escapeAttr(waUrl)}" target="_blank" rel="noopener noreferrer" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-xs font-extrabold text-slate-800 hover:border-emerald-500 transition">
                   💬 WhatsApp Sipariş &amp; TDS/SDS İste
@@ -449,37 +462,38 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
             </div>
           </div>
 
-          <!-- Hızlı Kimyasal Sipariş Formu -->
+          <!-- Hızlı Sipariş & Teklif Talebi Formu -->
           <div id="modal-order-form-section" class="rounded-3xl border-2 border-emerald-500 bg-emerald-50/50 p-5 sm:p-6">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
               <div>
-                <span class="inline-block rounded-full bg-emerald-700 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-white">Endüstriyel Kimyasal Sipariş Hattı</span>
+                <span class="inline-block rounded-full bg-emerald-700 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-white">Kurumsal Sipariş &amp; Teklif Talebi</span>
                 <h3 class="mt-1 font-display text-xl font-black text-slate-900">🛒 ${escapeHtml(chem.title)} — Sipariş Ver</h3>
-                <p class="text-xs text-slate-600">Formu gönderdiğinizde kimyasal siparişiniz anında Yönetim Paneli (Dashboard) Sipariş ekranına düşer.</p>
+                <p class="text-xs text-slate-600">Talebiniz Yönetim Paneli (Dashboard) ekranına düşer; stok durumu, minimum sipariş miktarı (MOQ), KDV, nakliye/ADR koşulları ve güncel parti belgeleri satış ekibimizce teyit edilir.</p>
               </div>
             </div>
 
             <form id="modal-chemical-order-form" class="grid gap-3.5 sm:grid-cols-2">
               <div class="sm:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Sipariş Edilen Kimyasal Ürün</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Talep Edilen Ürün &amp; Spesifikasyon</label>
                 <input type="text" name="productLabel" readonly value="${escapeAttr(`${chem.title} (${chem.activeChemical})`)}" class="w-full rounded-xl border border-slate-300 bg-slate-100 px-3.5 py-2.5 text-xs font-bold text-slate-800" />
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Ambalaj Tipi Seçimi *</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Ambalaj / Birim Seçimi *</label>
                 <select name="packType" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900">
-                  <option value="1000 kg / 1200 kg IBC Tank">1000 kg / 1200 kg IBC Tank</option>
+                  <option value="${escapeAttr(chem.packaging || 'Orijinal Katalog Ambalajı')}">Ürün Ambalajı: ${escapeHtml(chem.packaging || 'Orijinal Katalog Ambalajı')}</option>
                   <option value="30 kg / 60 kg UN Sertifikalı Bidon">30 kg / 60 kg UN Sertifikalı Bidon</option>
                   <option value="25 kg Kraft Torba (Paletli)">25 kg Kraft Torba (Paletli)</option>
                   <option value="200 kg Varil">200 kg Varil</option>
+                  <option value="1000 kg / 1200 kg IBC Tank">1000 kg / 1200 kg IBC Tank</option>
                   <option value="Dökme ADR Kimyasal Tankeri">Dökme ADR Kimyasal Tankeri</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Talep Edilen Miktar / Tonaj *</label>
-                <input type="text" name="amount" required placeholder="Örn: 2 IBC (2.000 kg) / 20 Bidon / 1 Tanker" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900" />
+                <label class="block text-xs font-bold text-slate-700 mb-1">Talep Edilen Miktar / Adet *</label>
+                <input type="text" name="amount" required placeholder="Örn: 2 Adet / 5 Şişe / 2 IBC (2.000 kg)" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900" />
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Firma / Fabrika Adı *</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Firma / Kurum / Fabrika Adı *</label>
                 <input type="text" name="companyName" required placeholder="Örn: Çukurova Demir Çelik A.Ş." class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900" />
               </div>
               <div>
@@ -496,12 +510,27 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
               </div>
               <div class="sm:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1">Teslimat Şehri / OSB ve Sevk Notu *</label>
-                <input type="text" name="cityCountry" required placeholder="Örn: Adana Hacı Sabancı OSB — COA ve SDS belgeleri sevkiyatla birlikte iletilsin" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900" />
+                <input type="text" name="cityCountry" required placeholder="Örn: Adana Hacı Sabancı OSB — Güncel parti COA ve SDS belgeleri teklifle iletilsin" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900" />
+              </div>
+              <div class="sm:col-span-2 rounded-xl border border-emerald-200 bg-white p-3 text-xs text-slate-800 space-y-2">
+                <label class="flex items-start gap-2.5 cursor-pointer font-semibold">
+                  <input type="checkbox" name="requestDocs" value="Güncel Parti SDS/TDS/COA Talep Edildi" checked class="mt-0.5 h-4 w-4 accent-emerald-600" />
+                  <span>📄 Teklifle birlikte bu ürünün güncel revizyon <strong>Güvenlik Bilgi Formu (SDS/GBF)</strong>, <strong>Teknik Bülteni (TDS)</strong> ve mevcutsa parti <strong>Analiz Sertifikasını (COA)</strong> talep ediyorum.</span>
+                </label>
+                <hr class="border-slate-100" />
+                <label class="flex items-start gap-2.5 cursor-pointer font-semibold">
+                  <input type="checkbox" name="kvkkConsent" required class="mt-0.5 h-4 w-4 accent-emerald-600" />
+                  <span>6698 sayılı KVKK kapsamında iletişim ve firma verilerimin kurumsal sipariş/teklif hazırlığı amacıyla işlenmesini kabul ediyorum. *</span>
+                </label>
+                <details class="pl-6 text-[11px] text-slate-600">
+                  <summary class="cursor-pointer font-bold text-emerald-800 hover:underline">KVKK Aydınlatma Özeti</summary>
+                  <p class="mt-1 leading-relaxed">Veri Sorumlusu: Elif Çevre Kimya (Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana, info@elifcevrekimya.com.tr). İletilen ad, firma, telefon, e-posta ve talep verileri yalnızca B2B tekliflendirme, teknik belge paylaşımı ve sevkiyat iletişimi amacıyla KVKK m.5/2-c ve m.5/2-f hukuki sebeplerine dayanılarak işlenir.</p>
+                </details>
               </div>
               <div class="sm:col-span-2 flex flex-wrap items-center justify-between gap-3 pt-1">
-                <span class="text-xs text-slate-600">🔒 Siparişiniz doğrudan <strong>elifkimya</strong> veritabanına kaydedilir ve Yönetim Paneli (Dashboard) ekranına düşer.</span>
+                <span class="text-xs text-slate-600">🔒 Talebiniz doğrudan <strong>elifkimya</strong> veritabanına kaydedilir ve Yönetim Paneli (Dashboard) ekranına düşer.</span>
                 <button type="submit" id="modal-chem-submit-btn" class="rounded-xl bg-emerald-700 px-6 py-3 text-sm font-extrabold text-white shadow-md hover:bg-emerald-800 transition">
-                  ✅ Kimyasal Siparişini Onayla ve Gönder
+                  ✅ Sipariş &amp; Teklif Talebini Gönder
                 </button>
               </div>
               <div id="modal-chem-feedback" class="sm:col-span-2" hidden></div>
@@ -531,11 +560,12 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
     const phone = String(fd.get('phone') || '').trim();
     const email = String(fd.get('email') || '').trim();
     const cityCountry = String(fd.get('cityCountry') || 'Adana / Türkiye').trim();
+    const requestDocs = String(fd.get('requestDocs') || 'Belirtilmedi').trim();
 
     try {
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sipariş Kaydediliyor...';
+        submitBtn.textContent = 'Talep Kaydediliyor...';
       }
       await submitPublicCrmForm({
         companyName,
@@ -545,27 +575,28 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
         cityCountry,
         formChannel: 'order_form',
         requestType: 'order_request',
-        subject: `[KİMYASAL SİPARİŞ] ${chem.title} (${amount})`,
+        subject: `[SİPARİŞ/TEKLİF TALEBİ] ${chem.title} (${amount})`,
         relatedProductOrSystem: `${chem.title} — ${chem.categoryTitle}`,
         packagingInfo: `${amount} • ${packType}`,
         description: [
-          `[ENDÜSTRİYEL KİMYASAL SİPARİŞİ]`,
+          `[KURUMSAL ÜRÜN SİPARİŞ & TEKLİF TALEBİ]`,
           `Ürün Adı: ${chem.title}`,
           `Kategori: ${chem.categoryTitle}`,
           `Etken Madde / Spesifikasyon: ${chem.activeChemical}`,
           `Talep Edilen Miktar: ${amount}`,
           `Ambalaj Tipi: ${packType}`,
+          `Teknik Belge Talebi: ${requestDocs}`,
           `Teslimat & Sevk Notu: ${cityCountry}`
         ].join('\n'),
         sourcePage: window.location.pathname
       });
 
-      showNotification(`${chem.title} siparişiniz alındı ve yönetim paneline (Dashboard) iletildi.`, 'success');
+      showNotification(`${chem.title} sipariş ve teklif talebiniz alındı, yönetim paneline iletildi.`, 'success');
       if (feedback) {
         feedback.hidden = false;
         renderSafeHtml(feedback, `
           <div class="rounded-2xl border border-emerald-300 bg-emerald-100 px-4 py-3 text-xs font-bold text-emerald-950">
-            ✅ <strong>${escapeHtml(chem.title)}</strong> (${escapeHtml(amount)} - ${escapeHtml(packType)}) siparişiniz sunucuya doğrulandı ve Yönetim Paneli (Dashboard) Sipariş Ekranına düştü.
+            ✅ <strong>${escapeHtml(chem.title)}</strong> (${escapeHtml(amount)} - ${escapeHtml(packType)}) sipariş ve teklif talebiniz sunucuya doğrulandı. Satış ekibimiz stok, MOQ ve güncel parti belgeleriyle birlikte dönüş yapacaktır.
           </div>
         `);
       }
@@ -575,7 +606,7 @@ export function openChemicalProductModal(rawChemical, { mode = 'detail' } = {}) 
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '✅ Kimyasal Siparişini Onayla ve Gönder';
+        submitBtn.textContent = '✅ Sipariş & Teklif Talebini Gönder';
       }
     }
   });

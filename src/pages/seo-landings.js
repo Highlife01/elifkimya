@@ -57,7 +57,7 @@ export function buildPublicRoutes() {
       {
         paragraphs: [
           cat.shortDesc || cat.description,
-          `Ambalaj seçenekleri katalog kaydına göredir: ${cat.packaging}. Fiyat, stok ve teslim süresi teklifte netleşir. Dozaj veya kapasite, su analizi olmadan garanti edilmez.`
+          `Tedarik ve uygulama rolü: ${cat.supplyRole || 'Kurumsal Tedarik'}. Ambalaj seçenekleri katalog kaydına göredir: ${cat.packaging}. Fiyat, stok, MOQ ve teslim süresi resmi proforma teklifte netleşir. Dozaj veya kapasite, su analizi olmadan garanti edilmez.`
         ],
         items: (cat.subcategories || []).map((sub) => ({
           title: sub.name,
@@ -137,7 +137,7 @@ export function buildPublicRoutes() {
       {
         paragraphs: [
           region.details,
-          'Kayıtlı adres Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana’dır. Site adresi www.elifcevrekimya.com.tr. Bu sayfa 01 Adana’dan 81 Düzce’ye tüm Türkiye sevkiyat kapsamını anlatır; ayrı şube adresi ilan etmez.'
+          'Kayıtlı tek fiziksel merkez ve depo adresi Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana’dır. Site adresi www.elifcevrekimya.com.tr. Bu sayfa 01 Adana’dan 81 Düzce’ye tüm Türkiye sevkiyat kapsamını anlatır; ayrı fiziksel şube adresi ilan etmez.'
         ],
         items: [
           {
@@ -279,13 +279,14 @@ export function renderPublicLanding(record) {
           <div class="breadcrumb">
             <a href="/" data-nav>Ana Sayfa</a>
             <span>/</span>
-            <a href="/teknik-bilgi" data-nav>Teknik Belge Merkezi & Mühendislik Rehberi</a>
+            <a href="/teknik-bilgi" data-nav>Teknik Belge Merkezi &amp; Mühendislik Rehberi</a>
             <span>/</span>
             <span>Rehber #${escapeHtml(String(post.number))}</span>
           </div>
           <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
             <span class="badge badge-teal">${escapeHtml(post.categoryLabel)}</span>
-            <span class="badge badge-neutral">Anahtar Kelime: ${escapeHtml(post.keyword)}</span>
+            <span class="badge badge-neutral">Hazırlayan: Elif Çevre Kimya Proses Mühendisliği Masası</span>
+            <span class="badge badge-neutral">Son Güncelleme: Ekim 2026</span>
             <span class="badge badge-neutral">⏱️ ${escapeHtml(post.readingTime)}</span>
           </div>
           <h1>${escapeHtml(post.title)}</h1>
@@ -319,24 +320,12 @@ export function renderPublicLanding(record) {
                 </ul>
               </section>
             ` : ''}
-
-            <div style="margin-top:1.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-              ${(post.keywords || []).map((kw) => `<span class="metric-tag">#${escapeHtml(kw)}</span>`).join('')}
-            </div>
           </div>
 
-          <!-- Görsel Alt Metni & 16:9 Fotoğraf Üretim Promptu -->
-          <div class="card" style="padding:1.75rem;margin-bottom:2rem;background:var(--bg-secondary);">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem;">
-              <span class="section-tag">Görsel & Medya Künyesi (16:9 Endüstriyel Standart)</span>
-              <span class="badge badge-neutral">Slug: /teknik-bilgi/${escapeHtml(post.slug)}</span>
-            </div>
-            <div style="font-size:0.9rem;margin-bottom:0.65rem;">
-              <strong>Görsel Alt Metni (Alt Text):</strong> ${escapeHtml(post.imageAlt)}
-            </div>
-            <div style="font-size:0.86rem;color:var(--text-secondary);background:#ffffff;padding:0.9rem 1rem;border-radius:8px;border:1px solid var(--border-subtle);">
-              <strong>16:9 Fotoğraf Üretim Promptu (TR):</strong><br/>
-              <span>${escapeHtml(post.imagePromptTr)}</span>
+          <!-- Editorial & Kaynak Notu -->
+          <div class="card" style="padding:1.5rem;margin-bottom:2rem;background:var(--bg-secondary);">
+            <div style="font-size:0.86rem;color:var(--text-secondary);line-height:1.6;">
+              <strong>Teknik İnceleme &amp; Kapsam Künyesi:</strong> Bu mühendislik rehberi <strong>Elif Çevre Kimya Proses Mühendisliği Masası</strong> tarafından endüstriyel su şartlandırma, membran işletimi ve atıksu arıtma saha ön değerlendirmeleri için hazırlanmıştır (Son Güncelleme: <strong>Ekim 2026</strong>). Uygulama öncesinde besleme suyu analizi, Jar-Test ve ekipman malzeme uyumluluk kontrolü yapılmalıdır.
             </div>
           </div>
 

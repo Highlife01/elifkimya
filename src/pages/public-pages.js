@@ -69,7 +69,7 @@ export async function renderProductsPage(container, navigate) {
         <p class="chip mb-3">Tam Katalog</p>
         <h1 class="font-display text-4xl font-black text-slate-900 sm:text-5xl">Ürün Yelpazesi ve Teknik Formülasyonlar</h1>
         <p class="mt-4 max-w-2xl text-slate-600 text-base sm:text-lg leading-relaxed">
-          Toptan, kurumsal ve endüstriyel tesisler için spesifikasyona göre üretilir — her hatta bidon, 1000 kg IBC ve dökme tanker seçeneği.
+          Toptan, kurumsal ve endüstriyel tesisler için ürün grubuna göre formülasyon, sistem mühendisliği veya bağımsız katalog tedariki — birim fiyat, stok, MOQ, nakliye ve güncel SDS/TDS belgeleri resmi proforma teklifte teyit edilir.
         </p>
       </div>
     </section>
@@ -78,17 +78,17 @@ export async function renderProductsPage(container, navigate) {
       <div class="container-x grid gap-4 lg:grid-cols-2">
         <a href="/sistemler#medipure-katalog" data-nav class="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-emerald-200 bg-emerald-50 p-5 hover:border-emerald-500">
           <div>
-            <p class="text-xs font-black uppercase tracking-wider text-emerald-800">Medipure cihaz vitrini</p>
-            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">163 saf su ve ultra saf su modeli, kapasite ve liste fiyatıyla</p>
+            <p class="text-xs font-black uppercase tracking-wider text-emerald-800">Medipure cihaz vitrini • Cihaz Tedariki &amp; Proje Entegrasyonu</p>
+            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">163 saf su ve ultra saf su modeli (EUR gösterge liste fiyatı; KDV, nakliye ve montaj teklifte netleşir)</p>
           </div>
           <span class="text-sm font-extrabold text-emerald-800 group-hover:translate-x-1 transition">Kataloğu aç →</span>
         </a>
         <a href="#laboratuvar-kimyasallari-katalog" class="group flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-sky-200 bg-sky-50 p-5 hover:border-sky-500">
           <div>
-            <p class="text-xs font-black uppercase tracking-wider text-sky-900">HORIBA &amp; Laboratuvar Kimyasalları (95 Ürün)</p>
-            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">HORIBA kalibrasyon çözeltileri, HACH küvet/toz testleri, Merck, Isolab ve CRM standartları</p>
+            <p class="text-xs font-black uppercase tracking-wider text-sky-900">HORIBA &amp; Laboratuvar Kimyasalları (130 Ürün) • Bağımsız Katalog Tedariki</p>
+            <p class="mt-1 font-display text-lg font-extrabold text-slate-900">HORIBA cihaz, elektrot ve kalibrasyon çözeltileri, HACH küvet/toz testleri, Merck, Isolab ve CRM standartları</p>
           </div>
-          <span class="text-sm font-extrabold text-sky-900 group-hover:translate-x-1 transition">95 Ürünü İncele →</span>
+          <span class="text-sm font-extrabold text-sky-900 group-hover:translate-x-1 transition">130 Ürünü İncele →</span>
         </a>
       </div>
     </section>
@@ -106,8 +106,13 @@ export async function renderProductsPage(container, navigate) {
                   <span class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur-md text-[10px] font-mono font-bold text-emerald-800 border border-emerald-200/80 shadow-xs">${escapeHtml(cat.shortTitle)}</span>
                 </div>
                 <div class="pt-4 px-1">
+                  <div class="mb-1.5 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-700 border border-slate-200">
+                    <span>Rol:</span>
+                    <strong class="text-emerald-800">${escapeHtml(cat.supplyRole || 'Kurumsal Tedarik')}</strong>
+                  </div>
                   <h3 class="font-display text-base font-bold text-slate-900 group-hover:text-brand-green transition">${escapeHtml(cat.title)}</h3>
                   <p class="mt-1.5 text-xs leading-relaxed text-slate-600 line-clamp-2">${escapeHtml(cat.description)}</p>
+                  <p class="mt-1.5 text-[10px] font-medium text-slate-500">Birim fiyat, MOQ ve SDS/TDS resmi teklifte paylaşılır.</p>
                 </div>
               </div>
               <div class="mt-4 pt-3 border-t border-slate-100 px-1 flex items-center justify-between gap-2">
@@ -192,7 +197,7 @@ export async function renderProductsPage(container, navigate) {
         <div class="section-header" style="margin-top:3rem;">
           <span class="section-tag">Endüstriyel Ürün Grupları</span>
           <h2 class="section-title">Teknik Kimyasal Kategorilerimiz</h2>
-          <p class="section-desc">Herhangi bir kimyasal satırının üzerine tıklayarak teknik açıklamasını ve parametrelerini görüntüleyebilir, <strong>Sipariş Ver</strong> butonuyla doğrudan sipariş oluşturabilirsiniz.</p>
+          <p class="section-desc">Herhangi bir kimyasal satırının üzerine tıklayarak teknik açıklamasını ve parametrelerini görüntüleyebilir, <strong>Sipariş Ver</strong> butonuyla kurumsal sipariş ve proforma teklif talebi oluşturabilir; parti bazlı SDS/GBF, TDS ve COA belgelerini talep edebilirsiniz. Stok, MOQ ve teslimat süresi resmi teklifte netleşir.</p>
         </div>
 
         <div class="categories-detailed-list" id="static-categories-list">
@@ -202,14 +207,17 @@ export async function renderProductsPage(container, navigate) {
                 <div style="display:flex;align-items:center;gap:1.25rem;flex:1;min-width:280px;">
                   <img src="${escapeAttr(cat.image || categoryImages[idx % categoryImages.length])}" alt="${escapeAttr(cat.title)}" width="140" height="96" loading="lazy" style="width:140px;height:96px;object-fit:cover;border-radius:14px;border:2px solid #cbd5e1;flex-shrink:0;" />
                   <div>
-                    <span class="sector-region-pill">${escapeHtml(cat.shortTitle)}</span>
+                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;margin-bottom:0.35rem;">
+                      <span class="sector-region-pill" style="margin:0;">${escapeHtml(cat.shortTitle)}</span>
+                      <span class="badge badge-neutral">Rol: ${escapeHtml(cat.supplyRole || 'Kurumsal Tedarik')}</span>
+                    </div>
                     <h2>${escapeHtml(cat.title)}</h2>
                     <p>${escapeHtml(cat.description)}</p>
                   </div>
                 </div>
                 <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                   <button type="button" class="btn btn-secondary btn-sm" data-cat-chem-idx="${idx}" data-chem-open="detail">
-                    📋 Grup Açıklaması
+                    📋 Grup Açıklaması &amp; SDS
                   </button>
                   <button type="button" class="btn btn-primary btn-sm" data-cat-chem-idx="${idx}" data-chem-open="order">
                     🛒 Sipariş Ver
@@ -222,8 +230,8 @@ export async function renderProductsPage(container, navigate) {
                     <tr>
                       <th>Ticari / Teknik Ürün Adı</th>
                       <th>Proses Uygulama ve Teknik Özellik</th>
-                      <th>Ambalaj Seçenekleri</th>
-                      <th>Detay &amp; Sipariş</th>
+                      <th>Ambalaj / MOQ Seçenekleri</th>
+                      <th>Detay, SDS &amp; Sipariş</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -244,7 +252,7 @@ export async function renderProductsPage(container, navigate) {
                         <td>
                           <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
                             <button type="button" class="btn btn-sm btn-secondary" data-chem-open="detail">
-                              📋 Açıklama
+                              📋 Açıklama &amp; SDS
                             </button>
                             <button type="button" class="btn btn-sm btn-primary" data-chem-open="order">
                               🛒 Sipariş Ver
@@ -618,9 +626,13 @@ export function renderSystemsPage(container, navigate) {
             </div>
             <div class="form-group full-width">
               <label class="checkbox-label">
-                <input type="checkbox" name="kvkkConsent" required checked />
-                <span>Proje değerlendirmesi kapsamında iletişim bilgilerimin işlenmesini kabul ediyorum.</span>
+                <input type="checkbox" name="kvkkConsent" required />
+                <span>6698 sayılı KVKK kapsamında proje değerlendirmesi için kurumsal iletişim bilgilerimin işlenmesini kabul ediyorum. *</span>
               </label>
+              <details style="margin-top:0.35rem;font-size:0.8rem;color:var(--text-secondary);">
+                <summary style="cursor:pointer;font-weight:700;color:var(--accent-teal);">KVKK Aydınlatma Özeti</summary>
+                <p style="margin-top:0.25rem;line-height:1.5;">Veri Sorumlusu: Elif Çevre Kimya (Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana • info@elifcevrekimya.com.tr). İletilen veriler yalnızca su arıtma projesi mühendislik değerlendirmesi ve kurumsal teklif hazırlığı amacıyla işlenir.</p>
+              </details>
             </div>
             <div class="form-group full-width">
               <button type="submit" class="btn btn-primary" id="sys-submit-btn">Proje Değerlendirme Talebini Gönder</button>
@@ -1227,25 +1239,19 @@ export async function renderTechnicalCenterPage(container, navigate) {
             <a href="/teknik-bilgi/${escapeAttr(post.slug)}" data-nav style="color:var(--text-primary);">${escapeHtml(post.title)}</a>
           </h3>
 
+          <div style="font-size:0.78rem;color:var(--text-secondary);background:var(--bg-surface-alt);padding:0.45rem 0.75rem;border-radius:6px;margin-bottom:0.75rem;border:1px solid var(--border-subtle);">
+            <strong>Hazırlayan:</strong> Elif Çevre Kimya Proses Mühendisliği Masası • <strong>Güncelleme:</strong> Ekim 2026 • <strong>Kapsam:</strong> Saha Ön Değerlendirme Rehberi
+          </div>
+
           <p style="font-size:0.92rem;color:var(--text-secondary);line-height:1.6;margin-bottom:0.75rem;">
             ${escapeHtml(post.summary)}
           </p>
 
-          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.85rem;">
-            <span class="metric-tag">🎯 Anahtar Kelime: ${escapeHtml(post.keyword)}</span>
-            <span class="metric-tag">🔗 /teknik-bilgi/${escapeHtml(post.slug)}</span>
-          </div>
-
           <details style="background:var(--bg-secondary);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);padding:0.85rem 1rem;margin-bottom:0.5rem;">
             <summary style="cursor:pointer;font-weight:700;font-size:0.88rem;color:var(--accent-teal-hover);">
-              📖 Tam Metni, Saha Kontrol Listesini & 16:9 Görsel Promptunu Aç
+              📖 Teknik Rehber İçeriğini ve Saha Kontrol Listesini Aç
             </summary>
             <div style="margin-top:1rem;padding-top:0.85rem;border-top:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:1rem;">
-              <div style="font-size:0.8rem;color:var(--text-muted);background:#ffffff;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid var(--border-subtle);">
-                <div><strong>SEO Başlığı:</strong> ${escapeHtml(post.seoTitle)}</div>
-                <div style="margin-top:0.2rem;"><strong>Meta Açıklaması:</strong> ${escapeHtml(post.metaDescription)}</div>
-              </div>
-
               ${post.sections.map((sec) => `
                 <div>
                   <h4 style="font-size:1rem;color:var(--text-primary);margin-bottom:0.35rem;">${escapeHtml(sec.heading)}</h4>
@@ -1262,12 +1268,8 @@ export async function renderTechnicalCenterPage(container, navigate) {
                 </div>
               ` : ''}
 
-              <div style="background:#ffffff;border:1px solid var(--border-subtle);border-radius:6px;padding:0.8rem 1rem;font-size:0.82rem;">
-                <div style="margin-bottom:0.35rem;"><strong>🖼️ Görsel Alt Metni:</strong> ${escapeHtml(post.imageAlt)}</div>
-                <div style="color:var(--text-secondary);margin-bottom:0.5rem;"><strong>🎨 16:9 Fotoğraf Üretim Promptu:</strong> ${escapeHtml(post.imagePromptTr)}</div>
-                <button type="button" class="btn btn-secondary btn-xs copy-prompt-btn" data-prompt="${escapeAttr(post.imagePromptTr)}">
-                  📋 Fotoğraf Promptunu Kopyala
-                </button>
+              <div style="font-size:0.78rem;color:var(--text-muted);background:#ffffff;padding:0.6rem 0.8rem;border-radius:6px;border:1px solid var(--border-subtle);">
+                <strong>Mühendislik Notu:</strong> Bu rehber genel proses değerlendirmesi içindir; tesisinize özel kesin dozaj, kapasite ve ekipman seçimi yalnızca doğrulanmış su/atıksu analizi ve Jar-Test sonrasında belirlenir.
               </div>
             </div>
           </details>
@@ -1291,19 +1293,6 @@ export async function renderTechnicalCenterPage(container, navigate) {
 
     renderSafeHtml(listBox, `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.25rem;">${cardsHtml}</div>`);
     attachSpaLinks(listBox, navigate);
-
-    listBox.querySelectorAll('.copy-prompt-btn').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const promptText = btn.getAttribute('data-prompt') || '';
-        if (!promptText) return;
-        try {
-          await navigator.clipboard.writeText(promptText);
-          showNotification('16:9 fotoğraf üretim promptu panoya kopyalandı.', 'success');
-        } catch (_err) {
-          showNotification('Prompt kopyalanamadı.', 'error');
-        }
-      });
-    });
   }
 
   const html = `
@@ -1529,7 +1518,7 @@ export function renderQuotePage(container, navigate) {
           <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Kurumsal Sipariş, Teklif & Saha Jar-Test Formu</span>
         </div>
         <h1>Kurumsal Sipariş, Fiyat Teklifi ve Saha Etüdü Formu</h1>
-        <p>Toptan kimyasal/cihaz siparişinizi veya teklif talebinizi iletin; başvurunuz anında Elif Çevre Kimya Yönetim Paneli (Dashboard) ekranına düşer ve mühendislerimiz hızla dönüş yapar.</p>
+        <p>Toptan kimyasal/cihaz sipariş veya teklif talebinizi iletin; başvurunuz anında Elif Çevre Kimya Yönetim Paneli (Dashboard) ekranına düşer. Birim fiyat, stok, MOQ, KDV, nakliye, kur ve güncel SDS/TDS/COA belgeleri resmi proforma teklifte teyit edilir.</p>
       </div>
     </section>
 
@@ -1558,9 +1547,9 @@ export function renderQuotePage(container, navigate) {
           <div style="margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
             <div>
               <span class="badge badge-teal">CANLI DASHBOARD ENTEGRASYONLU</span>
-              <h3 style="margin:0.35rem 0 0;">Sipariş & Kurumsal Teklif Formu</h3>
+              <h3 style="margin:0.35rem 0 0;">Kurumsal Sipariş &amp; Proforma Teklif Talebi Formu</h3>
             </div>
-            <span style="font-size:0.82rem;color:var(--text-secondary);">Gönderilen tüm sipariş ve teklif formları anında merkez operasyon ekranına düşer.</span>
+            <span style="font-size:0.82rem;color:var(--text-secondary);">Resmi fatura unvanı, vergi dairesi, VKN/MERSİS ve teslimat şartları proforma teklifte paylaşılır.</span>
           </div>
           <form id="b2b-rfq-form" class="form-grid-2">
             <div class="form-group">
@@ -1584,14 +1573,14 @@ export function renderQuotePage(container, navigate) {
               <input type="text" id="rfq-city" name="cityCountry" class="form-input" required value="${escapeAttr(preCity || 'Adana / Türkiye')}" placeholder="Örn: Adana Hacı Sabancı OSB / Türkiye" />
             </div>
             <div class="form-group">
-              <label class="form-label" for="rfq-type">İşlem Türü (Sipariş / Teklif / Analiz) *</label>
+              <label class="form-label" for="rfq-type">İşlem Türü (Sipariş Talebi / Teklif / Analiz) *</label>
               <select id="rfq-type" name="requestType" class="form-select">
-                <option value="order_request" ${preType === 'order_request' || preType === 'order' ? 'selected' : ''}>🛒 Doğrudan Ürün / Cihaz Siparişi (Sevkiyat Talebi)</option>
+                <option value="order_request" ${preType === 'order_request' || preType === 'order' ? 'selected' : ''}>🛒 Kurumsal Ürün / Cihaz Sipariş Talebi (Proforma &amp; Sevk Onayı)</option>
                 <option value="product_quote" ${!preType || preType === 'product_quote' ? 'selected' : ''}>📋 Endüstriyel Kimyasal / Sistem Fiyat Teklifi</option>
                 <option value="jar_test_trial" ${preProgram === 'program-jartest' || preProgram === 'canli-jar-test' || preProgram === 'program-pilot' || preProgram === 'pilot-30-gun' ? 'selected' : ''}>🧪 Yerinde Jar-Test / 30 Günlük Pilot Deneme</option>
-                <option value="water_audit" ${preProgram === 'program-audit' || preProgram === 'korozyon-lsi-checkup' ? 'selected' : ''}>💧 Ücretsiz Su Analizi & LSI Korozyon Risk Etüdü</option>
-                <option value="water_project" ${preType === 'water_project' ? 'selected' : ''}>⚙️ Su Arıtma Sistemi Kurulum & Proje Teklifi</option>
-                <option value="service_maintenance" ${preType === 'service_maintenance' ? 'selected' : ''}>🔧 Periyodik Servis, Membran CIP & Bakım Talebi</option>
+                <option value="water_audit" ${preProgram === 'program-audit' || preProgram === 'korozyon-lsi-checkup' ? 'selected' : ''}>💧 Ücretsiz Su Analizi &amp; LSI Korozyon Risk Etüdü</option>
+                <option value="water_project" ${preType === 'water_project' ? 'selected' : ''}>⚙️ Su Arıtma Sistemi Kurulum &amp; Proje Teklifi</option>
+                <option value="service_maintenance" ${preType === 'service_maintenance' ? 'selected' : ''}>🔧 Periyodik Servis, Membran CIP &amp; Bakım Talebi</option>
                 <option value="document_request" ${preType === 'document_request' ? 'selected' : ''}>📄 Teknik Belge (SDS / GBF / TDS / COA) Talebi</option>
               </select>
             </div>
@@ -1600,7 +1589,7 @@ export function renderQuotePage(container, navigate) {
               <input type="text" id="rfq-product" name="relatedProductOrSystem" class="form-input" required value="${escapeAttr(initialProductVal)}" placeholder="Örn: Sodyum Hipoklorit, PAC %17, Anyonik Polielektrolit, RO Antiskalant veya Medipure Saf Su Cihazı" />
             </div>
             <div class="form-group">
-              <label class="form-label" for="rfq-packaging">Sipariş Miktarı & Ambalaj Tipi</label>
+              <label class="form-label" for="rfq-packaging">Sipariş Miktarı &amp; Ambalaj Tipi</label>
               <input type="text" id="rfq-packaging" name="packagingInfo" class="form-input" placeholder="Örn: 5 Adet 1000 kg IBC Tank / Aylık 15 Ton" />
             </div>
             <div class="form-group">
@@ -1608,14 +1597,18 @@ export function renderQuotePage(container, navigate) {
               <input type="date" id="rfq-followup" name="followUpDate" class="form-input" />
             </div>
             <div class="form-group full-width">
-              <label class="form-label" for="rfq-desc">Sipariş Notu, Teknik Açıklama veya Su Analizi Detayları *</label>
-              <textarea id="rfq-desc" name="description" class="form-textarea" rows="5" required placeholder="Sipariş miktarınız, teslimat adresiniz, kullandığınız mevcut kimyasal veya yaşadığınız proses problemi hakkında bilgi veriniz...">${escapeHtml(initialDescVal)}</textarea>
+              <label class="form-label" for="rfq-desc">Sipariş Notu, İstenen Belgeler (SDS/TDS/COA) veya Su Analizi Detayları *</label>
+              <textarea id="rfq-desc" name="description" class="form-textarea" rows="5" required placeholder="Sipariş miktarınız, teslimat adresiniz, talep ettiğiniz SDS/TDS/COA belgeleri veya proses detaylarınız...">${escapeHtml(initialDescVal)}</textarea>
             </div>
             <div class="form-group full-width">
               <label class="checkbox-label">
-                <input type="checkbox" name="kvkkConsent" required checked />
-                <span>6698 sayılı KVKK kapsamında kurumsal iletişim, sipariş ve talep bilgilerimin işlenmesini kabul ediyorum.</span>
+                <input type="checkbox" id="rfq-kvkk" name="kvkkConsent" required />
+                <span>6698 sayılı KVKK kapsamında kurumsal iletişim, sipariş ve teklif talep bilgilerimin işlenmesini kabul ediyorum. *</span>
               </label>
+              <details style="margin-top:0.35rem;font-size:0.8rem;color:var(--text-secondary);">
+                <summary style="cursor:pointer;font-weight:700;color:var(--accent-teal);">KVKK Aydınlatma Özeti ve Sipariş/Teklif Koşulları</summary>
+                <p style="margin-top:0.25rem;line-height:1.5;">Veri Sorumlusu: Elif Çevre Kimya (Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana • info@elifcevrekimya.com.tr). Gönderilen veriler yalnızca kurumsal tekliflendirme, sipariş hazırlığı, SDS/TDS paylaşımı ve mühendislik iletişimi amacıyla işlenir; üçüncü taraf reklam ağlarıyla paylaşılmaz.</p>
+              </details>
             </div>
             <div class="form-group full-width" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
               <span style="font-size:0.85rem;color:var(--text-secondary);">Formunuz doğrudan Elif Çevre Kimya Yönetim Dashboard'una canlı olarak düşer.</span>
@@ -1696,7 +1689,7 @@ export function renderQuotePage(container, navigate) {
           confirmBox.style.display = 'block';
           renderSafeHtml(confirmBox, `
             <h4>${reqType === 'order_request' ? '🛒 Sipariş Talebiniz' : '📋 Teklif Başvurunuz'} Kayıt Altına Alındı (Ref No: <code>${escapeHtml(saved.id)}</code>)</h4>
-            <p>Sayın <strong>${escapeHtml(saved.contactName)}</strong>, <strong>${escapeHtml(saved.companyName)}</strong> adına ilettiğiniz <em>${escapeHtml(saved.relatedProductOrSystem)}</em> kaydınız Yönetim Paneli (Dashboard) ekranımıza <strong>Yeni Talep</strong> olarak düşmüştür. İlgili satış ve proses mühendisimiz en kısa sürede sizinle iletişime geçecektir.</p>
+            <p>Sayın <strong>${escapeHtml(saved.contactName)}</strong>, <strong>${escapeHtml(saved.companyName)}</strong> adına ilettiğiniz <em>${escapeHtml(saved.relatedProductOrSystem)}</em> kaydınız Yönetim Paneli (Dashboard) ekranımıza <strong>Yeni Talep</strong> olarak düşmüştür. İlgili satış ve proses mühendisimiz resmi proforma teklif ile sizinle iletişime geçecektir.</p>
           `);
         }
       } catch (err) {
@@ -1712,60 +1705,65 @@ export function renderQuotePage(container, navigate) {
 }
 
 /* ==========================================================================
-   7. İLETİŞİM SAYFASI (/iletisim) — EFKİM & ALFACHEM KURUMSAL BÖLGE MİMARİSİ
+   7. İLETİŞİM SAYFASI (/iletisim) — KURUMSAL MERKEZ & SAHA KORİDOR MİMARİSİ
    ========================================================================== */
 export function renderContactPage(container, navigate) {
   const regionalOffices = [
     {
-      badge: 'GENEL MÜDÜRLÜK · FABRİKA & MERKEZ DEPO',
+      badge: 'GENEL MÜDÜRLÜK · TEK FİZİKSEL MERKEZ & DEPO',
       title: 'Adana Merkez Tesis & Lojistik Üssü',
       region: 'Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana',
+      addressLabel: 'Fiziksel Merkez & Depo Adresi',
       address: companyInfo.address,
       mapsUrl: companyInfo.mapsUrl,
       coverage: 'Adana Merkez, Hacı Sabancı OSB (AOSB), Ceyhan Enerji Endüstri Bölgesi ve Çukurova Sevkiyat',
       phone: companyInfo.phoneDisplay,
       email: companyInfo.email,
-      sla: 'Aynı Gün 90–120 Dakika Acil Sevkiyat & Laboratuvar Su Analizi'
+      sla: 'Stoklu Ürünlerde Sipariş Onayı Sonrası İş Günlerinde 90–120 Dk Adana Sevkiyatı'
     },
     {
-      badge: 'ÇUKUROVA & LİMAN BÖLGE İRTİBAT',
+      badge: 'MOBİL SAHA MÜHENDİSLİK & SEVKİYAT KORİDORU',
       title: 'Mersin – Tarsus OSB & Serbest Bölge Mühendislik Hattı',
       region: 'Mersin (MTOSB 1–4. Bölge & Liman Sanayi Koridoru)',
-      address: 'Mersin-Tarsus Organize Sanayi Bölgesi Lojistik Aksı, Akdeniz / Mersin',
+      addressLabel: 'Operasyon Modeli',
+      address: 'Fiziksel şube/depo değildir — Adana merkez depodan sevkiyat ve mobil saha mühendisliği koridoru',
       coverage: 'Düzcam/Cam Ambalaj, Krom/Soda, Gıda, Bakliyat, Kağıt ve Liman Dolum Tesisleri',
       phone: companyInfo.phoneDisplay,
       email: companyInfo.salesEmail,
-      sla: 'Günde 2 Rut Sevkiyat (2–3 Saat Teslimat) & Yerinde RO/Kule Servisi'
+      sla: 'Stoklu Ürünlerde Sipariş Onayı Sonrası İş Günlerinde 2–3 Saat Sevkiyat & Saha Ziyareti'
     },
     {
-      badge: 'DOĞU AKDENİZ AĞIR SANAYİ İRTİBAT',
+      badge: 'MOBİL SAHA MÜHENDİSLİK & SEVKİYAT KORİDORU',
       title: 'İskenderun Körfezi & Osmaniye Demir-Çelik Saha Ekibi',
       region: 'Hatay (İskenderun · Payas · Dörtyol) & Osmaniye OSB',
-      address: 'Osmaniye OSB – Payas/İskenderun Demir-Çelik Sanayi Koridoru Saha Koordinasyon',
+      addressLabel: 'Operasyon Modeli',
+      address: 'Fiziksel şube/depo değildir — Adana merkez depodan sevkiyat ve mobil saha mühendisliği koridoru',
       coverage: 'Sıcak/Soğuk Haddehaneler, Çelikhane Tufal Çukurları, Asitleme Hatları ve Boru Tesisleri',
       phone: companyInfo.phoneDisplay,
       email: companyInfo.salesEmail,
-      sla: '2–4 Saatte IBC/Tanker İkmal & Sahada Canlı 6’lı Jar-Test'
+      sla: 'Stoklu Ürünlerde Sipariş Onayı Sonrası İş Günlerinde 2–4 Saatte IBC/Tanker Sevk & Jar-Test'
     },
     {
-      badge: 'GÜNEYDOĞU ANADOLU BÖLGE İRTİBAT',
+      badge: 'MOBİL SAHA MÜHENDİSLİK & SEVKİYAT KORİDORU',
       title: 'Gaziantep & Kahramanmaraş Bölge Mühendislik Hizmetleri',
       region: 'Gaziantep (Başpınar 1.–5. OSB) & Kahramanmaraş',
-      address: 'Gaziantep Başpınar OSB – Kahramanmaraş Sanayi Havzası Teknik Servis Hattı',
+      addressLabel: 'Operasyon Modeli',
+      address: 'Fiziksel şube/depo değildir — Adana merkez depodan sevkiyat ve mobil saha mühendisliği koridoru',
       coverage: 'Tekstil Boyahaneleri, Halı/İplik, Kağıt, Enerji Santralleri ve Gıda Kompleksleri',
       phone: companyInfo.phoneDisplay,
       email: companyInfo.salesEmail,
-      sla: 'Aynı Gün / 24 Saat ADR’li Sevkiyat & Periyodik Su Şartlandırma Kontrolleri'
+      sla: 'Stoklu Ürünlerde Sipariş Onayı Sonrası İş Günlerinde Aynı Gün / 24 Saat Sevkiyat'
     },
     {
-      badge: 'İÇ ANADOLU BÖLGE İRTİBAT',
+      badge: 'MOBİL SAHA MÜHENDİSLİK & SEVKİYAT KORİDORU',
       title: 'Kayseri OSB & Niğde Kalsit/Maden Saha Koordinasyon',
       region: 'Kayseri (OSB · Mimarsinan · İncesu) & Niğde / Bor OSB',
-      address: 'Niğde Bor – Kayseri Organize Sanayi Bölgesi Kuzey Lojistik Koridoru',
+      addressLabel: 'Operasyon Modeli',
+      address: 'Fiziksel şube/depo değildir — Adana merkez depodan sevkiyat ve mobil saha mühendisliği koridoru',
       coverage: 'Mikronize Kalsit (CaCO₃) Değirmenleri, Çelik Boru/Profil, Sıcak Daldırma Galvaniz ve Mobilya/Metal',
       phone: companyInfo.phoneDisplay,
       email: companyInfo.salesEmail,
-      sla: 'Pozantı Otoyol Aksından Kesintisiz Sevkiyat & Banyo/Polimer Optimizasyonu'
+      sla: 'Stoklu Ürünlerde Sipariş Onayı Sonrası İş Günlerinde Planlı Sevkiyat & Banyo Optimizasyonu'
     }
   ];
 
@@ -1806,34 +1804,64 @@ export function renderContactPage(container, navigate) {
     <section class="page-hero">
       <div class="container">
         <div class="breadcrumb">
-          <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Kurumsal İletişim & Bölge Müdürlükleri</span>
+          <a href="/" data-nav>Ana Sayfa</a> <span>/</span> <span>Kurumsal İletişim &amp; Merkez Depo</span>
         </div>
-        <h1>Kurumsal İletişim, Sizi Arayalım & Bölge Mühendislik Noktaları</h1>
-        <p>Adana merkez fabrika ve depomuz (<strong>${escapeHtml(companyInfo.address)}</strong>) ile Mersin, İskenderun/Osmaniye, Gaziantep ve Kayseri/Niğde saha mühendislik ekiplerimizle 7/24 kesintisiz endüstriyel destek.</p>
+        <h1>Elif Çevre Kimya — Kurumsal İletişim, Merkez Depo &amp; Saha Mühendislik Hattı</h1>
+        <p>Tek fiziksel merkez ve depomuz <strong>${escapeHtml(companyInfo.address)}</strong> adresindedir. Resmi çalışma saatlerimiz (<strong>${escapeHtml(companyInfo.workingHours)}</strong>) içinde telefon ve saha sevkiyat desteği; 7/24 çevrimiçi talep kaydı.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <!-- EFKİM TARZI 3'LÜ HIZLI AKSİYON ŞERİDİ: SİZİ ARAYALIM / WHATSAPP / HEMEN ARA -->
+        <!-- SÜRE, ÇALIŞMA SAATİ VE SEVKİYAT KOŞULLARI AYRIMI BANNER'I -->
+        <div class="card" style="padding:1.5rem;margin-bottom:2.5rem;background:var(--bg-surface-alt);border:1px solid var(--border-subtle);">
+          <div class="form-grid-2" style="gap:1.5rem;">
+            <div>
+              <span class="badge badge-teal" style="margin-bottom:0.4rem;">📞 İLETİŞİM &amp; GERİ ARAMA SÜRESİ</span>
+              <h3 style="font-size:1.05rem;margin-bottom:0.35rem;">Mesai Saatlerinde 30 Dakikada Ön Geri Dönüş</h3>
+              <p style="font-size:0.86rem;color:var(--text-secondary);line-height:1.55;margin:0;">
+                Resmi çalışma saatlerimiz <strong>Pazartesi–Cumartesi 08:00–18:30</strong>’dur. Bu saatler içinde iletilen geri arama taleplerine <strong>30 dakika içinde telefonla ön mühendislik dönüşü</strong> yapılır. Mesai dışı veya Pazar günü iletilen çevrimiçi form ve WhatsApp taleplerine <strong>ilk iş günü sabahı</strong> dönüş sağlanır.
+              </p>
+            </div>
+            <div>
+              <span class="badge badge-neutral" style="margin-bottom:0.4rem;">🚚 STOKLU ÜRÜN SEVKİYAT &amp; ADR KOŞULLARI</span>
+              <h3 style="font-size:1.05rem;margin-bottom:0.35rem;">Sipariş / Stok Onayı Sonrası İş Günü Sevkiyatı</h3>
+              <p style="font-size:0.86rem;color:var(--text-secondary);line-height:1.55;margin:0;">
+                Belirtilen bölge süreleri (<strong>Adana 90–120 dk, Mersin 2–3 saat, İskenderun 2–4 saat, Gaziantep aynı gün / 24 saat</strong>) yalnızca stokta hazır ürünler için, <strong>proforma/sipariş onayı sonrasında iş günlerinde</strong> Adana merkez depodan çıkış bazlı tahmini teslimat aralıklarıdır. <strong>ADR kapsamı</strong> ürünün UN tehlike sınıfına ve sevk miktarına göre uygulanır.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3'LÜ HIZLI AKSİYON ŞERİDİ: SİZİ ARAYALIM / WHATSAPP / HEMEN ARA -->
         <div class="roi-simulators-grid" style="margin-bottom:3.5rem;">
           <!-- 1. Sizi Arayalım (Hızlı Geri Arama Kartı) -->
           <div class="card" style="padding:1.75rem;border-top:4px solid var(--accent-teal);">
-            <span class="badge badge-teal" style="margin-bottom:0.6rem;">SİZİ ARAYALIM</span>
+            <span class="badge badge-teal" style="margin-bottom:0.6rem;">SİZİ ARAYALIM (PZT–CMT 08:00–18:30)</span>
             <h3 style="font-size:1.2rem;margin-bottom:0.4rem;">Mühendislerimiz Sizi Arasın</h3>
-            <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:1rem;">Numaranızı bırakın; ilgili kimya veya su arıtma mühendisimiz 30 dakika içinde sizi arasın.</p>
+            <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:1rem;">Numaranızı bırakın; mesai saatleri içinde 30 dakikada, mesai dışında ilk iş günü sabahı sizi arayalım.</p>
             <form id="quick-callback-form" style="display:flex;flex-direction:column;gap:0.65rem;">
               <input type="text" name="contactName" class="form-input" required placeholder="Adınız Soyadınız *" />
               <input type="text" name="companyName" class="form-input" required placeholder="Firma / Fabrika Adı *" />
               <input type="tel" name="phone" class="form-input" required placeholder="Telefon Numaranız (+90 5XX...) *" />
               <select name="relatedProductOrSystem" class="form-select">
-                <option value="Genel Teknik Görüşme & Fiyat Teklifi">Konu: Genel Teknik Görüşme & Fiyat</option>
+                <option value="Genel Teknik Görüşme & Fiyat Teklifi">Konu: Genel Teknik Görüşme &amp; Fiyat</option>
                 <option value="Kazan - Buhar ve Kondens Kimyasalları">Kazan - Buhar ve Kondens Kimyasalları</option>
-                <option value="Soğutma Suyu & Kapalı Devre Kimyasalları">Soğutma Suyu & Kapalı Devre Kimyasalları</option>
-                <option value="Reverse Osmosis (RO) Kimyasalları & Sistemleri">Reverse Osmosis (RO) Kimyasalları & Sistemleri</option>
-                <option value="Atıksu Polimerleri (PAM) & Saha Jar-Test">Atıksu Polimerleri (PAM) & Saha Jar-Test</option>
-                <option value="Haddehane / Asitleme İnhibitörü / Proses Kimyasalları">Haddehane / Asitleme / Proses Kimyasalları</option>
+                <option value="Soğutma Suyu & Kapalı Devre Kimyasalları">Soğutma Suyu &amp; Kapalı Devre Kimyasalları</option>
+                <option value="Reverse Osmosis (RO) Kimyasalları & Sistemleri">Reverse Osmosis (RO) Kimyasalları &amp; Sistemleri</option>
+                <option value="Atıksu Polimerleri (PAM) & Saha Jar-Test">Atıksu Polimerleri (PAM) &amp; Saha Jar-Test</option>
+                <option value="SDS / TDS / COA Belge Talebi">SDS / TDS / COA Belge Talebi</option>
               </select>
+              <div style="font-size:0.78rem;color:var(--text-secondary);background:var(--bg-surface-alt);padding:0.55rem 0.75rem;border-radius:8px;border:1px solid var(--border-subtle);">
+                <label style="display:flex;align-items:flex-start;gap:0.45rem;cursor:pointer;">
+                  <input type="checkbox" name="kvkkConsent" required style="margin-top:0.2rem;" />
+                  <span><strong>6698 sayılı KVKK</strong> kapsamında geri arama ve teklif iletişimi için verilerimin işlenmesini kabul ediyorum. *</span>
+                </label>
+                <details style="margin-top:0.25rem;font-size:0.74rem;">
+                  <summary style="cursor:pointer;font-weight:700;color:var(--accent-teal);">KVKK Aydınlatma Özeti</summary>
+                  <p style="margin-top:0.2rem;line-height:1.45;">Veri Sorumlusu: Elif Çevre Kimya (Adana). Bilgileriniz yalnızca kurumsal geri arama ve teknik destek amacıyla işlenir.</p>
+                </details>
+              </div>
               <button type="submit" class="btn btn-primary" id="callback-submit-btn" style="width:100%;">
                 Beni Arayın (Geri Arama Talebi)
               </button>
@@ -1849,12 +1877,12 @@ export function renderContactPage(container, navigate) {
                 Mevcut su analizi raporunuzun, kazan/kule etiketinizin veya aradığınız kimyasalın SDS/COA belgesinin fotoğrafını doğrudan WhatsApp mühendislik hattımıza gönderebilirsiniz.
               </p>
               <ul style="font-size:0.85rem;color:var(--text-secondary);padding-left:1.1rem;margin-bottom:1.25rem;line-height:1.7;">
-                <li>Anında TDS / SDS (GBF) Belge Paylaşımı</li>
-                <li>Su Analiz Raporu Üzerinden Hızlı Dozaj Önerisi</li>
-                <li>Acil IBC / Bidon Stok ve Sevkiyat Sorgulama</li>
+                <li>Talep Bazlı TDS / SDS (GBF) Belge Paylaşımı</li>
+                <li>Su Analiz Raporu Üzerinden Ön Değerlendirme</li>
+                <li>IBC / Bidon Stok ve Sevkiyat Sorgulama</li>
               </ul>
             </div>
-            <a href="https://wa.me/${escapeAttr(companyInfo.whatsappNumber)}?text=${encodeURIComponent('Merhaba Elif Kimya, kurumsal ürün ve mühendislik çözümleriniz hakkında bilgi almak istiyorum.')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width:100%;background:#059669;border-color:#059669;text-align:center;">
+            <a href="https://wa.me/${escapeAttr(companyInfo.whatsappNumber)}?text=${encodeURIComponent('Merhaba Elif Çevre Kimya, kurumsal ürün ve mühendislik çözümleriniz hakkında bilgi almak istiyorum.')}" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width:100%;background:#059669;border-color:#059669;text-align:center;">
               WhatsApp Mühendislik Hattını Aç (${escapeHtml(companyInfo.phoneDisplay)})
             </a>
           </div>
@@ -1862,16 +1890,16 @@ export function renderContactPage(container, navigate) {
           <!-- 3. Doğrudan Telefon & İhale Masası -->
           <div class="card" style="padding:1.75rem;border-top:4px solid var(--accent-blue);display:flex;flex-direction:column;justify-content:space-between;">
             <div>
-              <span class="badge" style="background:#f0f9ff;color:#0369a1;margin-bottom:0.6rem;">7/24 KURUMSAL DESTEK</span>
-              <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Hemen Arayın veya İhale Dosyası İletin</h3>
+              <span class="badge" style="background:#f0f9ff;color:#0369a1;margin-bottom:0.6rem;">KURUMSAL SATIŞ &amp; İHALE MASASI</span>
+              <h3 style="font-size:1.2rem;margin-bottom:0.5rem;">Hemen Arayın veya Şartname İletin</h3>
               <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:1rem;">
-                Yıllık kimyasal alım şartnameleriniz, su arıtma sistemi projeleriniz ve acil servis talepleriniz için doğrudan merkez ofisimizle görüşün.
+                Yıllık kimyasal alım şartnameleriniz, su arıtma sistemi projeleriniz ve servis talepleriniz için doğrudan Adana merkez ofisimizle görüşün.
               </p>
               <div style="background:var(--bg-surface-alt);padding:1rem;border-radius:10px;margin-bottom:1rem;">
-                <div style="font-size:0.8rem;color:var(--text-muted);">Merkez Telefon & Operasyon:</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);">Merkez Telefon &amp; Operasyon (Pzt–Cmt 08:00–18:30):</div>
                 <a href="tel:${escapeAttr(companyInfo.phoneRaw)}" style="font-size:1.25rem;font-weight:800;color:var(--text-primary);text-decoration:none;display:block;margin:0.2rem 0;">${escapeHtml(companyInfo.phoneDisplay)}</a>
-                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;">Satış & Kurumsal Teklif E-posta:</div>
-                <a href="mailto:${escapeAttr(companyInfo.salesEmail)}" style="font-size:0.95rem;font-weight:600;color:var(--accent-teal);">${escapeHtml(companyInfo.salesEmail)}</a>
+                <div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem;">Resmi Kurumsal E-posta:</div>
+                <a href="mailto:${escapeAttr(companyInfo.email)}" style="font-size:0.95rem;font-weight:600;color:var(--accent-teal);">${escapeHtml(companyInfo.email)}</a>
               </div>
             </div>
             <div style="display:flex;gap:0.5rem;">
@@ -1881,11 +1909,11 @@ export function renderContactPage(container, navigate) {
           </div>
         </div>
 
-        <!-- MERKEZ VE BÖLGE MÜDÜRLÜKLERİ / SAHA İRTİBAT NOKTALARI -->
+        <!-- MERKEZ DEPO VE BÖLGESEL SAHA KORİDORLARI -->
         <div class="section-header" style="margin-bottom:2rem;">
-          <span class="section-tag">Genel Müdürlük & Bölge İrtibat Noktaları</span>
-          <h2 class="section-title">Adana Merkez ve Bölgesel Saha Mühendislik Ağımız</h2>
-          <p class="section-desc">Çukurova, Doğu Akdeniz, Güneydoğu Anadolu ve İç Anadolu sanayi koridorlarında yerinde su analizi, Jar-Test ve hızlı lojistik.</p>
+          <span class="section-tag">Fiziksel Merkez Depo &amp; Mobil Saha Koridorları</span>
+          <h2 class="section-title">Adana Tek Fiziksel Merkezimiz ve Bölgesel Sevkiyat Koridorlarımız</h2>
+          <p class="section-desc">Kayıtlı tek fiziksel merkez ve depomuz Seyhan/Adana’dadır. Mersin, İskenderun/Osmaniye, Gaziantep ve Kayseri/Niğde kartları fiziksel şube/depo değil; Adana merkezimizden çıkan mobil saha mühendisliği ve sevkiyat koridorlarıdır.</p>
         </div>
 
         <div class="regions-grid" style="margin-bottom:4rem;">
@@ -1894,10 +1922,10 @@ export function renderContactPage(container, navigate) {
               <div class="region-badge">${escapeHtml(off.badge)}</div>
               <h3>${escapeHtml(off.title)}</h3>
               <p style="font-weight:600;color:var(--accent-teal);margin-bottom:0.4rem;">📍 ${escapeHtml(off.region)}</p>
-              <p style="font-size:0.88rem;margin-bottom:0.65rem;"><strong>Adres / Aks:</strong> ${escapeHtml(off.address)}</p>
+              <p style="font-size:0.88rem;margin-bottom:0.65rem;"><strong>${escapeHtml(off.addressLabel)}:</strong> ${escapeHtml(off.address)}</p>
               <p style="font-size:0.86rem;color:var(--text-secondary);margin-bottom:0.75rem;"><strong>Kapsam:</strong> ${escapeHtml(off.coverage)}</p>
               <div style="background:var(--bg-teal-tint);padding:0.65rem 0.85rem;border-radius:8px;font-size:0.82rem;color:var(--text-primary);margin-bottom:1rem;">
-                <strong>Saha SLA:</strong> ${escapeHtml(off.sla)}
+                <strong>Sevkiyat &amp; Saha Koşulu:</strong> ${escapeHtml(off.sla)}
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;padding-top:0.75rem;border-top:1px solid var(--border-subtle);font-size:0.85rem;">
                 <a href="tel:${escapeAttr(companyInfo.phoneRaw)}" style="font-weight:700;color:var(--text-primary);">📞 ${escapeHtml(off.phone)}</a>
@@ -1914,38 +1942,38 @@ export function renderContactPage(container, navigate) {
         <div class="contact-layout-grid">
           <!-- İletişim Bilgileri Kartı -->
           <div class="contact-info-panel">
-            <span class="section-tag">Merkez & Lojistik</span>
-            <h2>${escapeHtml(companyInfo.legalName)}</h2>
-            <p style="color:var(--text-secondary);margin-bottom:1.5rem;">Adana merkez depomuzdan Çukurova, İç Anadolu, Güneydoğu ve tüm Türkiye sanayi bölgelerine ADR standartlarında sevkiyat.</p>
+            <span class="section-tag">Kurumsal Kimlik &amp; Merkez Depo</span>
+            <h2>${escapeHtml(companyInfo.name)}</h2>
+            <p style="color:var(--text-secondary);margin-bottom:1.5rem;">Adana merkez depomuzdan Çukurova, İç Anadolu, Güneydoğu ve tüm Türkiye sanayi bölgelerine sevkiyat.</p>
 
             <div class="contact-detail-list">
               <div class="contact-detail-item">
-                <strong>Genel Müdürlük & Merkez Depo</strong>
+                <strong>Ticari Marka &amp; Kurumsal Unvan</strong>
+                <span>${escapeHtml(companyInfo.legalName)} (Resmi fatura unvanı, vergi dairesi, VKN ve MERSİS bilgileri kurumsal proforma teklif ve e-Fatura belgelerinde paylaşılır)</span>
+              </div>
+              <div class="contact-detail-item">
+                <strong>Tek Fiziksel Genel Müdürlük &amp; Merkez Depo</strong>
                 <a href="${escapeAttr(companyInfo.mapsUrl)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent-teal);font-weight:700;text-decoration:underline;">
                   📍 ${escapeHtml(companyInfo.address)}
                 </a>
               </div>
               <div class="contact-detail-item">
-                <strong>Kurumsal Telefon & WhatsApp</strong>
+                <strong>Kurumsal Telefon &amp; WhatsApp</strong>
                 <a href="tel:${escapeAttr(companyInfo.phoneRaw)}">${escapeHtml(companyInfo.phoneDisplay)}</a>
               </div>
               <div class="contact-detail-item">
-                <strong>Genel E-posta</strong>
+                <strong>Resmi Kurumsal E-posta</strong>
                 <a href="mailto:${escapeAttr(companyInfo.email)}">${escapeHtml(companyInfo.email)}</a>
               </div>
               <div class="contact-detail-item">
-                <strong>Satış & İhale Masası</strong>
-                <a href="mailto:${escapeAttr(companyInfo.salesEmail)}">${escapeHtml(companyInfo.salesEmail)}</a>
-              </div>
-              <div class="contact-detail-item">
-                <strong>Çalışma Saatleri</strong>
+                <strong>Resmi Çalışma Saatleri</strong>
                 <span>${escapeHtml(companyInfo.workingHours)}</span>
               </div>
             </div>
 
             <div style="margin-top:1.5rem;border-radius:12px;overflow:hidden;border:2px solid var(--border-color);">
               <iframe
-                title="Elif Kimya Merkez Konumu - Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana"
+                title="Elif Çevre Kimya Merkez Konumu - Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana"
                 src="https://maps.google.com/maps?q=Ova%20Mah.%20%C5%9Eakirpa%C5%9Fa%20Cd.%20No:269,%2001080%20Seyhan/Adana&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
                 width="100%"
                 height="220"
@@ -1965,7 +1993,7 @@ export function renderContactPage(container, navigate) {
           <!-- Doğrudan İletişim Formu -->
           <div class="card" style="padding:2.25rem;">
             <span class="badge badge-teal" style="margin-bottom:0.5rem;">CANLI DASHBOARD ENTEGRASYONLU</span>
-            <h3 style="margin-bottom:0.5rem;">Kurumsal İletişim, Sipariş & Tedarikçi Formu</h3>
+            <h3 style="margin-bottom:0.5rem;">Kurumsal İletişim, Sipariş &amp; Tedarikçi Formu</h3>
             <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1.5rem;">İletiniz doğrudan Elif Çevre Kimya Yönetim Paneli (Dashboard) ve CRM ekranımıza gerçek zamanlı düşer.</p>
 
             <form id="direct-contact-form" class="form-grid-2">
@@ -1991,11 +2019,21 @@ export function renderContactPage(container, navigate) {
               </div>
               <div class="form-group">
                 <label class="form-label">Konu / İşlem Türü *</label>
-                <input type="text" name="subject" class="form-input" required placeholder="Örn: Kimyasal Siparişi / Ürün Bilgisi / İhale" />
+                <input type="text" name="subject" class="form-input" required placeholder="Örn: Kimyasal Siparişi / SDS Talebi / İhale" />
               </div>
               <div class="form-group full-width">
                 <label class="form-label">Mesajınız / Sipariş Detayınız *</label>
-                <textarea name="message" class="form-textarea" rows="4" required placeholder="Mesajınızı, sipariş etmek istediğiniz kimyasalları veya su arıtma sistemi ihtiyacınızı buraya yazınız..."></textarea>
+                <textarea name="message" class="form-textarea" rows="4" required placeholder="Mesajınızı, talep ettiğiniz kimyasalları, SDS/TDS belgelerini veya su arıtma sistemi ihtiyacınızı buraya yazınız..."></textarea>
+              </div>
+              <div class="form-group full-width">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="kvkkConsent" required />
+                  <span>6698 sayılı KVKK kapsamında kurumsal iletişim ve talep verilerimin işlenmesini kabul ediyorum. *</span>
+                </label>
+                <details style="margin-top:0.35rem;font-size:0.8rem;color:var(--text-secondary);">
+                  <summary style="cursor:pointer;font-weight:700;color:var(--accent-teal);">KVKK Aydınlatma Özeti</summary>
+                  <p style="margin-top:0.25rem;line-height:1.5;">Veri Sorumlusu: Elif Çevre Kimya (Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana • info@elifcevrekimya.com.tr). İletilen veriler yalnızca kurumsal iletişim, tekliflendirme ve teknik destek amacıyla işlenir.</p>
+                </details>
               </div>
               <div class="form-group full-width">
                 <button type="submit" class="btn btn-primary" id="contact-submit-btn" style="width:100%;">Mesajı Yönetim Dashboard'una Gönder</button>
@@ -2006,9 +2044,9 @@ export function renderContactPage(container, navigate) {
           </div>
         </div>
 
-        <!-- 5 ANA HİZMET VE ÜRÜN GRUBU ÖZETİ (EFKİM & ALFACHEM HİZMET MİMARİSİ) -->
+        <!-- 5 ANA HİZMET VE ÜRÜN GRUBU ÖZETİ -->
         <div class="section-header" style="margin-top:4rem;margin-bottom:2rem;">
-          <span class="section-tag">Endüstriyel Su Şartlandırma & Proses Uzmanlığı</span>
+          <span class="section-tag">Endüstriyel Su Şartlandırma &amp; Proses Uzmanlığı</span>
           <h2 class="section-title">Hizmet ve Ürün Gruplarımız</h2>
         </div>
         <div class="regions-grid">
@@ -2054,11 +2092,11 @@ export function renderContactPage(container, navigate) {
           requestType: 'callback_30min',
           subject: `[SİZİ ARAYALIM TALEBİ] ${fd.get('relatedProductOrSystem') || 'Genel Görüşme'}`,
           relatedProductOrSystem: `[SİZİ ARAYALIM TALEBİ] ${fd.get('relatedProductOrSystem') || 'Genel Görüşme'}`,
-          description: `Müşteri /iletisim sayfasındaki "Sizi Arayalım" hızlı geri arama formu üzerinden acil telefon dönüşü talep etti. Konu: ${fd.get('relatedProductOrSystem') || 'Genel Görüşme'}`,
-          kvkkConsent: true,
+          description: `Müşteri /iletisim sayfasındaki "Sizi Arayalım" hızlı geri arama formu üzerinden telefon dönüşü talep etti. Konu: ${fd.get('relatedProductOrSystem') || 'Genel Görüşme'}`,
+          kvkkConsent: Boolean(fd.get('kvkkConsent')),
           sourcePage: '/iletisim#sizi-arayalim'
         });
-        showNotification('Geri arama talebiniz Yönetim Dashboard ekranına düştü! Mühendisimiz en kısa sürede sizi arayacaktır.', 'success');
+        showNotification('Geri arama talebiniz Yönetim Dashboard ekranına düştü! Mesai saatleri içinde 30 dakikada dönüş yapılacaktır.', 'success');
         cbForm.reset();
       } catch (err) {
         showNotification(err.message || 'Geri arama talebi gönderilemedi.', 'error');
@@ -2092,7 +2130,7 @@ export function renderContactPage(container, navigate) {
           cityCountry: fd.get('cityCountry'),
           subject: fd.get('subject'),
           message: fd.get('message'),
-          kvkkConsent: true,
+          kvkkConsent: Boolean(fd.get('kvkkConsent')),
           sourcePage: '/iletisim'
         });
         showNotification('Mesajınız Yönetim Dashboard ekranına başarıyla iletildi!', 'success');

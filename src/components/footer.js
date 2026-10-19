@@ -24,10 +24,10 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
               <span>Teknik Bilgi &amp; Belge Merkezi (SDS / GBF • TDS • COA)</span>
             </div>
             <h3 class="font-display text-xl sm:text-2xl font-extrabold text-white">
-              Mühendislik Rehberi, Güvenlik Bilgi Formları ve Parti Analiz Sertifikaları
+              Mühendislik Rehberi ve Talep Bazlı SDS / TDS / COA Belge Merkezi
             </h3>
             <p class="mt-1.5 text-sm text-slate-300 leading-relaxed">
-              Kimyasal yoğunluk (g/cm³) tabloları, Langelier Doygunluk İndeksi (LSI) hesaplama rehberleri, RO membran koruma protokolleri ve ürünlerimize ait doğrulanmış SDS/TDS dokümanlarına doğrudan erişin.
+              Kimyasal yoğunluk (g/cm³) tabloları, Langelier Doygunluk İndeksi (LSI) hesaplama rehberleri, RO membran koruma protokolleri ve ürünlerimize ait talep bazlı SDS/TDS/COA dokümanlarına erişin.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-3 shrink-0">
@@ -45,9 +45,9 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
       <!-- 4 Sütunlu Kurumsal Footer -->
       <div class="container-x grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <a class="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-md" aria-label="ELİF KİMYA Ana Sayfa" href="/" data-nav="/">
+          <a class="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2.5 shadow-md" aria-label="Elif Çevre Kimya Ana Sayfa" href="/" data-nav="/">
             <img
-              alt="ELİF KİMYA"
+              alt="Elif Çevre Kimya"
               loading="lazy"
               width="230"
               height="65"
@@ -67,13 +67,14 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
               <a href="mailto:${escapeAttr(email)}" class="font-bold text-emerald-400 hover:text-emerald-300 transition-colors">✉️ ${escapeHtml(email)}</a>
             </p>
             <p class="font-mono font-bold text-white text-sm">📞 ${escapeHtml(rawPhone)}</p>
+            <p class="text-[11px] text-slate-400">🕒 Mesai: Pazartesi–Cumartesi 08:00–18:30</p>
             <p>
               <a
                 href="https://www.google.com/maps/place//data=!4m2!3m1!1s0x15288751a6fd9097:0xffc6bfce58ff18ef?sa=X&amp;ved=1t:8290&amp;ictx=111"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="text-slate-300 hover:text-emerald-400 transition-colors underline decoration-slate-600 underline-offset-4"
-              >📍 Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana</a>
+              >📍 Tek Fiziksel Merkez &amp; Depo: Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana</a>
             </p>
           </div>
         </div>
@@ -149,7 +150,7 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
             </li>
             <li>
               <a class="text-slate-200 hover:text-emerald-400 transition-colors" href="/hizmet-bolgeleri" data-nav="/hizmet-bolgeleri">
-                Hizmet Bölgeleri &amp; ADR Lojistik Ağı
+                Hizmet Bölgeleri &amp; Lojistik Ağı
               </a>
             </li>
             <li>
@@ -192,14 +193,14 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
             </li>
           </ul>
           <p class="mt-4 text-xs leading-relaxed text-slate-300">
-            Adana AOSB, Mersin-Tarsus OSB, İskenderun-Payas, Osmaniye, Gaziantep, Kayseri ve Niğde sanayi bölgelerine 2–6 saatte ADR sertifikalı sevkiyat.
+            Adana merkez depomuzdan stok/sipariş onayı sonrası iş günlerinde Çukurova (Adana, Mersin, İskenderun, Osmaniye, Gaziantep, Kayseri, Niğde) ve 81 il OSB sevkiyatı.
           </p>
         </div>
       </div>
 
       <div class="border-t border-white/10 bg-slate-950/60">
         <div class="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs text-slate-400 sm:flex-row font-semibold">
-          <p>© 2026 ELİF ÇEVRE KİMYA SANAYİ VE TİCARET (www.elifcevrekimya.com.tr). Tüm hakları saklıdır.</p>
+          <p>© 2026 ELİF ÇEVRE KİMYA (www.elifcevrekimya.com.tr). Tüm hakları saklıdır.</p>
           <div class="flex flex-wrap items-center gap-6">
             <a class="text-emerald-400 hover:text-white transition-colors" href="/teknik-bilgi" data-nav="/teknik-bilgi">Teknik Bilgi Merkezi</a>
             <a class="hover:text-emerald-400 transition-colors" href="/llms.txt" target="_blank" rel="noopener">AI / GEO Rehberi (llms.txt)</a>

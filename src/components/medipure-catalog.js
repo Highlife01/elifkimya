@@ -70,12 +70,15 @@ function productCard(product, categoryTitle) {
       <div class="flex flex-1 flex-col p-4">
         <p class="text-[11px] font-bold uppercase tracking-wide text-emerald-700">${escapeHtml(categoryTitle)}</p>
         <h3 class="mt-1 font-display text-base font-extrabold leading-snug text-slate-900 group-hover:text-emerald-800 transition" data-medipure-open="detail">${escapeHtml(product.name)}</h3>
-        ${qualitySpec ? `<p class="mt-1 font-mono text-[11px] font-bold text-slate-600">Su Kalitesi: ${escapeHtml(qualitySpec)}</p>` : ''}
+        ${qualitySpec ? `<p class="mt-1 font-mono text-[11px] font-bold text-slate-600"><span>Su Kalitesi:</span> <span>${escapeHtml(qualitySpec)}</span></p>` : ''}
         <p class="mt-1.5 text-xs leading-relaxed text-slate-600 line-clamp-2" data-medipure-open="detail">${escapeHtml(shortDesc)}</p>
         <div class="mt-auto pt-3">
-          <div class="flex items-end justify-between gap-2 border-t border-slate-100 pt-3">
+          <p class="mb-2 rounded-lg bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-600 border border-slate-200/80">
+            💡 KDV, nakliye ve montaj hariç gösterge liste fiyatı • Kur, stok ve teslimat teklifte netleşir
+          </p>
+          <div class="flex items-end justify-between gap-2 border-t border-slate-100 pt-2.5">
             <div>
-              <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Medipure liste</p>
+              <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Gösterge Liste (KDV Hariç)</p>
               <p class="font-display text-lg font-black text-slate-950">${escapeHtml(product.listPriceEur)} €</p>
             </div>
             <div class="flex items-center gap-1.5">
@@ -109,13 +112,13 @@ export function renderMedipureShowcase() {
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div class="max-w-3xl">
             <p class="chip">Medipure® Su Saflaştırma • Saf Su &amp; Ultra Saf Su EDI Sistemler</p>
-            <h2 class="h2-title">Su Saflaştırma, Saf Su ve Ultra Saf Su EDI Sistemleri (${MEDIPURE_PRODUCT_COUNT} Model)</h2>
+            <h2 class="h2-title"><span>Su Saflaştırma, Saf Su ve Ultra Saf Su EDI Sistemleri</span> (<span>${MEDIPURE_PRODUCT_COUNT}</span> <span>Model</span>)</h2>
             <p class="mt-3 text-base leading-relaxed text-slate-700">
-              Laboratuvar, medikal, sterilizasyon, deiyonize, elektrodeiyonizasyon (EDI), mobil ve endüstriyel <strong>Medipure GEN-6</strong> su saflaştırma cihazları; üzerine tıklayarak <strong>teknik açıklamalarını</strong> inceleyebilir ve <strong>Sipariş Ver</strong> butonuyla doğrudan sipariş oluşturabilirsiniz.
+              Laboratuvar, medikal, sterilizasyon, deiyonize, elektrodeiyonizasyon (EDI), mobil ve endüstriyel <strong>Medipure GEN-6</strong> su saflaştırma cihazları; üzerine tıklayarak <strong>teknik açıklamalarını</strong> inceleyebilir ve <strong>Sipariş Ver</strong> butonuyla <strong>kurumsal sipariş ve teklif talebi</strong> oluşturabilirsiniz. Belirtilen EUR tutarları KDV, nakliye ve montaj hariç gösterge liste fiyatlarıdır; besleme suyu analizi, güncel kur, stok ve garanti koşulları resmi teklifte teyit edilir.
             </p>
           </div>
           <a class="btn-primary !px-5 !py-3 text-xs font-extrabold" href="/sistemler#medipure-katalog" data-nav="/sistemler#medipure-katalog">
-            Tüm ${MEDIPURE_PRODUCT_COUNT} Modeli İncele →
+            <span>Tüm</span> <span>${MEDIPURE_PRODUCT_COUNT}</span> <span>Modeli İncele →</span>
           </a>
         </div>
 
@@ -142,11 +145,14 @@ export function renderMedipureCatalog() {
   return `
     <section id="medipure-katalog" class="mt-14" style="scroll-margin-top:7rem;" data-medipure-catalog>
       <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div class="max-w-2xl">
+        <div class="max-w-3xl">
           <span class="section-tag">Medipure® Su Saflaştırma &amp; EDI Cihaz Kataloğu</span>
           <h2 class="section-title" style="margin-top:0.4rem;">Saf Su, Ultra Saf Su ve Elektrodeiyonizasyon (EDI) Modelleri</h2>
           <p class="section-desc" style="margin:0.6rem 0 0;">
-            ${MEDIPURE_PRODUCT_COUNT} model; cihazların üzerine tıklayarak detaylı ürün açıklamasını ve teknik özellik tablosunu görebilir, <strong>Sipariş Ver</strong> butonuyla doğrudan sipariş oluşturabilirsiniz.
+            <span>${MEDIPURE_PRODUCT_COUNT}</span> <span>model; cihazların üzerine tıklayarak detaylı ürün açıklamasını ve teknik özellik tablosunu görebilir,</span> <strong>Sipariş Ver</strong> <span>butonuyla</span> <strong>kurumsal sipariş ve teklif talebi</strong> <span>oluşturabilirsiniz.</span>
+          </p>
+          <p class="mt-2 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-medium text-slate-700">
+            <strong>Tedarik &amp; Uygulama Rolü:</strong> Proje Entegrasyonu, Cihaz Tedariki &amp; Saha Devreye Alma — Kartlarda yer alan EUR tutarları KDV, nakliye, ön arıtma ve saha montajı hariç gösterge katalog liste fiyatlarıdır. Besleme suyu iletkenlik/sertlik analizi, güncel TCMB/banka kuru, stok/üretim termin süresi ve 2 yıl cihaz garantisi (sarf membran/kartuşlar hariç) resmi proforma teklifte netleştirilir.
           </p>
         </div>
         <p class="text-sm font-bold text-slate-700">
@@ -185,7 +191,7 @@ export function renderMedipureCatalog() {
             class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-bold text-slate-700 hover:border-emerald-400"
             data-medipure-category="${escapeAttr(category.id)}"
             data-group="${escapeAttr(category.group)}"
-          >${escapeHtml(category.title)} (${category.products.length})</button>
+          ><span>${escapeHtml(category.title)}</span> (${category.products.length})</button>
         `).join('')}
       </div>
 

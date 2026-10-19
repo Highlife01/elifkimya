@@ -9,8 +9,7 @@ import { showNotification } from '../components/notification.js';
 import { escapeHtml, escapeAttr, renderSafeHtml } from '../utils/security.js';
 import {
   WATER_CHEMICAL_LIFECYCLE,
-  ENGINEERING_360_TABS,
-  SEO_KEYWORD_CLUSTERS
+  ENGINEERING_360_TABS
 } from '../utils/seo-geo.js';
 import { bindMedipureCatalog, renderMedipureShowcase } from '../components/medipure-catalog.js';
 import { bindLabChemicalsCatalog, renderLabChemicalsShowcase } from '../components/lab-chemicals-catalog.js';
@@ -24,7 +23,7 @@ const HERO_SLIDES = [
     shortNav: 'AĞIR HİZMET SOĞUTMA & KAZAN ŞARTLANDIRMA',
     title: 'Korozyon, Kışır ve Biyofilm Önleyici Su Şartlandırma Programları',
     subtitle:
-      'Açık/kapalı devre soğutma kuleleri ve yüksek basınçlı buhar kazanlarında enerji kaybını önleyen yüksek termal kararlılıklı PBTC/HEDP antiskalant, inhibitör ve biyositler.',
+      'Açık/kapalı devre soğutma kuleleri ve yüksek basınçlı buhar kazanlarında kireç ve korozyon kaynaklı enerji kaybını önlemeye yönelik PBTC/HEDP antiskalant, inhibitör ve biyosit programları.',
     highlights: [
       'PBTC / HEDP / Azol İnhibitörleri',
       'DBNPA & İzotiyazolin Biyositler',
@@ -40,8 +39,8 @@ const HERO_SLIDES = [
     subtitle:
       'Haddehane tufal çukurları, tekstil arıtmaları ve çamur susuzlaştırma dekantörleri için PAC (%17–%30), Demir III Klorür ve Anyonik/Katyonik Poliakrilamid çözümleri.',
     highlights: [
-      '< 30 sn Hızlı Flok Çökme Süresi',
-      'Yerinde 6’lı Jar-Test Optimizasyonu',
+      'Jar-Test İle Flok Optimizasyonu',
+      'Yerinde 6’lı Jar-Test Desteği',
       '25 kg Torba / 1000 kg IBC / Dökme'
     ]
   },
@@ -54,9 +53,9 @@ const HERO_SLIDES = [
     subtitle:
       'Ham su analizine göre terzi işi projelendirilen 1–250 m³/saat kapasiteli Ters Ozmoz (RO), Ultrafiltrasyon (UF), EDI ultra saf su ve PLC/SCADA otomasyon panoları.',
     highlights: [
-      '%99.5 Tuz & İletkenlik Giderimi',
+      'Besleme Analizine Göre RO Tasarımı',
       'PLC / SCADA Otomasyon Panosu',
-      '240 ppm Silis Toleranslı Antiskalant'
+      'Yüksek Silis Toleranslı Antiskalant'
     ]
   },
   {
@@ -66,9 +65,9 @@ const HERO_SLIDES = [
     shortNav: 'MEDIPURE SAF SU & ULTRA SAF SU EDI SİSTEMLER',
     title: 'Medipure Su Saflaştırma: Saf Su ve Ultra Saf Su EDI Sistemleri',
     subtitle:
-      'Laboratuvar, medikal, sterilizasyon ve endüstriyel prosesler için 18.2 MΩ·cm (0.055 µS/cm) Tip-1/Tip-2 ultra saf su cihazları, Elektrodeiyonizasyon (EDI) sistemleri ve 163 model Medipure kataloğu.',
+      'Laboratuvar, medikal, sterilizasyon ve endüstriyel prosesler için 18.2 MΩ·cm (0.055 µS/cm) hedef çıkışlı Tip-1/Tip-2 ultra saf su cihazları, Elektrodeiyonizasyon (EDI) sistemleri ve 163 model Medipure kataloğu.',
     highlights: [
-      '18.2 MΩ·cm (0.055 µS/cm) Ultra Saf Su',
+      '18.2 MΩ·cm Hedefli Ultra Saf Su',
       'Saf Su & Elektrodeiyonizasyon (EDI) Sistemler',
       'Laboratuvardan Endüstriye 163 Model'
     ]
@@ -80,7 +79,7 @@ const HERO_SLIDES = [
     shortNav: 'LABORATUVAR & HORIBA STANDART ÇÖZELTİLER',
     title: 'HORIBA Su Kalitesi Ölçüm ve Standart Kalibrasyon Çözeltileri',
     subtitle:
-      'Laboratuvar ve proses su kalitesi analizleri için NIST izlenebilir HORIBA pH tampon çözeltileri (pH 4.01 / 7.00 / 10.01), iletkenlik standartları (84 µS/cm – 111.8 mS/cm), iyon (ISE), ORP ve 3.33 M KCl elektrot bakım solüsyonları.',
+      'Laboratuvar ve proses su kalitesi analizleri için HORIBA pH tampon çözeltileri (pH 4.01 / 7.00 / 10.01), iletkenlik standartları (84 µS/cm – 111.8 mS/cm), iyon (ISE), ORP ve 3.33 M KCl elektrot bakım solüsyonları.',
     highlights: [
       'HORIBA pH & İletkenlik (EC) Standartları',
       'LAQUAtwin İyon (ISE) & ORP Çözeltileri',
@@ -98,7 +97,7 @@ const HERO_SLIDES = [
     highlights: [
       'NaOCl %15–16 & NaOH %48 / %99',
       '30 kg Bidon / 1000 kg IBC / Tanker',
-      'Parti Bazlı COA & SDS/GBF'
+      'Talep Bazlı SDS/GBF & TDS Paylaşımı'
     ]
   }
 ];
@@ -109,7 +108,8 @@ const HOME_CATEGORY_CARDS = [
     title: 'Soğutma Kulesi Kimyasalları',
     emoji: '❄️',
     specPill: 'PBTC / HEDP / Azol • DBNPA Biyosit',
-    desc: 'Açık ve kapalı soğutma devrelerinde kireç, korozyon, yosun ve Legionella oluşumunu engelleyen şartlandırma ürünleri.',
+    supplyRole: 'Formülasyon & Saha Şartlandırma',
+    desc: 'Açık ve kapalı soğutma devrelerinde kireç, korozyon, yosun ve mikrobiyal risk kontrolü için su analizine göre uygulanan şartlandırma ürünleri.',
     image: '/assets/cat-cooling.jpg',
     href: '/urunler#sogutma-kulesi-kimyasallari'
   },
@@ -118,7 +118,8 @@ const HOME_CATEGORY_CARDS = [
     title: 'Kazan Suyu Kimyasalları',
     emoji: '⚡',
     specPill: 'DEHA Oksijen Tutucu • Kondens Amin',
-    desc: 'Buhar kazanlarında oksijen çukurlaşmasını (pitting) ve kışır kaynaklı yakıt kaybını önleyen şartlandırıcılar.',
+    supplyRole: 'Formülasyon & Saha Şartlandırma',
+    desc: 'Buhar kazanlarında oksijen çukurlaşmasını (pitting) ve kışır kaynaklı ısı transfer kaybını önlemeye yönelik şartlandırıcılar.',
     image: '/assets/cat-boiler.jpg',
     href: '/urunler#kazan-suyu-kimyasallari'
   },
@@ -127,6 +128,7 @@ const HOME_CATEGORY_CARDS = [
     title: 'Koagülant & Polielektrolitler',
     emoji: '💧',
     specPill: 'PAC %17/%30 • A-PAM / C-PAM',
+    supplyRole: 'Toptan Kimyasal Tedarik & Jar-Test',
     desc: 'Atıksu arıtma, tufal çukuru ve çamur susuzlaştırma için PAC, Demir III Klorür ve Anyonik/Katyonik Poliakrilamid.',
     image: '/assets/cat-coagulants.jpg',
     href: '/urunler#atik-su-aritma-kimyasallari'
@@ -135,7 +137,8 @@ const HOME_CATEGORY_CARDS = [
     id: 'ro-membran-ve-antiskalant',
     title: 'RO Antiskalant & CIP Kimyasalları',
     emoji: '🛡️',
-    specPill: '240 ppm Silis Toleransı • Asit/Baz CIP',
+    specPill: 'Yüksek Silis Toleransı • Asit/Baz CIP',
+    supplyRole: 'Formülasyon & Membran Şartlandırma',
     desc: 'Ters Ozmoz (RO) membranlarında silis, kalsiyum karbonat ve sülfat tıkanmasını önleyen konsantre antiskalantlar.',
     image: '/assets/cat-ro-membrane.jpg',
     href: '/urunler#endustriyel-su-aritma-sistemleri'
@@ -145,6 +148,7 @@ const HOME_CATEGORY_CARDS = [
     title: 'Medipure Saf Su & RO/EDI Sistemleri',
     emoji: '⚙️',
     specPill: '18.2 MΩ·cm EDI • 163 Model Medipure',
+    supplyRole: 'Cihaz Tedariki & Sistem Kurulumu',
     desc: 'Medipure Tip-1/Tip-2 ultra saf su cihazları, Elektrodeiyonizasyon (EDI) ve endüstriyel Ters Ozmoz (RO) üniteleri.',
     image: '/assets/hero-medipure-edi.jpg',
     href: '/sistemler#medipure-katalog'
@@ -154,7 +158,8 @@ const HOME_CATEGORY_CARDS = [
     title: 'Laboratuvar Kimyasalları & HORIBA Çözeltileri',
     emoji: '🔬',
     specPill: 'HORIBA • HACH • Merck • 95 Ürün',
-    desc: 'HORIBA kalibrasyon solüsyonları, HACH küvet/toz testleri, Merck, Isolab, CPAChem CRM ve Chembio su analiz kitleri.',
+    supplyRole: 'Bağımsız Kurumsal Katalog Tedariki',
+    desc: 'HORIBA kalibrasyon solüsyonları, HACH küvet/toz testleri, Merck, Isolab, CPAChem CRM ve Chembio su analiz kitleri (yetkili distribütörlük iddiası taşımaz).',
     image: '/assets/hero-horiba-lab.jpg',
     href: '/urunler#laboratuvar-kimyasallari-katalog'
   },
@@ -163,6 +168,7 @@ const HOME_CATEGORY_CARDS = [
     title: 'Sodyum Hipoklorit & Klor',
     emoji: '🧪',
     specPill: '%15–16 Aktif Klor • Dökme / IBC',
+    supplyRole: 'Toptan Endüstriyel Kimyasal Tedariki',
     desc: 'Su dezenfeksiyonu, tekstil ağartma ve endüstriyel arıtma için yüksek stabiliteli sıvı sodyum hipoklorit (NaOCl).',
     image: '/assets/cat-hypochlorite.jpg',
     href: '/urunler#fabrika-ve-proses-kimyasallari'
@@ -172,6 +178,7 @@ const HOME_CATEGORY_CARDS = [
     title: 'Kostik Soda & Alkaliler',
     emoji: '⚗️',
     specPill: 'NaOH %48 Sıvı & %99 Payet',
+    supplyRole: 'Toptan Endüstriyel Kimyasal Tedariki',
     desc: 'Nötralizasyon, CIP yıkama, sabun/deterjan ve proses pH kontrolü için membran kalitesinde sıvı ve payet kostik.',
     image: '/assets/cat-caustic.jpg',
     href: '/urunler#fabrika-ve-proses-kimyasallari'
@@ -193,7 +200,7 @@ const FEATURED_PRODUCTS = [
     badgeEmoji: '⚡',
     badgeText: 'Buhar Kazanı & Termik Koruma',
     materialSpec: 'DEHA / Sodyum Sülfit + Nötralize Edici Amin',
-    desc: 'Kazan besi suyundaki çözünmüş oksijeni <5 ppb altına indirerek çukurlaşma (pitting) korozyonunu ve kondens hattı delinmelerini önler.',
+    desc: 'Uygun degazör ve kazan besi suyu rejiminde çözünmüş oksijeni düşürerek çukurlaşma (pitting) korozyonunu ve kondens hattı delinmelerini önler.',
     moq: '30 kg Bidon / 1000 kg IBC',
     image: '/assets/cat-boiler.jpg'
   },
@@ -218,9 +225,9 @@ const FEATURED_PRODUCTS = [
   {
     title: 'HORIBA pH Tampon, İletkenlik (EC) & İyon Standart Çözeltileri',
     badgeEmoji: '🔬',
-    badgeText: 'Laboratuvar & Kalibrasyon Çözeltileri',
-    materialSpec: 'NIST İzlenebilir pH 4.01/7.00/10.01 • 84 µS/cm – 111.8 mS/cm • 3.33 M KCl',
-    desc: 'HORIBA masaüstü, taşınabilir ve LAQUAtwin su kalitesi cihazları için orijinal pH tampon, iletkenlik, iyon (ISE), ORP ve elektrot bakım çözeltileri.',
+    badgeText: 'Bağımsız Katalog Tedariki',
+    materialSpec: 'pH 4.01/7.00/10.01 • 84 µS/cm – 111.8 mS/cm • 3.33 M KCl',
+    desc: 'HORIBA masaüstü, taşınabilir ve LAQUAtwin su kalitesi cihazları için orijinal ambalajlı pH tampon, iletkenlik, iyon (ISE), ORP ve elektrot bakım çözeltileri.',
     moq: '14 mL×6 Kit / 250 mL & 500 mL Orijinal Şişe',
     image: '/assets/hero-horiba-lab.jpg'
   },
@@ -437,7 +444,7 @@ export async function renderHomePage(container, navigate) {
             <p class="chip mb-3">Endüstriyel Katalog</p>
             <h2 class="h2-title">Ürün ve Çözüm Yelpazesi</h2>
             <p class="mt-3 text-base leading-relaxed text-slate-700 font-medium">
-              Toptan, kurumsal ve ağır sanayi tesisleri için proses spesifikasyonuna göre üretilir ve tedarik edilir — her grupta UN bidon, 1000 kg IBC ve dökme tanker seçeneği.
+              Toptan, kurumsal ve ağır sanayi tesisleri için ürün grubuna göre formülasyon, sistem mühendisliği veya kurumsal katalog tedariki — her grupta stok, MOQ, nakliye ve güncel SDS/TDS belgeleri resmi teklifte teyit edilir.
             </p>
           </div>
           <a class="btn-primary !py-3 !px-6 text-xs" href="/teklif-al" data-nav="/teklif-al">
@@ -469,11 +476,18 @@ export async function renderHomePage(container, navigate) {
                   </span>
                 </div>
                 <div class="pt-4 px-1" data-chem-open="detail">
+                  <div class="mb-1.5 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-mono font-bold text-slate-700 border border-slate-200">
+                    <span>Rol:</span>
+                    <strong class="text-emerald-800">${escapeHtml(card.supplyRole || 'Kurumsal Tedarik')}</strong>
+                  </div>
                   <h3 class="font-display text-lg font-extrabold text-slate-900 group-hover:text-brand-green transition">
                     ${escapeHtml(card.title)}
                   </h3>
                   <p class="mt-1.5 text-xs leading-relaxed text-slate-700 font-medium line-clamp-2">
                     ${escapeHtml(card.desc)}
+                  </p>
+                  <p class="mt-2 text-[10px] font-medium text-slate-500">
+                    Birim fiyat, MOQ, nakliye ve güncel SDS/TDS resmi teklifte paylaşılır.
                   </p>
                 </div>
               </div>
@@ -574,7 +588,7 @@ export async function renderHomePage(container, navigate) {
               Suyun ve Kimyanın Döngüsünde Nerelerdeyiz?
             </h2>
             <p class="mt-3 text-base text-slate-200 leading-relaxed">
-              Doğal su kaynağından fabrika prosesine, buhar kazanı ve soğutma kulesinden atıksu geri kazanımına kadar tüm su döngüsünü ölçülebilir mühendislik ile yönetiyoruz.
+              Doğal su kaynağından fabrika prosesine, buhar kazanı ve soğutma kulesinden atıksu geri kazanımına kadar tüm su döngüsünü su analizine dayalı mühendislik ile yönetiyoruz.
             </p>
           </div>
           <a href="/sistemler" data-nav="/sistemler" class="btn-primary !px-6 !py-3.5 text-xs font-extrabold shadow-cta">
@@ -630,7 +644,7 @@ export async function renderHomePage(container, navigate) {
 
             <div class="rounded-2xl border-2 border-emerald-500/40 bg-emerald-950/60 p-6 flex flex-col justify-between gap-5">
               <div>
-                <div class="text-xs font-mono font-extrabold uppercase tracking-wider text-emerald-300">Ölçülebilir Performans Kriterleri</div>
+                <div class="text-xs font-mono font-extrabold uppercase tracking-wider text-emerald-300">Saha Analizi İle Hedeflenen Kriterler</div>
                 <div class="mt-4 space-y-3">
                   ${initialCycle.metrics.map((m) => `
                     <div class="flex items-center gap-3 rounded-xl bg-slate-900/90 border border-emerald-400/30 px-4 py-3 text-sm font-extrabold text-white">
@@ -729,7 +743,7 @@ export async function renderHomePage(container, navigate) {
             <p class="chip mb-3">En Çok Talep Edilenler</p>
             <h2 class="h2-title">Öne Çıkan Endüstriyel Ürünler</h2>
             <p class="mt-3 text-base leading-relaxed text-slate-700 font-medium">
-              Ağır sanayi, su şartlandırma ve arıtma tesisleri için yüksek saflıkta üretilir — her üründe teknik veri formu (TDS) ve güvenlik bilgi formu (SDS) standarttır.
+              Ağır sanayi, su şartlandırma ve arıtma tesisleri için tedarik edilir — güncel parti teknik veri formu (TDS), güvenlik bilgi formu (SDS/GBF) ve analiz sertifikası (COA) sipariş/teklif adımında paylaşılır.
             </p>
           </div>
           <a class="btn-outline-dark !border-2 !border-slate-800 !text-slate-900 font-extrabold" href="/urunler" data-nav="/urunler">Tüm ürünleri gör →</a>
@@ -765,13 +779,16 @@ export async function renderHomePage(container, navigate) {
                     ${escapeHtml(item.desc)}
                   </p>
                   <p class="mt-2 text-[11px] font-mono text-slate-600 font-bold">
-                    Ambalaj: <strong class="text-slate-900">${escapeHtml(item.moq)}</strong>
+                    Ambalaj / MOQ: <strong class="text-slate-900">${escapeHtml(item.moq)}</strong>
+                  </p>
+                  <p class="mt-1 text-[10px] font-medium text-slate-500">
+                    Stok, teslimat ve güncel SDS/TDS resmi teklifte teyit edilir.
                   </p>
                 </div>
               </div>
               <div class="mt-4 pt-3 border-t border-slate-200 px-1 flex items-center justify-between gap-2">
                 <button type="button" data-chem-open="detail" class="inline-flex items-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-extrabold text-slate-800 hover:border-emerald-500 hover:text-emerald-800 transition">
-                  📋 Açıklama &amp; Detay
+                  📋 Açıklama &amp; SDS
                 </button>
                 <button type="button" data-chem-open="order" class="inline-flex items-center rounded-xl bg-emerald-600 px-3.5 py-2 text-xs font-extrabold text-white hover:bg-emerald-700 shadow-xs transition">
                   🛒 Sipariş Ver
@@ -826,11 +843,11 @@ export async function renderHomePage(container, navigate) {
           <div class="rounded-3xl p-6 border-2 border-brand-green bg-slate-900 text-white shadow-xl">
             <div class="flex items-center gap-2 mb-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-400">30 Dakikada Mühendislik Geri Arama</span>
+              <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-400">Mesai Saatlerinde 30 Dakikada Ön Geri Arama</span>
             </div>
             <h3 class="font-display text-lg font-extrabold text-white">Hızlı Teklif &amp; Saha Analizi Talebi</h3>
             <p class="mt-1 text-xs text-slate-300 mb-4">
-              Telefon numaranızı bırakın, nöbetçi kimya/su arıtma mühendisimiz 30 dakika içinde sizi arasın.
+              Telefon numaranızı bırakın; resmi çalışma saatlerimiz (<strong>Pazartesi–Cumartesi 08:00–18:30</strong>) içinde 30 dakikada ön geri dönüş yapalım. Mesai dışı taleplere ilk iş günü sabahı dönüş sağlanır.
             </p>
             <form id="home-callback-form" class="space-y-3">
               <div>
@@ -845,7 +862,22 @@ export async function renderHomePage(container, navigate) {
                   <option value="Medipure Saf Su Cihazı">Medipure Saf Su Cihazı</option>
                   <option value="Jeotermal Kireç ve Korozyon">Jeotermal Kireç ve Korozyon</option>
                   <option value="Ücretsiz Saha Su Analizi & Jar-Test">Saha Su Analizi &amp; Jar-Test</option>
+                  <option value="SDS / TDS / COA Belge Talebi">SDS / TDS / COA Belge Talebi</option>
                 </select>
+              </div>
+              <div class="rounded-xl border border-white/15 bg-white/5 p-3 text-xs text-slate-200">
+                <label class="flex items-start gap-2.5 cursor-pointer">
+                  <input type="checkbox" id="cb-kvkk" name="kvkkConsent" required class="mt-0.5 h-4 w-4 rounded border-slate-400 text-emerald-500 focus:ring-emerald-400" />
+                  <span>
+                    <strong>6698 sayılı KVKK</strong> kapsamında firma ve iletişim bilgilerimin kurumsal geri arama ve teklif hazırlığı amacıyla işlenmesini kabul ediyorum. *
+                  </span>
+                </label>
+                <details class="mt-1.5 text-[11px] text-slate-300">
+                  <summary class="cursor-pointer font-bold text-emerald-300 hover:underline">KVKK Aydınlatma Özeti</summary>
+                  <p class="mt-1 leading-relaxed">
+                    Veri Sorumlusu: Elif Çevre Kimya (Ova Mah. Şakirpaşa Cd. No:269 Seyhan/Adana • info@elifcevrekimya.com.tr). İletişim verileriniz yalnızca B2B geri arama, tekliflendirme ve teknik destek süreçleri için işlenir; üçüncü taraf reklam ağlarıyla paylaşılmaz.
+                  </p>
+                </details>
               </div>
               <button type="submit" id="cb-submit-btn" class="btn-primary w-full !py-3.5 text-sm font-extrabold">
                 <span>📞</span>
@@ -871,55 +903,7 @@ export async function renderHomePage(container, navigate) {
       </div>
     </section>
 
-    <section class="section bg-white border-t border-slate-200" id="geo-ozet">
-      <div class="container-x max-w-3xl">
-        <p class="chip mb-3">GEO &amp; Yapay Zeka Özeti (www.elifcevrekimya.com.tr)</p>
-        <h2 class="h2-title">Elif Çevre Kimya ne tedarik eder, nereden sevk eder?</h2>
-        <p class="mt-3 text-base leading-relaxed text-slate-700">
-          <strong>Elif Çevre Kimya</strong> (<a href="https://www.elifcevrekimya.com.tr" class="text-brand-green-dark font-bold underline">www.elifcevrekimya.com.tr</a> • <a href="mailto:info@elifcevrekimya.com.tr" class="text-brand-green-dark font-bold underline">info@elifcevrekimya.com.tr</a>), <strong>Ova Mah. Şakirpaşa Cd. No:269, 01080 Seyhan/Adana</strong> merkezli bir çevre kimyası, endüstriyel proses kimyasalları ve 360° su arıtma mühendisliği firmasıdır. Sodyum hipoklorit, kostik soda, hidroklorik asit, soğutma kulesi ve buhar kazanı kimyasalları, çevre ve atık su arıtma koagülantları (PAC, Demir III Klorür, polielektrolit), jeotermal kireç inhibitörü, RO/EDI sistemleri ve 163 model Medipure saf su cihazı için kurumsal teklif verir.
-        </p>
-        <p class="mt-3 text-base leading-relaxed text-slate-700">
-          Sevkiyat hattı Adana Hacı Sabancı OSB, Mersin-Tarsus OSB, İskenderun-Payas, Osmaniye, Gaziantep Başpınar OSB, Kahramanmaraş, Kayseri ve Niğde OSB’dir. Jeotermal programlar Denizli, Aydın, Manisa ve Afyon sahaları için de kurulur. Dozaj ve cihaz kapasitesi su veya brine analizi görülmeden garanti edilmez.
-        </p>
-      </div>
-    </section>
-
-    <!-- 8. SEO & GEO ENDÜSTRİYEL ANAHTAR KELİME VE OSB OTORİTE MATRİSİ -->
-    <section class="section bg-slate-100 border-t border-slate-200" id="seo-geo-matrix">
-      <div class="container-x">
-        <div class="max-w-3xl">
-          <p class="chip mb-3">Teknik Dizin &amp; Bölgesel OSB Otoritesi</p>
-          <h2 class="h2-title">Endüstriyel Kimya &amp; Su Arıtma Hızlı Tedarik Matrisi</h2>
-          <p class="mt-3 text-sm sm:text-base text-slate-700 font-medium leading-relaxed">
-            Fabrikanızın aradığı spesifik kimyasal hammadde, su şartlandırma formülü veya arıtma ekipmanına tıklayarak doğrudan teknik şartnameli teklif ekranına geçebilirsiniz.
-          </p>
-        </div>
-
-        <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          ${SEO_KEYWORD_CLUSTERS.map((cluster) => `
-            <div class="card p-6 border-2 border-slate-200 bg-white">
-              <div class="text-[11px] font-mono font-extrabold text-brand-green-dark uppercase tracking-wider mb-1">
-                ${escapeHtml(cluster.intent)}
-              </div>
-              <h3 class="font-display text-base font-extrabold text-slate-900">${escapeHtml(cluster.title)}</h3>
-              <p class="mt-1 text-xs text-slate-500 font-semibold">Bölge: ${escapeHtml(cluster.targetRegions)}</p>
-              <div class="mt-4 flex flex-wrap gap-1.5">
-                ${cluster.keywords.map((kw) => `
-                  <a
-                    href="/teklif-al?product=${encodeURIComponent(kw)}"
-                    data-nav="/teklif-al?product=${encodeURIComponent(kw)}"
-                    class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-emerald-100 text-slate-800 hover:text-emerald-950 border border-slate-200 hover:border-emerald-400 transition">
-                    ${escapeHtml(kw)}
-                  </a>
-                `).join('')}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    </section>
-
-    <!-- 9. ALT KURUMSAL TEKLİF BANNER'I -->
+    <!-- 8. ALT KURUMSAL TEKLİF BANNER'I -->
     <section class="hero-bg section border-t-2 border-emerald-500/30 text-slate-900">
       <div class="container-x text-center max-w-3xl mx-auto">
         <p class="chip mb-3">Toptan Tedarik &amp; İhracat</p>
@@ -927,7 +911,7 @@ export async function renderHomePage(container, navigate) {
           Toplu teklif veya yerinde su analizi için hazır mısınız?
         </h2>
         <p class="mx-auto mt-4 max-w-xl text-slate-700 font-medium text-base sm:text-lg">
-          Spesifikasyonlarınızı, teslimat şehrinizi/OSB'nizi ve miktarınızı gönderin — TDS/SDS belgeleri ve ambalaj detaylarıyla aynı iş günü içinde teklif alın.
+          Spesifikasyonlarınızı, teslimat şehrinizi/OSB'nizi ve miktarınızı gönderin — talep edilen TDS/SDS belgeleri, MOQ ve ambalaj detaylarıyla resmi proforma teklif alın.
         </p>
         <div class="mt-8 flex flex-wrap justify-center gap-4">
           <a class="btn-primary !px-8 !py-4 !text-base shadow-cta" href="/teklif-al" data-nav="/teklif-al">
@@ -1193,6 +1177,7 @@ export async function renderHomePage(container, navigate) {
       const companyName = String(fd.get('companyName') || '').trim();
       const phone = String(fd.get('phone') || '').trim();
       const topic = String(fd.get('relatedProductOrSystem') || '').trim();
+      const kvkkConsent = Boolean(fd.get('kvkkConsent'));
 
       try {
         if (btn) {
@@ -1209,11 +1194,11 @@ export async function renderHomePage(container, navigate) {
           requestType: 'callback_30min',
           relatedProductOrSystem: topic,
           description: `Ana sayfa 30 Dakikada Mühendislik Geri Arama talebi. Konu: ${topic}`,
-          kvkkConsent: true,
+          kvkkConsent,
           sourcePage: '/'
         });
         callbackForm.reset();
-        showNotification('Talebiniz alındı! Mühendisimiz 30 dakika içinde sizi arayacaktır.', 'success');
+        showNotification('Talebiniz alındı! Mesai saatleri içinde 30 dakikada ön geri dönüş yapılacaktır.', 'success');
       } catch (err) {
         showNotification(err.message || 'Talep gönderilirken bir hata oluştu.', 'error');
       } finally {
@@ -1236,6 +1221,7 @@ export async function renderHomePage(container, navigate) {
       e.preventDefault();
       openChemicalProductModal({
         title: item.title,
+        categoryTitle: item.supplyRole || 'Kurumsal Tedarik',
         activeChemical: item.specPill,
         description: item.desc,
         image: item.image

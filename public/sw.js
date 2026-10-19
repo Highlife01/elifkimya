@@ -1,4 +1,4 @@
-const CACHE_NAME = 'elifkimya-pwa-v10';
+const CACHE_NAME = 'elifkimya-pwa-v11';
 const PRECACHE_URLS = [
   '/',
   '/manifest.webmanifest',
@@ -41,11 +41,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // HTML, JS ve CSS isteklerinde her zaman Network-First (önce güncel sunucu, çevrimdışıysa önbellek)
-  if (
-    request.mode === 'navigate' ||
-    /\.(js|css|json|html)$/i.test(url.pathname)
-  ) {
+  // Gezinme (HTML Sayfa) isteklerinde Network-First, çevrimdışıysa önbellekteki sayfa veya '/'
+  if (request.mode === 'navigate' || /\.html$/i.test(url.pathname)) {
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -56,6 +53,22 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match('/')))
+    );
+    return;
+  }
+
+  // JS, CSS ve JSON isteklerinde Network-First; çevrimdışıysa yalnızca kendi önbellek kaydına düş (asla HTML döndürme)
+  if (/\.(js|css|json)$/i.test(url.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy)).catch(() => {});
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }
