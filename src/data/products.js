@@ -392,14 +392,53 @@ export const productCategories = [
   {
     id: 'laboratuvar-kimyasallari-ve-horiba-cozeltileri',
     code: '08',
-    title: 'Laboratuvar Kimyasalları & HORIBA Standart Çözeltileri',
-    shortDesc: 'HORIBA su kalitesi ölçüm cihazları için NIST izlenebilir pH tampon, iletkenlik (EC), iyon (ISE), ORP ve elektrot bakım çözeltileri ile analitik laboratuvar kimyasalları.',
+    title: 'Laboratuvar Kimyasalları, Reaktifler & HORIBA Ölçüm Cihazları / Çözeltileri',
+    shortDesc: 'HORIBA LAQUAtwin cep tipi ölçerler, LAQUA masa tipi ve portatif pH/EC/DO/İyon cihazları, elektrotlar, NIST izlenebilir HORIBA kalibrasyon çözeltileri ve HACH/Merck/Isolab laboratuvar kimyasalları.',
     tag: 'HORIBA & Analitik Laboratuvar',
     badge: 'NIST İzlenebilir Standart',
     icon: 'activity',
     image: '/assets/hero-horiba-lab.jpg',
-    packaging: '14 mL Tekli Paket / 50–250–500 mL Orijinal HORIBA Şişe / Kit',
+    packaging: 'Orijinal Cihaz Seti / Elektrot / 14–500 mL Çözelti & Reaktif',
     subcategories: [
+      {
+        name: 'HORIBA LAQUAtwin Cep Tipi pH, İletkenlik (EC), Tuzluluk, ORP & İyon Ölçerler',
+        slug: 'horiba-laquatwin-cep-tipi-olcerler',
+        activeChemical: 'pH-11 / pH-22 / pH-33, EC-11 / EC-22 / EC-33, SALT-11 / Salt-22, ORP-11, Na-11, Ca-11 / Ca-11C, NO3-11 / NO3-11S / NO3-11C, F-11',
+        desc: 'Yalnızca 0,1 mL (tek damla) numune ile beher gerektirmeden doğrudan pH, iletkenlik, TDS, tuzluluk, ORP ve spesifik iyon (Kalsiyum Ca²⁺, Nitrat NO₃⁻, Sodyum Na⁺, Florür F⁻) ölçümü yapan IP67 su geçirmez cep tipi dijital analiz cihazları.',
+        specs: [
+          'Cep Tipi pH & ORP: LAQUAtwin pH-11 (0.1 pH), pH-22 (0.01 pH), pH-33 (±0.01 pH, Sıcaklık Gösterimli) ve ORP-11 (-1000…+1000 mV)',
+          'Cep Tipi İletkenlik & Tuzluluk: LAQUAtwin EC-11, EC-22, EC-33 (0…199.9 mS/cm & TDS) ve SALT-11 / Salt-22 (%0.01…%25 NaCl)',
+          'Cep Tipi İyon Seçici (ISE) Ölçerler: Ca-11 & Ca-11C (Kalsiyum), NO3-11 / NO3-11S Toprak / NO3-11C Bitki Özsuyu (Nitrat), Na-11 (Sodyum), F-11 (Florür)',
+          'Paket İçeriği: Orijinal Taşıma Çantası, Kalibrasyon Çözeltisi Seti (2×14 mL), Numune Pipeti ve Pil Dahil'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'HORIBA LAQUA Masa Tipi & Portatif Çok Parametreli Su Analiz Cihazları',
+        slug: 'horiba-laqua-portatif-ve-masa-tipi-cihazlar',
+        activeChemical: 'LAQUA PH2000 Masa Tipi, WQ-330-K (3 Kanallı), PC220-K / PC210-K, PH210-K, EC220-K / EC210-K, DO220-K / DO210-K',
+        desc: 'Laboratuvar ve saha su kalitesi kontrolleri için profesyonel masa tipi PH2000 ile IP67 korumalı, veri kayıt hafızalı portatif pH, ORP, İletkenlik (EC), TDS, Tuzluluk, Direnç ve Çözünmüş Oksijen (DO) ölçüm setleri.',
+        specs: [
+          'Masa Tipi: HORIBA LAQUA PH2000 (-2.000…+20.000 pH, ±0.003 pH hassasiyet, ORP & Sıcaklık)',
+          'Çok Parametreli Portatif: LAQUA WQ-330-K (3 Kanallı Eş Zamanlı pH/ORP/İyon/EC/DO) ile PC220-K & PC210-K (Çift Kanallı pH/EC/TDS/Tuzluluk)',
+          'Tek Parametreli Portatif Setler: PH210-K (pH/ORP), EC220-K & EC210-K (İletkenlik/TDS/Direnç), DO220-K & DO210-K (Çözünmüş Oksijen 0–20 mg/L)',
+          'Dayanıklılık: IP67 Su/Toz Korumalı Gövde, Arka Aydınlatmalı Ekran, 500–1000 Veri Kayıt Hafızası ve Taşıma Çantalı Tam Set'
+        ],
+        tdsReady: true
+      },
+      {
+        name: 'HORIBA pH, İletkenlik (EC) ve Çözünmüş Oksijen (DO) Elektrotları & Probları',
+        slug: 'horiba-ph-iletkenlik-do-elektrot-ve-problari',
+        activeChemical: '9615S-10D ToupH Cam, 9681S-10D Sleeve Tip, 9652-10D/20D, 9651-10D, 6252-10D Gıda Tipi, 9383-10D EC, 9552-20D/50D DO & 5402 Uç',
+        desc: 'HORIBA masaüstü ve portatif su analiz cihazlarıyla tam uyumlu, entegre sıcaklık sensörlü (3-in-1) pH elektrotları, titanyum/platin siyahı iletkenlik hücreleri ve galvanik çözünmüş oksijen probları.',
+        specs: [
+          'Cam Gövdeli pH Elektrotları: 9615S-10D Standart ToupH Cam, 9681S-10D Kıvamlı/Viskoz Numune Sleeve Tip, 6252-10D Sivri Uçlu Gıda Tipi',
+          'Plastik Gövdeli Jel pH Elektrotları: 9652-10D (1 m), 9652-20D (2 m) ve 9651-10D (1 m) Bakımsız Jel Dolgulu',
+          'İletkenlik & Oksijen Probları: 9383-10D İletkenlik Elektrodu (1 µS/cm–100 mS/cm, K=1), 9552-20D (2 m) & 9552-50D (5 m) Galvanik DO Probu ve 5402 Yedek DO Sensör Ucu',
+          'Bağlantı: BNC + Phono Entegre Sıcaklık Sensörlü Orijinal HORIBA Kablo Yapısı'
+        ],
+        tdsReady: true
+      },
       {
         name: 'HORIBA pH Standart Tampon Çözeltileri (USA & NIST Serisi)',
         slug: 'horiba-ph-tampon-cozeltileri',

@@ -1,10 +1,10 @@
 /**
- * Elif Çevre Kimya — Laboratuvar Kimyasalları, Analitik Reaktifler & HORIBA Standart Çözeltileri Kataloğu
- * Toplam 95 ürün (83 Analitik Laboratuvar Kimyasalı + 12 HORIBA Standart Çözelti Serisi).
+ * Elif Çevre Kimya — Laboratuvar Kimyasalları, Analitik Reaktifler & HORIBA Cihaz / Elektrot / Standart Çözelti Kataloğu
+ * Toplam 130 ürün (83 Analitik Laboratuvar Kimyasalı + 35 HORIBA Cihaz & Elektrot + 12 HORIBA Standart Çözelti Serisi).
  * Kurumsal B2B politikası gereği fiyat bilgisi gösterilmez; tüm ürünler teklif ve kurumsal sipariş usulüyle sunulur.
  */
 
-export const LAB_CHEMICALS_COUNT = 95;
+export const LAB_CHEMICALS_COUNT = 130;
 
 export const LAB_CHEMICAL_GROUPS = [
   {
@@ -12,6 +12,30 @@ export const LAB_CHEMICAL_GROUPS = [
     "title": "HACH, Merck Spectroquant & Su Analiz Kitleri",
     "shortTitle": "HACH & Su Analiz Kitleri",
     "blurb": "HACH LCK küvet testleri, toz reaktif yastıkları (Powder Pillows), Merck Spectroquant hücre testleri ve Chembio kitler."
+  },
+  {
+    "id": "horiba-laquatwin-cep-cihazlari",
+    "title": "HORIBA LAQUAtwin Cep Tipi pH, İletkenlik, Tuzluluk, ORP & İyon Ölçerler",
+    "shortTitle": "HORIBA LAQUAtwin Cep Cihazları",
+    "blurb": "Tek damla (0.1 mL) numune ile sahada ve laboratuvarda doğrudan pH, EC, TDS, tuzluluk, ORP ve spesifik iyon (Ca²⁺, NO₃⁻, Na⁺, F⁻) ölçen cep tipi cihazlar."
+  },
+  {
+    "id": "horiba-laqua-portatif-masaustu",
+    "title": "HORIBA LAQUA Masa Tipi & Portatif Çok Parametreli Su Analiz Cihazları",
+    "shortTitle": "HORIBA Portatif & Masaüstü Cihazlar",
+    "blurb": "Masa tipi PH2000 ve IP67 saha korumalı WQ-330-K, PC220-K, PC210-K, PH210-K, EC220-K, EC210-K, DO220-K ve DO210-K su kalitesi analiz cihazları."
+  },
+  {
+    "id": "horiba-elektrot-ve-problar",
+    "title": "HORIBA pH, İletkenlik (EC) & Çözünmüş Oksijen (DO) Elektrotları ve Probları",
+    "shortTitle": "HORIBA Elektrot & Problar",
+    "blurb": "ToupH darbeye dayanıklı cam pH elektrotları, kıvamlı numune ve gıda tipi pH probları, titanyum/platin iletkenlik hücreleri ve galvanik DO probları."
+  },
+  {
+    "id": "horiba-standart-cozeltiler",
+    "title": "HORIBA Standart Kalibrasyon & Elektrot Bakım Çözeltileri",
+    "shortTitle": "HORIBA Çözeltileri",
+    "blurb": "NIST izlenebilir pH tampon, iletkenlik (EC), iyon (ISE), ORP ve 3.33 M KCl elektrot bakım solüsyonları."
   },
   {
     "id": "analitik-asit-baz-solvent",
@@ -36,12 +60,6 @@ export const LAB_CHEMICAL_GROUPS = [
     "title": "Analitik Tuzlar & İnorganik/Organik Kimyasallar",
     "shortTitle": "Analitik Tuzlar & Kimyasallar",
     "blurb": "ACS, ISO ve Reag. Ph. Eur. saflıkta laboratuvar tuzları, standart katılar ve sentez/analiz kimyasalları."
-  },
-  {
-    "id": "horiba-standart-cozeltiler",
-    "title": "HORIBA Standart Çözeltileri",
-    "shortTitle": "HORIBA Çözeltileri",
-    "blurb": "NIST izlenebilir pH tampon, iletkenlik (EC), iyon (ISE), ORP ve 3.33 M KCl elektrot bakım solüsyonları."
   }
 ];
 
@@ -172,6 +190,134 @@ export const LAB_CHEMICAL_PRODUCTS = [
       "Ambalaj / Miktar: 10 Test",
       "Kalite Standardı: Analitik / Laboratuvar Reaktifi (ACS / ISO / Ph. Eur.)",
       "Belgelendirme: Parti Bazlı Analiz Sertifikası (COA) & Güvenlik Bilgi Formu (SDS/GBF)"
+    ]
+  },
+  {
+    "code": "HRB-001",
+    "name": "HORIBA 9383-10D İletkenlik Elektrodu – 1 µS/cm… 100 mS/cm, K=1",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "Orijinal Yedek Sensör / Elektrot",
+    "cas": "Model: 9383-10D • HORIBA Kod: 3200780927",
+    "image": "/assets/horiba/horiba-001.png",
+    "summary": "HORIBA 9383-10D İletkenlik Elektrodu – 1 µS/cm… 100 mS/cm, K=1 , laboratuvar ve saha uygulamalarında su ve sulu çözeltilerin elektriksel iletkenliğini ölçmek için geliştirilmiş, sıcaklık sensörlü ve suya dayanıklı daldırma tipi iletkenlik elektrodudur. Titanyum ve platin siyahı...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9383-10D (Ref: 3200780927)",
+      "Donanım / Paket Yapısı: Orijinal Yedek Sensör / Elektrot",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-006",
+    "name": "HORIBA 9615S-10D Standart ToupH Cam Gövdeli pH Elektrodu – 1 m Kablolu",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "1 m Kablolu Orijinal Elektrot",
+    "cas": "Model: 9615S-10D • HORIBA Kod: 3200585428",
+    "image": "/assets/horiba/horiba-006.png",
+    "summary": "HORIBA 9615S-10D Standart ToupH Cam pH Elektrodu HORIBA 9615S-10D Standart ToupH Cam Gövdeli pH Elektrodu – 1 m Kablolu , genel laboratuvar uygulamalarında, tampon çözeltilerde ve sulu numunelerde hassas pH ölçümü için geliştirilmiştir. Cam gövdeli, yeniden doldurulabilir kombine...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9615S-10D (Ref: 3200585428)",
+      "Donanım / Paket Yapısı: 1 m Kablolu Orijinal Elektrot",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-010",
+    "name": "LAQUA WQ-330-K Üç Kanallı Portatif Çok Parametreli Su Analiz Cihazı",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: WQ-330-K • HORIBA Kod: 3200832607",
+    "image": "/assets/horiba/horiba-010.png",
+    "summary": "HORIBA LAQUA WQ-330-K, laboratuvar ve saha uygulamalarında su kalitesi parametrelerinin ölçümü için geliştirilmiş üç kanallı dijital ölçüm cihazıdır. Uygun sensörlerle pH, ORP, iyon, çözünmüş oksijen, iletkenlik, direnç, TDS, tuzluluk ve sıcaklık ölçümlerini destekler. Üç sensörün eş...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: WQ-330-K (Ref: 3200832607)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-011",
+    "name": "HORIBA LAQUA PC220-K pH/ORP/EC/TDS/Direnç/Tuzluluk/Sıcaklık Ölçer",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: PC220-K • HORIBA Kod: 3200779533",
+    "image": "/assets/horiba/horiba-011.png",
+    "summary": "HORIBA LAQUA PC220-K; pH, ORP, elektriksel iletkenlik (EC), toplam çözünmüş madde (TDS), direnç, tuzluluk ve sıcaklık ölçümleri için geliştirilmiş, iki kanallı portatif su analiz cihazıdır. 1.000 ölçüm kaydı hafızası, tarih-saat bilgisi, bilgisayar ve yazıcı bağlantısı özellikleriyle...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: PC220-K (Ref: 3200779533)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-022",
+    "name": "HORIBA LAQUAtwin Ca-11 Kalsiyum İyon Ölçer (Ca²⁺) 4… 9900 ppm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: Ca-11 • HORIBA Kod: 3200689161",
+    "image": "/assets/horiba/horiba-022.png",
+    "summary": "HORIBA LAQUAtwin Ca-11 Kalsiyum İyon Ölçer (Ca²⁺) 4… 9900 ppm, küçük hacimli sıvı numunelerde kalsiyum iyonu (Ca²⁺) konsantrasyonunu ölçmek için geliştirilmiş, cep tipi dijital kalsiyum ölçüm cihazıdır. İyon seçici elektrot (ISE) teknolojisi sayesinde yalnızca birkaç damla numune ile...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: Ca-11 (Ref: 3200689161)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-029",
+    "name": "HORIBA LAQUAtwin EC-33 Cep Tipi İletkenlik, TDS ve Sıcaklık Ölçer 20.00... 199.99 mS/cm | 1000... 9990 ppm | 0... 50 °C",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: EC-33 • HORIBA Kod: 3999960127",
+    "image": "/assets/horiba/horiba-029.png",
+    "summary": "HORIBA LAQUAtwin EC-33 Cep Tipi İletkenlik, TDS ve Sıcaklık Ölçer HORIBA LAQUAtwin EC-33 Cep Tipi İletkenlik, TDS ve Sıcaklık Ölçer 20.00... 199.99 mS/cm 1000... 9990 ppm 0... 50 °C; elektriksel iletkenlik (EC), toplam çözünmüş madde (TDS) ve sıcaklık ölçümü için geliştirilmiş, kompakt...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: EC-33 (Ref: 3999960127)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-032",
+    "name": "HORIBA LAQUAtwin pH-33 Cep Tipi pH ve Sıcaklık Ölçer",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: pH-33 • HORIBA Kod: 3999960124",
+    "image": "/assets/horiba/horiba-032.png",
+    "summary": "HORIBA LAQUAtwin pH-33, yalnızca 0,1 mL numune kullanarak pH ölçümü yapabilen, cep tipi dijital pH metredir. Düz yüzeyli cam elektrot sensörü, küçük hacimli sıvı örneklerinde pratik ölçüm yapılmasını sağlar. Uygun numune hazırlama yöntemleriyle gıda, bitki, toprak ve yarı katı...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: pH-33 (Ref: 3999960124)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-035",
+    "name": "HORIBA LAQUA PH2000 Masa Tipi pH, ORP ve Sıcaklık Ölçer",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Masa Tipi Laboratuvar Cihazı",
+    "cas": "Model: PH2000 • HORIBA Kod: 3200896829",
+    "image": "/assets/horiba/horiba-035.png",
+    "summary": "HORIBA LAQUA PH2000 , laboratuvarlarda hassas pH, oksidasyon-redüksiyon potansiyeli (ORP/mV) ve sıcaklık ölçümleri için geliştirilmiş profesyonel masa tipi analiz cihazıdır. 3200896829 ürün kodlu Avrupa versiyonu, elektrot ve kalibrasyon çözeltileri içermeyen cihaz seçeneğidir. HORIBA...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: PH2000 (Ref: 3200896829)",
+      "Donanım / Paket Yapısı: Masa Tipi Laboratuvar Cihazı",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
     ]
   },
   {
@@ -1372,6 +1518,438 @@ export const LAB_CHEMICAL_PRODUCTS = [
       "Ambalaj / Miktar: 2.5 L",
       "Kalite Standardı: Analitik / Laboratuvar Reaktifi (ACS / ISO / Ph. Eur.)",
       "Belgelendirme: Parti Bazlı Analiz Sertifikası (COA) & Güvenlik Bilgi Formu (SDS/GBF)"
+    ]
+  },
+  {
+    "code": "HRB-002",
+    "name": "HORIBA 5402 Yedek Çözünmüş Oksijen Sensör Ucu – 9552-20D / 9552-50D Uyumlu",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "Orijinal Yedek Sensör / Elektrot",
+    "cas": "Model: 5402 • HORIBA Kod: 3200781553",
+    "image": "/assets/horiba/horiba-002.png",
+    "summary": "HORIBA 5402 Yedek Çözünmüş Oksijen Sensör Ucu HORIBA 5402 , HORIBA 9552-20D ve 9552-50D galvanik çözünmüş oksijen problarında kullanılan değiştirilebilir DO sensör ucudur. Mevcut probun sensör ucunun değiştirilmesi gerektiğinde, prob gövdesi ve bağlantı kablosu korunarak bakım...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 5402 (Ref: 3200781553)",
+      "Donanım / Paket Yapısı: Orijinal Yedek Sensör / Elektrot",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-003",
+    "name": "HORIBA 9552-50D Galvanik Çözünmüş Oksijen Probu – 5 m Kablolu, Sıcaklık Sensörlü",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "5 m Kablolu Orijinal Prob",
+    "cas": "Model: 9552-50D • HORIBA Kod: 3200780941",
+    "image": "/assets/horiba/horiba-003.png",
+    "summary": "HORIBA 9552-50D Galvanik Çözünmüş Oksijen Probu – 2 m Kablolu HORIBA 9552-50D , su numunelerinde çözünmüş oksijen (DO) ve sıcaklık ölçümleri için tasarlanmış, galvanik sensör teknolojisine sahip bir oksijen probudur. HORIBA LAQUA portatif çözünmüş oksijen ölçüm cihazlarıyla kullanılmak...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9552-50D (Ref: 3200780941)",
+      "Donanım / Paket Yapısı: 5 m Kablolu Orijinal Prob",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-004",
+    "name": "HORIBA 9552-20D Galvanik Çözünmüş Oksijen Probu – 2 m Kablolu, Sıcaklık Sensörlü",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "2 m Kablolu Orijinal Elektrot/Prob",
+    "cas": "Model: 9552-20D • HORIBA Kod: 3200780939",
+    "image": "/assets/horiba/horiba-004.png",
+    "summary": "HORIBA 9552-20D Galvanik Çözünmüş Oksijen Probu – 2 m Kablolu HORIBA 9552-20D , su numunelerinde çözünmüş oksijen (DO) ve sıcaklık ölçümleri için tasarlanmış, galvanik sensör teknolojisine sahip bir oksijen probudur. HORIBA LAQUA portatif çözünmüş oksijen ölçüm cihazlarıyla kullanılmak...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9552-20D (Ref: 3200780939)",
+      "Donanım / Paket Yapısı: 2 m Kablolu Orijinal Elektrot/Prob",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-005",
+    "name": "HORIBA 9681S-10D Kıvamlı Numuneler İçin Sleeve Tip Cam pH Elektrodu – 1 m Kablolu",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "1 m Kablolu Orijinal Elektrot",
+    "cas": "Model: 9681S-10D • HORIBA Kod: 3200585463",
+    "image": "/assets/horiba/horiba-005.png",
+    "summary": "HORIBA 9681S-10D Sleeve ToupH Cam pH Elektrodu HORIBA 9681S-10D Kıvamlı Numuneler İçin Sleeve Tip Cam pH Elektrodu – 1 m Kablolu, yüksek viskoziteli, yoğun kıvamlı ve susuz çözücü içeren uygun numunelerde pH ölçümü için geliştirilmiş, cam gövdeli ve doldurulabilir bir kombine pH...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9681S-10D (Ref: 3200585463)",
+      "Donanım / Paket Yapısı: 1 m Kablolu Orijinal Elektrot",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-007",
+    "name": "HORIBA 9652-20D Plastik Gövdeli Jel Dolgulu pH Elektrodu – 2 m Kablolu",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "2 m Kablolu Orijinal Elektrot/Prob",
+    "cas": "Model: 9652-20D • HORIBA Kod: 3200786361",
+    "image": "/assets/horiba/horiba-007.png",
+    "summary": "HORIBA 9652-20D Plastik Gövdeli Jel Dolgulu pH Elektrodu –2 m Kablolu HORIBA 9652-20D Plastik Gövdeli Jel Dolgulu pH Elektrodu – 2 m Kablolu, laboratuvar ve saha uygulamalarında pH ölçümü için tasarlanmış, plastik gövdeli, jel dolgulu ve entegre sıcaklık sensörlü bir elektrottur. 0…14...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9652-20D (Ref: 3200786361)",
+      "Donanım / Paket Yapısı: 2 m Kablolu Orijinal Elektrot/Prob",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-008",
+    "name": "HORIBA LAQUAtwin ORP-11 ORP (Redoks Potansiyeli) Ölçer -1000… +1000 mV",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: ORP-11 • HORIBA Kod: 3200965260",
+    "image": "/assets/horiba/horiba-008.png",
+    "summary": "HORIBA LAQUAtwin ORP-11 ORP (Redoks Potansiyeli) Ölçer -1000… +1000 mV , sıvı numunelerin oksidasyon-indirgenme potansiyelini belirlemek için geliştirilmiş, taşınabilir ve kompakt bir ölçüm cihazıdır. Platin elektrot teknolojisiyle çalışan cihaz, -1000… +1000 mV ölçüm aralığına ve...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: ORP-11 (Ref: 3200965260)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-009",
+    "name": "HORIBA LAQUAtwin F-11 Florür İyonu (F⁻) Ölçer 0,1… 990 ppm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: F-11 • HORIBA Kod: 3200934412",
+    "image": "/assets/horiba/horiba-009.png",
+    "summary": "HORIBA LAQUAtwin F-11 Florür İyonu (F⁻) Ölçer 0,1… 990 ppm , su ve uygun sıvı numunelerde florür iyonu (F⁻) konsantrasyonunun belirlenmesi için geliştirilmiş taşınabilir bir florür analiz cihazıdır. İyon seçici elektrot (ISE) teknolojisiyle çalışan cihaz, çok az miktarda sıvı numuneyle...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: F-11 (Ref: 3200934412)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-012",
+    "name": "HORIBA LAQUA PC210-K pH/ORP/EC, TDS/Direnç/Tuzluluk/Sıcaklık Ölçer",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: PC210-K • HORIBA Kod: 3200779532",
+    "image": "/assets/horiba/horiba-012.png",
+    "summary": "HORIBA LAQUA PC210-K; pH, ORP, iletkenlik (EC), toplam çözünmüş madde (TDS), direnç, tuzluluk ve sıcaklık ölçümleri için geliştirilmiş iki kanallı portatif su analiz cihazıdır. Laboratuvar ve saha uygulamalarında farklı su kalitesi parametrelerinin tek cihazla değerlendirilmesini...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: PC210-K (Ref: 3200779532)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-013",
+    "name": "HORIBA 9652-10D Plastik Gövdeli Jel Dolgulu pH Elektrodu – 1 m Kablolu",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "1 m Kablolu Orijinal Elektrot",
+    "cas": "Model: 9652-10D • HORIBA Kod: 3200786359",
+    "image": "/assets/horiba/horiba-013.png",
+    "summary": "HORIBA 9652-10D Plastik Gövdeli Jel Dolgulu pH Elektrodu HORIBA 9652-10D Plastik Gövdeli Jel Dolgulu pH Elektrodu – 1 m Kablolu, laboratuvar ve saha uygulamalarında pH ölçümü için tasarlanmış, plastik gövdeli, jel dolgulu ve entegre sıcaklık sensörlü bir elektrottur. 0…14 pH ölçüm...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9652-10D (Ref: 3200786359)",
+      "Donanım / Paket Yapısı: 1 m Kablolu Orijinal Elektrot",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-014",
+    "name": "HORIBA LAQUAtwin Ca-11C İnek Kanı İyonize Kalsiyum (Ca²⁺) Ölçer 0,1… 5,0 mmol/L",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: Ca-11C • HORIBA Kod: 1300084982",
+    "image": "/assets/horiba/horiba-014.png",
+    "summary": "HORIBA LAQUAtwin Ca-11C İnek Kanı İyonize Kalsiyum (Ca²⁺) Ölçer 0,1…5,0 mmol/L HORIBA LAQUAtwin Ca-11C İnek Kanı İyonize Kalsiyum (Ca²⁺) Ölçer 0,1… 5,0 mmol/L , özellikle inek kanında iyonize kalsiyum (Ca²⁺) ölçümü için geliştirilmiş taşınabilir bir veteriner araştırma cihazıdır. Süt...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: Ca-11C (Ref: 1300084982)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-015",
+    "name": "HORIBA LAQUA DO220-K Portatif Çözünmüş Oksijen Ölçer Seti – 0,00…20,00 mg/L, IP67",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: DO220-K • HORIBA Kod: 3200779531",
+    "image": "/assets/horiba/horiba-015.png",
+    "summary": "HORIBA LAQUA DO220-K Portatif Çözünmüş Oksijen Ölçer Seti HORIBA LAQUA DO220-K , su numunelerinde çözünmüş oksijen konsantrasyonu (DO), oksijen doygunluğu (%) ve sıcaklık ölçümü için geliştirilmiş portatif oksijen metredir. IP67 korumalı gövdesi, arka aydınlatmalı LCD ekranı, galvanik...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: DO220-K (Ref: 3200779531)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-016",
+    "name": "HORIBA LAQUA DO210-K Portatif Çözünmüş Oksijen ve Sıcaklık Ölçer – 0… 20 mg/L",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: DO210-K • HORIBA Kod: 3200779530",
+    "image": "/assets/horiba/horiba-016.png",
+    "summary": "HORIBA LAQUA DO210-K Portatif Çözünmüş Oksijen ve Sıcaklık Ölçer HORIBA LAQUA DO210-K , içme suyu, atık su, yüzey suları, endüstriyel proses suyu ve su ürünleri yetiştiriciliği uygulamalarında çözünmüş oksijen (DO) ve sıcaklık ölçümü için geliştirilmiş portatif su analiz cihazıdır....",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: DO210-K (Ref: 3200779530)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-017",
+    "name": "HORIBA 6252-10D Gıda Tipi Sivri Uçlu pH Elektrodu – 1 m Kablolu",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "1 m Kablolu Orijinal Elektrot",
+    "cas": "Model: 6252-10D • HORIBA Kod: 3014080850",
+    "image": "/assets/horiba/horiba-017.png",
+    "summary": "HORIBA 6252-10D Gıda Tipi Sivri Uçlu pH Elektrodu HORIBA 6252-10D Gıda Tipi Sivri Uçlu pH Elektrodu – 1 m Kablolu , et, meyve, sebze ve diğer gıda numunelerinde doğrudan pH ölçümü için geliştirilmiş, sivri uçlu cam gövdeli bir elektrottur. Numuneye batırılabilen özel uç tasarımı...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 6252-10D (Ref: 3014080850)",
+      "Donanım / Paket Yapısı: 1 m Kablolu Orijinal Elektrot",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-018",
+    "name": "HORIBA 9651-10D Plastik Gövdeli Jel Dolgulu pH Elektrodu – 1 m Kablolu",
+    "brand": "HORIBA",
+    "group": "horiba-elektrot-ve-problar",
+    "packaging": "1 m Kablolu Orijinal Elektrot",
+    "cas": "Model: 9651-10D • HORIBA Kod: 3200642020",
+    "image": "/assets/horiba/horiba-018.png",
+    "summary": "HORIBA 9651-10D Plastik Gövdeli Jel Dolgulu pH Elektrodu HORIBA 9651-10D Plastik Gövdeli Jel Dolgulu pH Elektrodu – 1 m Kablolu , saha ve laboratuvar ortamlarında pH ölçümleri için geliştirilmiş, plastik gövdeli, jel dolgulu ve entegre sıcaklık sensörlü bir elektrottur. pH, referans ve...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: 9651-10D (Ref: 3200642020)",
+      "Donanım / Paket Yapısı: 1 m Kablolu Orijinal Elektrot",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-019",
+    "name": "HORIBA LAQUA EC220-K Portatif İletkenlik, TDS, Tuzluluk ve Direnç Ölçer Seti – IP67",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: EC220-K • HORIBA Kod: 3200779529",
+    "image": "/assets/horiba/horiba-019.png",
+    "summary": "HORIBA LAQUA EC220-K Portatif İletkenlik Ölçer Seti HORIBA LAQUA EC220-K Portatif İletkenlik, TDS, Tuzluluk ve Direnç Ölçer Seti – IP67; aydınlatmalı ekranı ve otomatik veri kayıt özellikleri sayesinde laboratuvar ve saha uygulamalarında kullanılabilir. Öne Çıkan Özellikler İletkenlik,...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: EC220-K (Ref: 3200779529)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-020",
+    "name": "HORIBA LAQUA EC210-K Portatif İletkenlik, TDS, Direnç, Tuzluluk ve Sıcaklık Ölçer",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: EC210-K • HORIBA Kod: 3200779528",
+    "image": "/assets/horiba/horiba-020.png",
+    "summary": "HORIBA LAQUA EC210-K , su ve sulu çözeltilerde elektriksel iletkenlik (EC), toplam çözünmüş madde (TDS), özdirenç, tuzluluk ve sıcaklık ölçümleri için geliştirilmiş portatif çok parametreli ölçüm cihazıdır. IP67 korumalı gövdesi, otomatik sıcaklık kompanzasyonu ve 500 verilik hafızası...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: EC210-K (Ref: 3200779528)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-021",
+    "name": "HORIBA LAQUA PH210-K Portatif pH, ORP ve Sıcaklık Ölçer -2,00… 16,00 pH",
+    "brand": "HORIBA",
+    "group": "horiba-laqua-portatif-masaustu",
+    "packaging": "Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+    "cas": "Model: PH210-K • HORIBA Kod: 3200779526",
+    "image": "/assets/horiba/horiba-021.png",
+    "summary": "HORIBA LAQUA PH210-K Portatif pH, ORP ve Sıcaklık Ölçer HORIBA LAQUA PH210-K , laboratuvar ve saha uygulamalarında pH, oksidasyon-redüksiyon potansiyeli (ORP/mV) ve sıcaklık ölçümleri için geliştirilmiş portatif su analiz cihazıdır. -2,00… 16,00 pH ölçüm aralığı, 0,01 pH çözünürlüğü ve...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: PH210-K (Ref: 3200779526)",
+      "Donanım / Paket Yapısı: Portatif Saha & Laboratuvar Cihaz Seti (IP67)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-023",
+    "name": "HORIBA LAQUAtwin NO3-11 Nitrat İyonu (NO₃⁻) Ölçer 6…9900 ppm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: NO3-11 • HORIBA Kod: 3200689162",
+    "image": "/assets/horiba/horiba-023.png",
+    "summary": "HORIBA LAQUAtwin NO3-11 Nitrat İyonu (NO₃⁻) Ölçer 6…9900 ppm, sıvı numunelerde nitrat iyonu (NO₃⁻) konsantrasyonunu belirlemek için geliştirilmiş, kompakt ve taşınabilir bir iyon ölçüm cihazıdır. İyon seçici elektrot (ISE) teknolojisiyle yalnızca birkaç damla numune kullanılarak ölçüm...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: NO3-11 (Ref: 3200689162)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-024",
+    "name": "HORIBA LAQUAtwin NO3-11S Toprak Nitrat İyonu (NO₃⁻) Ölçer 6… 9900 ppm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: NO3-11S • HORIBA Kod: 3200689164",
+    "image": "/assets/horiba/horiba-024.png",
+    "summary": "HORIBA LAQUAtwin NO3-11S Toprak Nitrat İyonu (NO₃⁻) Ölçer 6…9900 ppm HORIBA LAQUAtwin NO3-11S Toprak Nitrat İyonu (NO₃⁻) Ölçer 6… 9900 ppm , toprak numunelerinden hazırlanan sıvı ekstraktlarda nitrat iyonu (NO₃⁻) konsantrasyonunun belirlenmesine yönelik taşınabilir bir nitrat analiz...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: NO3-11S (Ref: 3200689164)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-025",
+    "name": "HORIBA LAQUAtwin NO3-11C Bitki Özsuyu Nitrat İyonu (NO₃⁻) Ölçer 6… 9900 ppm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: NO3-11C • HORIBA Kod: 3200689163",
+    "image": "/assets/horiba/horiba-025.png",
+    "summary": "HORIBA LAQUAtwin NO3-11C , bitki özsularındaki nitrat iyonu (NO₃⁻) konsantrasyonunun belirlenmesi için geliştirilmiş taşınabilir bir nitrat analiz kitidir. İyon seçici elektrot (ISE) teknolojisiyle çalışan cihaz, çok az miktarda numuneyle hızlı ve pratik ölçüm yapılmasını sağlar....",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: NO3-11C (Ref: 3200689163)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-026",
+    "name": "HORIBA LAQUAtwin Na-11 Sodyum İyon Ölçer (Na+) 2… 9900 ppm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: Na-11 • HORIBA Kod: 3200689159",
+    "image": "/assets/horiba/horiba-026.png",
+    "summary": "HORIBA LAQUAtwin Na-11 Sodyum İyon Ölçer (Na+) 2… 9900 ppm , sıvı numunelerde sodyum iyonu (Na⁺) konsantrasyonunu belirlemek için geliştirilmiş, taşınabilir bir iyon ölçüm cihazıdır. İyon seçici elektrot (ISE) teknolojisiyle çalışan cihaz, yalnızca birkaç damla numuneyle ölçüm...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: Na-11 (Ref: 3200689159)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-027",
+    "name": "HORIBA LAQUAtwin Salt-22 Tuzluluk Ölçer Na+ Sensörlü | Ağırlıkça % 0.01 İle %25",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: Salt-22 • HORIBA Kod: 3200689158",
+    "image": "/assets/horiba/horiba-027.png",
+    "summary": "HORIBA LAQUAtwin Salt-22 Tuzluluk Ölçer Ağırlıkça % 0.01 ile %25 HORIBA LAQUAtwin Salt- Cep Tipi Tuzluluk Ölçer; 0.3 mL'lik numune ile tuzluluk değerini ölçen tek cep tipi saltmetredir. Ölçüm cihazınızı kalibre etmesi veya bir numuneyi ölçmesi için bir behere gerek yoktur. Sadece düz...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: Salt-22 (Ref: 3200689158)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-028",
+    "name": "HORIBA LAQUAtwin SALT-11 Tuzluluk ve Sıcaklık Ölçer",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: SALT-11 • HORIBA Kod: 3999960128",
+    "image": "/assets/horiba/horiba-028.png",
+    "summary": "HORIBA LAQUAtwin SALT-11 Tuzluluk ve Sıcaklık Ölçer, sıvı numunelerde tuzluluk ve sıcaklık ölçümü yapabilen taşınabilir dijital analiz cihazıdır. Tuzluluğu 0,0…100,0 ppt (g/L) veya %0,00…10,00 aralığında gösterirken, 0…50,0 °C aralığında sıcaklık ölçümü de gerçekleştirir. Deniz suyu,...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: SALT-11 (Ref: 3999960128)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-030",
+    "name": "HORIBA LAQUAtwin EC-22 İletkenlik Ölçer 20.00... 199.99 mS/cm | 0.1 mS/cm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: EC-22 • HORIBA Kod: 3999960126",
+    "image": "/assets/horiba/horiba-030.png",
+    "summary": "HORIBA LAQUAtwin EC-22 Cep Tipi İletkenlik Ölçer HORIBA LAQUAtwin EC-22 İletkenlik Ölçer 20.00... 199.99 mS/cm 0.1 mS/cm, sıvı numunelerin elektriksel iletkenliğini hızlı ve pratik şekilde ölçmek için geliştirilmiş, cep tipi dijital iletkenlik ölçerdir. Düz yüzeyli sensör teknolojisi...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: EC-22 (Ref: 3999960126)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-031",
+    "name": "HORIBA LAQUAtwin EC-11 İletkenlik Ölçer 2.00.... 19.99 mS/cm / 0.01 mS/cm",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: EC-11 • HORIBA Kod: 3999960125",
+    "image": "/assets/horiba/horiba-031.png",
+    "summary": "HORIBA LAQUAtwin EC-11 Cep Tipi İletkenlik Ölçer HORIBA Laquatwin EC-11 İletkenlik Ölçer 2.00.... 19.99 mS/cm / 0.01 mS/cm, su ve sıvı numunelerin elektriksel iletkenliğini ölçmek için geliştirilmiş, kompakt ve taşınabilir bir iletkenlik ölçüm cihazıdır. Düz yüzeyli sensörü sayesinde...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: EC-11 (Ref: 3999960125)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-033",
+    "name": "HORIBA LAQUAtwin pH-22 pH Metre 0.00... 14.00 pH / 0.01 pH",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: pH-22 • HORIBA Kod: 3999960123",
+    "image": "/assets/horiba/horiba-033.png",
+    "summary": "HORIBA LAQUAtwin pH-22, küçük hacimli sıvı numunelerinde hassas pH ölçümü için geliştirilmiş cep tipi dijital pH metredir. Düz yüzeyli cam elektrot sensörü sayesinde yalnızca 0,1 mL numune ile ölçüm yapılabilir. 0,01 pH çözünürlüğü, 3 noktaya kadar kalibrasyon ve IP67 koruması...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: pH-22 (Ref: 3999960123)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
+    ]
+  },
+  {
+    "code": "HRB-034",
+    "name": "HORIBA LAQUAtwin pH-11 pH Metre 0.0...14.0 pH / 0.1 pH",
+    "brand": "HORIBA",
+    "group": "horiba-laquatwin-cep-cihazlari",
+    "packaging": "Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+    "cas": "Model: pH-11 • HORIBA Kod: 3999960122",
+    "image": "/assets/horiba/horiba-034.png",
+    "summary": "HORIBA LAQUAtwin pH-11, küçük hacimli sıvı numunelerinde hızlı ve pratik pH ölçümü için geliştirilmiş cep tipi dijital pH metredir. Düz yüzeyli cam elektrot sensörü sayesinde yalnızca 0,1 mL numune ile ölçüm yapılabilir. 0,1 pH çözünürlüğü, 2 noktaya kadar kalibrasyon özelliği ve IP67...",
+    "specs": [
+      "Marka / Üretici: HORIBA Advanced Techno (Japonya)",
+      "Model / Parça No: pH-11 (Ref: 3999960122)",
+      "Donanım / Paket Yapısı: Cep Tipi Kit (Sensör + Kalibrasyon Çözeltisi Seti)",
+      "Kalibrasyon & Garanti: NIST İzlenebilir HORIBA Çözeltileri ile Tam Uyumlu, Kurumsal Teknik Destek"
     ]
   },
   {

@@ -8,10 +8,10 @@ import {
 import { openChemicalProductModal } from './product-order-modal.js';
 
 const FEATURED_BRANDS = [
+  'HORIBA',
   'HACH',
   'MERCK',
   'ISOLAB',
-  'HORIBA',
   'SIGMA-ALDRICH',
   'CARLO ERBA',
   'CHEMBIO',
@@ -22,17 +22,17 @@ const FEATURED_BRANDS = [
 ];
 
 const SHOWCASE_CODES = [
-  'LAB-001',
-  'LAB-002',
   'LAB-003',
   'LAB-004',
-  'LAB-005',
-  'LAB-006',
   'LAB-010',
   'LAB-011',
   'LAB-017',
-  'LAB-029',
   'LAB-038',
+  'HRB-035',
+  'HRB-010',
+  'HRB-011',
+  'HRB-032',
+  'HRB-001',
   'HORIBA-500-7'
 ];
 
@@ -127,14 +127,14 @@ export function renderLabChemicalsShowcase() {
       <div class="container-x">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div class="max-w-3xl">
-            <p class="chip">HACH • MERCK • ISOLAB • HORIBA • CHEMBIO • CPACHEM</p>
-            <h2 class="h2-title">Laboratuvar Kimyasalları, Reaktifler ve HORIBA Standart Çözeltileri (${LAB_CHEMICALS_COUNT} Ürün)</h2>
+            <p class="chip">HORIBA • HACH • MERCK • ISOLAB • CHEMBIO • CPACHEM</p>
+            <h2 class="h2-title">Laboratuvar Kimyasalları, Reaktifler &amp; HORIBA Ölçüm Cihazları / Çözeltileri (${LAB_CHEMICALS_COUNT} Ürün)</h2>
             <p class="mt-3 text-base leading-relaxed text-slate-700">
-              Su, atıksu ve endüstriyel kalite kontrol laboratuvarları için <strong>HACH toz/küvet reaktifleri</strong>, <strong>Merck EMSURE® / Suprapur® / Titrisol®</strong> kimyasalları, <strong>Isolab, Sigma-Aldrich, Carlo Erba, CPAChem CRM, Chembio</strong> test kitleri ve <strong>HORIBA</strong> standart kalibrasyon çözeltileri. Tüm ürünler fiyatsız olarak kurumsal teklif ve sipariş usulüyle sunulmaktadır.
+              Su, atıksu ve endüstriyel kalite kontrol laboratuvarları için <strong>HORIBA LAQUAtwin cep tipi ölçerler</strong>, <strong>HORIBA LAQUA portatif &amp; masa tipi pH/EC/DO/İyon cihazları</strong>, <strong>HORIBA elektrotları ve standart çözeltileri</strong> ile <strong>HACH, Merck EMSURE® / Suprapur® / Titrisol®, Isolab, Sigma-Aldrich, Carlo Erba, CPAChem CRM ve Chembio</strong> laboratuvar kimyasalları. Tüm ürünler fiyatsız olarak kurumsal teklif ve sipariş usulüyle sunulmaktadır.
             </p>
           </div>
           <a class="btn-primary !px-5 !py-3 text-xs font-extrabold" href="/urunler#laboratuvar-kimyasallari-katalog" data-nav="/urunler#laboratuvar-kimyasallari-katalog">
-            Tüm ${LAB_CHEMICALS_COUNT} Laboratuvar Ürününü İncele →
+            Tüm ${LAB_CHEMICALS_COUNT} Laboratuvar &amp; HORIBA Ürününü İncele →
           </a>
         </div>
 
@@ -144,13 +144,13 @@ export function renderLabChemicalsShowcase() {
               class="rounded-full border border-slate-300 bg-slate-50 px-3.5 py-1.5 text-xs font-bold text-slate-800 hover:border-emerald-500 hover:text-emerald-800"
               href="/urunler?lab_grup=${escapeAttr(group.id)}#laboratuvar-kimyasallari-katalog"
               data-nav="/urunler?lab_grup=${escapeAttr(group.id)}#laboratuvar-kimyasallari-katalog"
-            >${escapeHtml(group.title)}</a>
+            >${escapeHtml(group.shortTitle)}</a>
           `).join('')}
         </div>
 
         <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           ${featured.map(({ product, idx }) =>
-            renderLabProductCard(product, idx, groupTitleById.get(product.group) || 'Laboratuvar Kimyasalları')
+            renderLabProductCard(product, idx, groupTitleById.get(product.group) || 'Laboratuvar & HORIBA')
           ).join('')}
         </div>
       </div>
@@ -165,12 +165,12 @@ export function renderLabChemicalsCatalog() {
     <section id="laboratuvar-kimyasallari-katalog" class="mb-14 pt-6 pb-10 border-b-2 border-slate-200" style="scroll-margin-top:6.5rem;" data-lab-catalog>
       <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div class="max-w-3xl">
-          <span class="section-tag">HACH • MERCK • ISOLAB • HORIBA • SIGMA-ALDRICH • CHEMBIO • CPACHEM</span>
+          <span class="section-tag">HORIBA • HACH • MERCK • ISOLAB • SIGMA-ALDRICH • CHEMBIO • CPACHEM</span>
           <h2 class="section-title" style="margin-top:0.4rem;">
-            Laboratuvar Kimyasalları, Reaktifler &amp; HORIBA Standart Çözeltileri (${LAB_CHEMICALS_COUNT} Ürün)
+            Laboratuvar Kimyasalları, Reaktifler &amp; HORIBA Cihaz / Elektrot / Standart Çözeltileri (${LAB_CHEMICALS_COUNT} Ürün)
           </h2>
           <p class="section-desc" style="margin:0.6rem 0 0;">
-            Su ve atıksu kalite kontrol laboratuvarları için <strong>HACH küvet ve toz reaktifleri</strong>, <strong>Merck EMSURE® / Suprapur® / Titrisol®</strong> analitik kimyasalları, <strong>Isolab, Carlo Erba, Sigma-Aldrich, SRL, Norateks, Tekkim</strong> reaktifleri, <strong>CPAChem CRM standartları</strong>, <strong>Chembio saha test kitleri</strong> ve <strong>HORIBA kalibrasyon çözeltileri</strong>. Tüm ürünler fiyatsız kurumsal teklif ve sipariş usulüyle sunulmaktadır.
+            Su ve atıksu kalite kontrol laboratuvarları için <strong>HORIBA LAQUAtwin cep tipi pH/EC/Tuzluluk/ORP/İyon ölçerler</strong>, <strong>HORIBA LAQUA portatif &amp; masa tipi su analiz cihazları</strong>, <strong>HORIBA elektrotları, probları ve kalibrasyon çözeltileri</strong> ile <strong>HACH küvet/toz reaktifleri</strong>, <strong>Merck EMSURE® / Suprapur® / Titrisol®</strong> kimyasalları, <strong>Isolab, Carlo Erba, Sigma-Aldrich, CPAChem CRM ve Chembio</strong> reaktifleri. Tüm ürünler fiyatsız kurumsal teklif ve sipariş usulüyle sunulmaktadır.
           </p>
         </div>
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-extrabold text-emerald-950">
@@ -185,8 +185,8 @@ export function renderLabChemicalsCatalog() {
             type="search"
             data-lab-search
             class="form-input"
-            placeholder="Laboratuvar kimyasalı, HACH/Merck/HORIBA kodu, CAS no veya parametre ara..."
-            aria-label="Laboratuvar kimyasallarında ara"
+            placeholder="HORIBA cihaz/elektrot modeli (LAQUAtwin, WQ-330, PC220, 9615S), HACH/Merck kodu veya CAS no ara..."
+            aria-label="Laboratuvar ve HORIBA ürünlerinde ara"
           />
         </div>
         <select data-lab-brand-select class="form-select lg:max-w-xs" aria-label="Marka Filtresi">
@@ -201,7 +201,7 @@ export function renderLabChemicalsCatalog() {
       <!-- Alt Grup Filtre Hapları -->
       <div class="mb-4 flex flex-wrap gap-2" data-lab-groups>
         <button type="button" class="filter-pill active" data-lab-group-btn="all">
-          Tüm Laboratuvar Kimyasalları (${LAB_CHEMICALS_COUNT})
+          Tüm Laboratuvar &amp; HORIBA Ürünleri (${LAB_CHEMICALS_COUNT})
         </button>
         ${LAB_CHEMICAL_GROUPS.map((group) => {
           const count = LAB_CHEMICAL_PRODUCTS.filter((p) => p.group === group.id).length;
@@ -233,12 +233,12 @@ export function renderLabChemicalsCatalog() {
       <!-- Ürün Kartları Izgarası -->
       <div class="medipure-grid" data-lab-grid>
         ${LAB_CHEMICAL_PRODUCTS.map((product, idx) =>
-          renderLabProductCard(product, idx, groupTitleById.get(product.group) || 'Laboratuvar Kimyasalları')
+          renderLabProductCard(product, idx, groupTitleById.get(product.group) || 'Laboratuvar & HORIBA')
         ).join('')}
       </div>
 
       <p data-lab-empty hidden class="mt-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center text-sm font-semibold text-slate-600">
-        Aradığınız kritere uygun laboratuvar kimyasalı veya standart çözelti bulunamadı. Farklı bir terim veya marka seçin.
+        Aradığınız kritere uygun laboratuvar kimyasalı veya HORIBA ürünü bulunamadı. Farklı bir terim veya marka seçin.
       </p>
     </section>
   `;
