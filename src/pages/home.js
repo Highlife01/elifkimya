@@ -13,6 +13,7 @@ import {
   SEO_KEYWORD_CLUSTERS
 } from '../utils/seo-geo.js';
 import { bindMedipureCatalog, renderMedipureShowcase } from '../components/medipure-catalog.js';
+import { bindLabChemicalsCatalog, renderLabChemicalsShowcase } from '../components/lab-chemicals-catalog.js';
 import { openChemicalProductModal } from '../components/product-order-modal.js';
 
 const HERO_SLIDES = [
@@ -787,6 +788,8 @@ export async function renderHomePage(container, navigate) {
 
     ${renderMedipureShowcase()}
 
+    ${renderLabChemicalsShowcase()}
+
     <!-- 6. HİZMET VERDİĞİMİZ SEKTÖRLER -->
     <section class="section bg-slate-100 border-y border-slate-200">
       <div class="container-x">
@@ -953,6 +956,7 @@ export async function renderHomePage(container, navigate) {
   }
   bindNavLinks(container);
   bindMedipureCatalog(container);
+  bindLabChemicalsCatalog(container);
 
   // Hero Slider Etkileşimi
   const heroSection = container.querySelector('#home-hero-section');

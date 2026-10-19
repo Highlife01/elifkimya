@@ -144,6 +144,9 @@ export async function renderProductsPage(container, navigate) {
           <div class="loading-banner">Doğrulanmış ürün kataloğu yükleniyor...</div>
         </div>
 
+        <!-- 95 Ürünlük Fiyatsız Laboratuvar Kimyasalları, Reaktifler & HORIBA Standart Çözeltileri Vitrini -->
+        ${renderLabChemicalsCatalog()}
+
         <!-- Doğrulanmış Yoğunluklu Birim Dönüştürücü (kg <-> litre) -->
         <div class="density-converter-card">
           <div class="density-converter-header">
@@ -256,8 +259,6 @@ export async function renderProductsPage(container, navigate) {
             </div>
           `).join('')}
         </div>
-
-        ${renderLabChemicalsCatalog()}
       </div>
     </section>
   `;
@@ -275,6 +276,14 @@ export async function renderProductsPage(container, navigate) {
       const actionEl = e.target.closest('[data-chem-open]');
       const mode = actionEl?.getAttribute('data-chem-open') || 'detail';
       e.preventDefault();
+      if (cat.id === 'laboratuvar-kimyasallari-ve-horiba-cozeltileri' && mode === 'detail' && el.tagName === 'ARTICLE') {
+        const labSec = container.querySelector('#laboratuvar-kimyasallari-katalog');
+        if (labSec) {
+          labSec.style.display = '';
+          labSec.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
       openChemicalProductModal({
         code: `KAT-${cat.code || '01'}`,
         title: cat.title,
@@ -433,6 +442,11 @@ export async function renderProductsPage(container, navigate) {
     if (labCatalogEl) {
       const showLab = activeCat === 'all' || activeCat === 'laboratuvar-kimyasallari-ve-horiba-cozeltileri';
       labCatalogEl.style.display = showLab ? '' : 'none';
+      const labSearchInput = labCatalogEl.querySelector('[data-lab-search]');
+      if (labSearchInput && searchInput && labSearchInput.value !== searchInput.value) {
+        labSearchInput.value = searchInput.value;
+        labSearchInput.dispatchEvent(new Event('input'));
+      }
     }
   }
 

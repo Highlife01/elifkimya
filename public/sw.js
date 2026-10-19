@@ -1,4 +1,4 @@
-const CACHE_NAME = 'elifkimya-pwa-v6';
+const CACHE_NAME = 'elifkimya-pwa-v9';
 const PRECACHE_URLS = [
   '/',
   '/manifest.webmanifest',
@@ -36,13 +36,16 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Admin ve Portal sayfalarında her zaman doğrudan ağ öncelikli çalış
+  // Admin ve Portal sayfalarında her zaman doğrudan ağdan çalış
   if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/portal')) {
     return;
   }
 
-  // HTML gezinme isteklerinde Network-First (çevrimdışıysa önbellekteki ana kabuk)
-  if (request.mode === 'navigate') {
+  // HTML, JS ve CSS isteklerinde her zaman Network-First (önce güncel sunucu, çevrimdışıysa önbellek)
+  if (
+    request.mode === 'navigate' ||
+    /\.(js|css|json|html)$/i.test(url.pathname)
+  ) {
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -57,10 +60,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Statik varlıklarda (/assets/, svg, jpg, woff2) Stale-While-Revalidate
+  // Görsel ve fontlarda (/assets/, svg, jpg, woff2) Stale-While-Revalidate
   if (
     url.pathname.startsWith('/assets/') ||
-    /\.(svg|png|jpg|jpeg|webp|woff2|css|js)$/i.test(url.pathname)
+    /\.(svg|png|jpg|jpeg|webp|woff2)$/i.test(url.pathname)
   ) {
     event.respondWith(
       caches.match(request).then((cached) => {
