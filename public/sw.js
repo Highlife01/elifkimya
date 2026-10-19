@@ -1,10 +1,12 @@
-const CACHE_NAME = 'elifkimya-pwa-v4';
+const CACHE_NAME = 'elifkimya-pwa-v6';
 const PRECACHE_URLS = [
   '/',
   '/manifest.webmanifest',
   '/brand-mark.svg',
   '/pwa-icon.svg',
-  '/logo.svg'
+  '/logo.svg',
+  '/assets/elif-cevre-kimya-logo.png',
+  '/assets/elif-intro-wheel.jpg'
 ];
 
 self.addEventListener('install', (event) => {

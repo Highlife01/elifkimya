@@ -49,11 +49,11 @@ export function renderFooter(_currentLang = 'tr', generalSettings = {}) {
             <img
               alt="ELİF KİMYA"
               loading="lazy"
-              width="190"
-              height="45"
+              width="230"
+              height="65"
               decoding="async"
-              class="h-9 w-auto object-contain"
-              src="/logo.svg"
+              class="h-12 sm:h-14 w-auto object-contain"
+              src="/assets/elif-cevre-kimya-logo.png"
             />
           </a>
           <p class="mt-4 max-w-xs text-sm leading-relaxed text-slate-300 font-medium">

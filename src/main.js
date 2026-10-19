@@ -211,6 +211,26 @@ subscribeLanguage((code) => {
 window.addEventListener('popstate', routeCurrentUrl);
 window.addEventListener('hashchange', routeCurrentUrl);
 
+function initIntroSplash() {
+  const splash = document.getElementById('elif-intro-splash');
+  if (!splash) return;
+  if (window.location.pathname.startsWith('/admin')) {
+    splash.remove();
+    return;
+  }
+  const dismiss = () => {
+    if (!splash.isConnected || splash.classList.contains('is-hiding')) return;
+    splash.classList.add('is-hiding');
+    setTimeout(() => {
+      splash.remove();
+    }, 600);
+  };
+  splash.addEventListener('click', dismiss, { once: true });
+  setTimeout(dismiss, 2350);
+}
+
+initIntroSplash();
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', routeCurrentUrl);
 } else {

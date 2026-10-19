@@ -76,11 +76,11 @@ export function renderNavbar(activeRoute = '/') {
           <img
             alt="ELİF KİMYA"
             fetchpriority="high"
-            width="220"
-            height="52"
+            width="240"
+            height="68"
             decoding="async"
-            class="h-10 sm:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
-            src="/logo.svg"
+            class="h-12 sm:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.02]"
+            src="/assets/elif-cevre-kimya-logo.png"
           />
         </a>
 
